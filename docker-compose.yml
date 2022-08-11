@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+
+  development:
+    # image: docker.io/bitnami/laravel:9
+    image: environment-php
+    hostname: environment-php
+    container_name: environment-php
+    labels:
+      description: environment-php
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev
+    working_dir: /app
+    volumes:
+      - ./:/app
+    env_file: 
+      - ./.env.dev
+    environment:
+      PHP_ENV: 'development'
+      LARAVEL_ENV: 'development'
+    command: bash -c "php artisan serve"
+    restart: unless-stopped
+    ports:
+      - '8000:8000'
