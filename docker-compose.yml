@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+  developemnt:
+    image: environment-php
+    hostname: environment-php
+    container_name: environment-php
+    labels:
+      description: environment-php
+    build: 
+      context: ./
+      dockerfile: Dockerfile.dev
+    working_dir: /app
+    volumes:
+      - './:/app'
+    env_file: 
+      - ./.env.dev
+    environment:
+      PHP_ENV: "development"
+      PHPPORT: 8000
+      DB_HOST: 'mariadb'
+      DB_PORT: 3306
+      DB_USERNAME: 'bn_myapp'
+      DB_DATABASE: 'bitnami_myapp'
+    restart: unless-stopped
+    networks:
+      local-network:
+    ports:
+      - '8000:8000'
+    depends_on:
+      - mysql
+
+  mysql:
+    image:  mysql:5.7
+    hostname: environment-mysql
+    container_name: environment-mysql
+    labels:
+      description: environment-mysql
+    working_dir: /var/lib/mysql
+    volumes:
+      - ./data:/var/lib/mysql
+    env_file:
+      - ./.env
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: "bitnami_myapp"
+      MYSQL_USER: "bn_myapp"
+      # MYSQL_ROOT_PASSWORD: "Alterar123"
+      # MYSQL_PASSWORD: "Alterar123"
+    # command: --default-authentication-plugin=mysql_native_password
+    networks:
+      local-network:
+    restart: always
+    ports:
+      - 3306:3306 # host:container
+volumes:
+  local-volume:
+networks:
+  local-network:
+
+      
