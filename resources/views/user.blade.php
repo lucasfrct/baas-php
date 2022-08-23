@@ -9,16 +9,19 @@
  
 <div class="container">
  
-    <h1>Novo Usuario</h1>
+    <h1>Cadastro de Usuario</h1>
  
     <hr />
  
-    <form action="/user" method="POST">
+    <form action="/user" method="POST" class="border border-grey-200 py-4 px-5 rounded-3 shadow m-4">
+      
+      <legend class="text-center h1">Novo Usuario</legend>
+
       <input type="hidden" name="_token" value="{{ csrf_token() }}">
  
       <div class="form-group mb-4">
         <label class="mb-2 ms-1" class="mb-2 ms-1" for="name">Name:</label>
-        <input type="text" id="name" name="name" class="form-control is-invalid" placeholder="name" value="Marcus">
+        <input type="text" id="name" name="name" placeholder="name" value="Marcus" @class(['is-valid'=>$validations['success'], 'is-invalid'=>$validations['invalid'], 'form-control'])>
         @isset($validations['name'])
           <div class="feedback text-danger">{{ $validations['name'] }}</div>
         @endisset
@@ -68,9 +71,9 @@
         <button type="submit" class="btn btn-primary btn-lg px-5">Enviar</button>
       </div>
 
-      <div class="alert alert-success my-4" role="alert">
-        A simple success alert—check it out!
-      </div>
+      @isset($success)
+        <div class="alert alert-success my-4" role="alert">Usuario criado com sucesso!</div>
+      @endisset
  
     </form>
  

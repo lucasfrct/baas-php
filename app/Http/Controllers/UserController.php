@@ -14,60 +14,71 @@ class UserController extends BaseController
     
     public function index(){
         // return view("user");
-        return view("user", []);
+        $validations = [];
+        $validations["invalid"] = false;
+        $validations["success"] = false;
 
+        return view("user", ["validations"=> $validations]);
     }
 
     public function store(Request $request){
         $form = $request->all();
         
         $validations = [];
+        $validations["invalid"] = false;
+        $validations["success"] = false;
 
         $name = $form["name"] ?? "";
         if (empty($name)) {
             $validations["name"] = "campo nome não pode ser vazio";
-            $validations["name_valid"] = true;
+            $validations["invalid"] = true;
+            $validations["success"] = false;
             return view("user", ["validations"=> $validations]);
         };
 
         $email = $form["email"] ?? "";
         if (empty($email)) {
             $validations["email"] = "campo email não pode ser vazio";
-            $validations["email_valid"] = true;
+            $validations["invalid"] = true;
+            $validations["success"] = false;
             return view("user", ["validations"=> $validations]);
         };
 
         $cpf = $form["cpf"] ?? "";
         if (empty($cpf)) {
             $validations["cpf"] = "campo cpf não pode ser vazio";
-            $validations["cpf_valid"] = true;
+            $validations["invalid"] = true;
+            $validations["success"] = false;
             return view("user", ["validations"=> $validations]);
         };
 
         $address = $form["address"] ?? "";
         if (empty($address)) {
             $validations["address"] = "campo endereço não pode ser vazio";
-            $validations["address_valid"] = true;
+            $validations["invalid"] = true;
+            $validations["success"] = false;
             return view("user", ["validations"=> $validations]);
         };
 
         $fone = $form["fone"] ?? "";
         if (empty($fone)) {
             $validations["fone"] = "campo telefone não pode ser vazio";
-            $validations["fone_valid"] = true;
+            $validations["invalid"] = true;
+            $validations["success"] = false;
             return view("user", ["validations"=> $validations]);
         };
 
         $message = $form["message"] ?? "";
         if (empty($message)) {
             $validations["message"] = "campo menssagem não pode ser vazio";
-            $validations["message_valid"] = true;
+            $validations["invalid"] = true;
+            $validations["success"] = false;
             return view("user", ["validations"=> $validations]);
         };
         
+        $validations["invalid"] = false;
+        $validations["success"] = true;
         // return view("user");
-        return view("user", ["sucess"=>true]);
-        dd($request->all());
-
+        return view("user", ["validations"=> $validations]);
     }
 }
