@@ -18,19 +18,17 @@ services:
     environment:
       PHP_ENV: "development"
       PHPPORT: 8000
-      DB_HOST: 'mariadb'
+      DB_HOST: 'mysql-db'
       DB_PORT: 3306
-      DB_USERNAME: 'bn_myapp'
-      DB_DATABASE: 'bitnami_myapp'
+      DB_USERNAME: 'root'
+      DB_DATABASE: 'laravel'
     restart: unless-stopped
-    networks:
-      local-network:
     ports:
       - '8000:8000'
     depends_on:
-      - mysql
+      - mysql-db
 
-  mysql:
+  mysql-db:
     image:  mysql:5.7
     hostname: environment-mysql
     container_name: environment-mysql
@@ -43,19 +41,11 @@ services:
       - ./.env
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-      MYSQL_DATABASE: "bitnami_myapp"
-      MYSQL_USER: "bn_myapp"
+      MYSQL_DATABASE: "laravel"
+      MYSQL_USER: "root"
       # MYSQL_ROOT_PASSWORD: "Alterar123"
       # MYSQL_PASSWORD: "Alterar123"
     # command: --default-authentication-plugin=mysql_native_password
-    networks:
-      local-network:
     restart: always
     ports:
-      - 3306:3306 # host:container
-volumes:
-  local-volume:
-networks:
-  local-network:
-
-      
+      - 3306:3306 # host:container     
