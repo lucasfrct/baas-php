@@ -6,7 +6,9 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class UserController extends BaseController
 {
@@ -80,5 +82,25 @@ class UserController extends BaseController
         $validations["success"] = true;
         // return view("user");
         return view("user", ["validations"=> $validations]);
+    }
+
+    public function auth(Request $request) {
+
+        $user = new User();
+        $user->name = "Lucas";
+        $user->email = "abc@abc.com";
+        $user->password = Hash::make("Alterar@123");
+
+        $user->save();
+
+        return view("home");
+    }
+
+    public function list() {
+
+        foreach (User::all() as $user ) {
+            var_dump($user);
+        }
+
     }
 }

@@ -15,9 +15,13 @@ use App\Http\Controllers\UserController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
 });
 
 Route::get('/user', [UserController::class, 'index']);
 
 Route::post('/user', [UserController::class, 'store']);
+
+Route::get('/auth', [UserController::class, 'auth']);
+
+Route::get('/list', [UserController::class, 'list']);
