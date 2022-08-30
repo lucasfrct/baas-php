@@ -51,6 +51,8 @@
                 </tbody>
               </table>
         </div>
+
+        @include("BankAccount")
     </main>
     
     @include('footer')

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\BankAccountController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,3 +26,5 @@ Route::post('/user', [UserController::class, 'store']);
 Route::get('/auth', [UserController::class, 'auth']);
 
 Route::get('/list', [UserController::class, 'list']);
+
+Route::resource('/bank-account', "BankAccountController");
