@@ -19,12 +19,16 @@ Route::get('/', function () {
     return view('home');
 });
 
-Route::get('/user', [UserController::class, 'index']);
+// Route::get('/user', [UserController::class, 'index']);
 
-Route::post('/user', [UserController::class, 'store']);
+// Route::post('/user', [UserController::class, 'store']);
 
 Route::get('/auth', [UserController::class, 'auth']);
 
 Route::get('/list', [UserController::class, 'list']);
 
 Route::resource('/bank-account', "BankAccountController");
+
+Route::get('/bank-account', [BankAccountController::class, 'create']);
+
+Route::post('/bank-account', [BankAccountController::class, 'store']);

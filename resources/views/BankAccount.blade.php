@@ -1,6 +1,6 @@
 <div class="">
  
-    <form action="/user" method="POST" class="border border-grey-200 p-3 rounded-3 shadow m-2 row col-3">
+    <form action="/bank-account" method="POST" class="border border-grey-200 p-3 rounded-3 shadow m-2 row col-3">
       
       <legend class="text-center h4">Nova Conta</legend>
 

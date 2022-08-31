@@ -3,8 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Hash;
+use App\Models\BankAccount;
+use App\Models\User;
 
-class BankAccount extends Controller
+class BankAccountController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -23,7 +30,7 @@ class BankAccount extends Controller
      */
     public function create()
     {
-        //
+        return view('home');
     }
 
     /**
@@ -34,7 +41,16 @@ class BankAccount extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $form = $request->all();
+
+        $bank_account = new BankAccount();
+        $bank_account->number = $form['number'];
+        $bank_account->branch = $form['branch'];
+        $bank_account->operator = $form['operator'];
+
+        $bank_account->save();
+
+        return view("home");
     }
 
     /**
