@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('bank_account', function (Blueprint $table) {
+        Schema::create('bank_accounts', function (Blueprint $table) {
             $table->id();
             $table->string('uuid');
             $table->string('number');
@@ -30,7 +30,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::drop('bank_account', function (Blueprint $table) {
+        Schema::drop('bank_accounts', function (Blueprint $table) {
             //
         });
     }

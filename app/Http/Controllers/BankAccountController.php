@@ -8,6 +8,9 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Hash;
+
+use Ramsey\Uuid\Uuid;
+
 use App\Models\BankAccount;
 use App\Models\User;
 
@@ -44,6 +47,7 @@ class BankAccountController extends Controller
         $form = $request->all();
 
         $bank_account = new BankAccount();
+        $bank_account->uuid = Uuid::uuid4();
         $bank_account->number = $form['number'];
         $bank_account->branch = $form['branch'];
         $bank_account->operator = $form['operator'];
