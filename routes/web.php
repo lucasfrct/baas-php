@@ -15,16 +15,10 @@ use App\Http\Controllers\BankAccountController;
 |
 */
 
-Route::get('/', function () {
-    return view('home');
-});
+Route::get('/', function () { return view('login'); });
 
-// Route::get('/user', [UserController::class, 'index']);
+Route::get('/login', function () { return view('login'); });
 
-// Route::post('/user', [UserController::class, 'store']);
-
-Route::get('/auth', [UserController::class, 'auth']);
-
-Route::get('/list', [UserController::class, 'list']);
+Route::post('/login', [UserController::class, 'login']);
 
 Route::resource('/bank-account', BankAccountController::class);

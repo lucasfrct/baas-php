@@ -103,4 +103,23 @@ class UserController extends BaseController
         }
 
     }
+
+    public function login(Request $request) {
+
+        $form = $request->all();
+
+        $validations = [];
+        $validations["invalid"] = false;
+        $validations["success"] = false;
+        
+        $userData = User::where("name", "=", $form["username"])->first();
+        dd($userData->name, $userData->password, Hash::make(trim($form["password"])));
+        if($userData->password == Hash::make($form["password"])){
+            $validations["invalid"] = true;
+            return view("home");
+        }
+
+        return view("login", ["validations", $validations]);
+
+    }
 }
