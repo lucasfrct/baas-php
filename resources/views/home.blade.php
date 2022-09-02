@@ -15,44 +15,22 @@
 <body>
     @include("header")
 
-    <main class="container-fluid my-2" style="min-height: 100vh">
-        <div class="border-bottom shadow p-4 col-3 fs-4">
-            <span>Seu Saldo: <b>100,00</b></span>
-        </div>
+    <main class="container-fluid my-2 row" style="min-height: 100vh">
 
-        <div class="border shadow p-4 col-6 my-4">
-            <table class="table">
-                <thead>
-                  <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">First</th>
-                    <th scope="col">Last</th>
-                    <th scope="col">Handle</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">3</th>
-                    <td colspan="2">Larry the Bird</td>
-                    <td>@twitter</td>
-                  </tr>
-                </tbody>
-              </table>
+      <div class="col-4">
+        <div class="border-bottom shadow p-4 col-12 fs-4">
+          <span>Seu Saldo: <b>100,00</b></span>
         </div>
+      </div>
 
+      <div class="col-4">
+        @include("BankAccountShow")
+      </div>
+      
+      <div class="col-4">
         @include("BankAccount")
+      </div>
+
     </main>
     
     @include('footer')

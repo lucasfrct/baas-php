@@ -1,6 +1,6 @@
-<div class="">
+<div class="row">
  
-    <form action="/bank-account" method="POST" class="border border-grey-200 p-3 rounded-3 shadow m-2 row col-3">
+    <form action="/bank-account" method="POST" class="border border-grey-200 p-3 rounded-3 shadow m-2 row">
       
       <legend class="text-center h4">Nova Conta</legend>
 
@@ -32,5 +32,11 @@
       </div>
  
     </form>
+
+    @isset($uuid)
+      <div class="row p-5">
+        <a href="/bank-account/{{$uuid}}" class="btn btn-primary col-4">Mostrar</a>
+      </div>
+    @endisset
  
 </div>

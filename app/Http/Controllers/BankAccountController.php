@@ -8,9 +8,11 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 use Ramsey\Uuid\Uuid;
 
+use App\Http\Controllers\Controller;
 use App\Models\BankAccount;
 use App\Models\User;
 
@@ -23,7 +25,7 @@ class BankAccountController extends Controller
      */
     public function index()
     {
-        //
+        return view('home', ["uuid" => "895f9fca-616f-4e3f-8af5-9b5f11d1cc41"]);
     }
 
     /**
@@ -65,7 +67,14 @@ class BankAccountController extends Controller
      */
     public function show($id)
     {
-        //
+        $bankAccountData = BankAccount::where("uuid", "=", $id)->first();
+        // dd($bankAccountData->uuid, $bankAccountData->number);
+        $bankAccount = [
+            'number' => $bankAccountData->number,
+            'branch' => $bankAccountData->branch,
+            'operator' => $bankAccountData->operator
+        ];
+        return view("home", ["bankAccount" => $bankAccount]);
     }
 
     /**
