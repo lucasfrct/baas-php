@@ -15,7 +15,7 @@ use App\Http\Controllers\BankAccountController;
 |
 */
 
-Route::get('/', function () { return view('login'); });
+Route::get('/', function () { return view('home'); });
 
 Route::get('/login', function () { return view('login'); });
 

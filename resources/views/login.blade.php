@@ -21,7 +21,7 @@
         <div class="container-fluid">
             <div class="row d-flex align-items-center justify-content-center" style="height: calc(100% - 168px)">
 
-                <form class="form border rounded-3 p-5 m-2" style="width: 500px;" method="POST" action="/login">
+                <form class="form border rounded-3 p-5 m-2 shadow" style="width: 500px;" method="POST" action="/login">
 
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
