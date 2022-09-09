@@ -29,9 +29,17 @@ class UserController extends BaseController
         $validations["invalid"] = false;
         $validations["success"] = false;
 
-        $name = $form["name"] ?? "";
-        if (empty($name)) {
-            $validations["name"] = "campo nome não pode ser vazio";
+        $firstName = $form["firstName"] ?? "";
+        if (empty($firstName)) {
+            $validations["firstName"] = "campo do primeiro nome não pode ser vazio";
+            $validations["invalid"] = true;
+            $validations["success"] = false;
+            return view("signin", ["validations"=> $validations]);
+        };
+
+        $lastName = $form["lastName"] ?? "";
+        if (empty($lastName)) {
+            $validations["lastName"] = "campo do ultimo nome não pode ser vazio";
             $validations["invalid"] = true;
             $validations["success"] = false;
             return view("signin", ["validations"=> $validations]);
@@ -53,14 +61,6 @@ class UserController extends BaseController
             return view("signin", ["validations"=> $validations]);
         };
 
-        // $address = $form["address"] ?? "";
-        // if (empty($address)) {
-        //     $validations["address"] = "campo endereço não pode ser vazio";
-        //     $validations["invalid"] = true;
-        //     $validations["success"] = false;
-        //     return view("signin", ["validations"=> $validations]);
-        // };
-
         $fone = $form["fone"] ?? "";
         if (empty($fone)) {
             $validations["fone"] = "campo telefone não pode ser vazio";
@@ -68,17 +68,13 @@ class UserController extends BaseController
             $validations["success"] = false;
             return view("signin", ["validations"=> $validations]);
         };
-
-        // $message = $form["message"] ?? "";
-        // if (empty($message)) {
-        //     $validations["message"] = "campo menssagem não pode ser vazio";
-        //     $validations["invalid"] = true;
-        //     $validations["success"] = false;
-        //     return view("signin", ["validations"=> $validations]);
-        // };
         
         $validations["invalid"] = false;
         $validations["success"] = true;
+
+        $user = new User();
+
+
         return view("signin", ["validations"=> $validations]);
     }
 

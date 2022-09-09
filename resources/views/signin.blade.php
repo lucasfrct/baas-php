@@ -25,79 +25,90 @@
 
         <div class="d-flex align-itens-center justify-content-center border border-danger">
 
-            <form action="/signin" method="POST" class="border border-grey-200 py-4 px-5 rounded-3 shadow m-4" style="min-width: 560px;">
-    
-                <legend class="text-center h1">Novo Usuario</legend>
-    
-                <input type="hidden" name="_token" value="{{ csrf_token() }}">
-    
-                <div class="form-group mb-4">
-                    <label class="mb-2 ms-1" class="mb-2 ms-1" for="name">Name:</label>
-                    <input type="text" id="name" name="name" placeholder="name" value="Marcus" 
-                        @class([
-                        'is-valid' => $validations['success'],
-                        'is-invalid' => $validations['invalid'],
-                        'form-control',
-                        ])
-                    >
-                    @isset($validations['name'])
-                        <div class="feedback text-danger">{{ $validations['name'] }}</div>
+            <form action="/" method="POST" class="border border-grey-200 py-4 px-5 rounded-3 shadow m-4"
+                style="width: 680px;">
+
+                <div class="row">
+
+                    <legend class="text-center h1 mb-4">Criar Conta</legend>
+
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+                    <div class="form-group mb-4 col-6">
+                        <label class="mb-2 ms-1" class="mb-2 ms-1" for="firstName">Primeiro Nome:</label>
+                        <input type="text" id="firstName" name="firstName" placeholder="Primeiro Nome" value="Marcus"
+                            @class([
+                                'is-valid' => $validations['success'],
+                                'is-invalid' => $validations['invalid'],
+                                'form-control',
+                            ])>
+                        @isset($validations['firstName'])
+                            <div class="feedback text-danger">{{ $validations['firstName'] }}</div>
+                        @endisset
+                    </div>
+
+                    <div class="form-group mb-4 col-6">
+                        <label class="mb-2 ms-1" class="mb-2 ms-1" for="lastName">Ultimo Nome:</label>
+                        <input type="text" id="lastName" name="lastName" placeholder="Ultimo Nome" value="Mariano"
+                            @class([
+                                'is-valid' => $validations['success'],
+                                'is-invalid' => $validations['invalid'],
+                                'form-control',
+                            ])>
+                        @isset($validations['lastName'])
+                            <div class="feedback text-danger">{{ $validations['lastName'] }}</div>
+                        @endisset
+                    </div>
+
+                    <div class="form-group mb-4  col-12">
+                        <label class="mb-2 ms-1" for="email">E-Mail:</label>
+                        <input required type="email" id="email" name="email" placeholder="E-Mail" value="abc@abc.com"                        
+                            @class([
+                                'is-valid' => $validations['success'],
+                                'is-invalid' => $validations['invalid'],
+                                'form-control',
+                            ])>
+                        @isset($validations['email'])
+                            <div class="feedback text-danger">{{ $validations['email'] }}</div>
+                        @endisset
+                    </div>
+
+                    <div class="form-group mb-4 col-6">
+                        <label class="mb-2 ms-1" for="cpf">CPF:</label>
+                        <input type="text" id="cpf" name="cpf" placeholder="cpf" value="902.948.740-20"                        
+                            @class([
+                                'is-valid' => $validations['success'],
+                                'is-invalid' => $validations['invalid'],
+                                'form-control',
+                            ])>
+                        @isset($validations['cpf'])
+                            <div class="feedback text-danger">{{ $validations['cpf'] }}</div>
+                        @endisset
+                    </div>
+
+                    <div class="form-group mb-4 col-6">
+                        <label class="mb-2 ms-1" for="fone">Telefone:</label>
+                        <input type="text" id="fone" name="fone" placeholder="fone" value="22912345678"
+                            @class([
+                                'is-valid' => $validations['success'],
+                                'is-invalid' => $validations['invalid'],
+                                'form-control',
+                            ])>
+                        @isset($validations['fone'])
+                            <div class="feedback text-danger">{{ $validations['fone'] }}</div>
+                        @endisset
+                    </div>
+
+                    <div class="d-flex flex-row-reverse mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg px-5">Cadastrar</button>
+                    </div>
+
+                    @isset($success)
+                        <div class="alert alert-success my-4" role="alert">Usuario criado com sucesso!</div>
                     @endisset
                 </div>
-    
-                <div class="form-group mb-4">
-                    <label class="mb-2 ms-1" for="email">E-Mail:</label>
-                    <input required type="email" id="email" name="email" class="form-control is-invalid"
-                        placeholder="E-Mail" value="abc@abc.com">
-                    @isset($validations['email'])
-                        <div class="feedback text-danger">{{ $validations['email'] }}</div>
-                    @endisset
-                </div>
-    
-                <div class="form-group mb-4">
-                    <label class="mb-2 ms-1" for="cpf">CPF:</label>
-                    <input type="text" id="cpf" name="cpf" class="form-control is-invalid" placeholder="cpf"
-                        value="902.948.740-20">
-                    @isset($validations['cpf'])
-                        <div class="feedback text-danger">{{ $validations['cpf'] }}</div>
-                    @endisset
-                </div>
-    
-                {{-- <div class="form-group mb-4">
-                    <label class="mb-2 ms-1" for="address">Endereço:</label>
-                    <input type="text" id="address" name="address" class="form-control is-invalid"
-                        placeholder="address" value="Rua joao da silva">
-                    @isset($validations['address'])
-                        <div class="feedback text-danger">{{ $validations['address'] }}</div>
-                    @endisset
-                </div> --}}
-    
-                <div class="form-group mb-4">
-                    <label class="mb-2 ms-1" for="fone">Telefone:</label>
-                    <input type="text" id="fone" name="fone" class="form-control is-invalid" placeholder="fone"
-                        value="22912345678">
-                    @isset($validations['fone'])
-                        <div class="feedback text-danger">{{ $validations['fone'] }}</div>
-                    @endisset
-                </div>
-    
-                {{-- <div class="form-group mb-4">
-                    <label class="mb-2 ms-1" for="message">Mensagem:</label>
-                    <textarea rows="8" id="message" name="message" class="form-control is-invalid"
-                        placeholder="Digite sua mensagem">abcdfg</textarea>
-                    @isset($validations['message'])
-                        <div class="feedback text-danger">{{ $validations['message'] }}</div>
-                    @endisset
-                </div> --}}
-    
-                <div class="d-flex flex-row-reverse mt-4">
-                    <button type="submit" class="btn btn-primary btn-lg px-5">Enviar</button>
-                </div>
-    
-                @isset($success)
-                    <div class="alert alert-success my-4" role="alert">Usuario criado com sucesso!</div>
-                @endisset
-    
+
+
             </form>
 
         </div>
@@ -117,8 +128,7 @@
                     <h2 class="display-5">Another headline</h2>
                     <p class="lead">And an even wittier subheading.</p>
                 </div>
-                <div class="bg-body shadow-sm mx-auto"
-                    style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;">
+                <div class="bg-body shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;">
                 </div>
             </div>
         </div>
