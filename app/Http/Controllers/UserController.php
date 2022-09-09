@@ -15,12 +15,11 @@ class UserController extends BaseController
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
     
     public function index(){
-        // return view("user");
         $validations = [];
         $validations["invalid"] = false;
         $validations["success"] = false;
 
-        return view("user", ["validations"=> $validations]);
+        return view("signin", ["validations"=> $validations]);
     }
 
     public function store(Request $request){
@@ -35,7 +34,7 @@ class UserController extends BaseController
             $validations["name"] = "campo nome não pode ser vazio";
             $validations["invalid"] = true;
             $validations["success"] = false;
-            return view("user", ["validations"=> $validations]);
+            return view("signin", ["validations"=> $validations]);
         };
 
         $email = $form["email"] ?? "";
@@ -43,7 +42,7 @@ class UserController extends BaseController
             $validations["email"] = "campo email não pode ser vazio";
             $validations["invalid"] = true;
             $validations["success"] = false;
-            return view("user", ["validations"=> $validations]);
+            return view("signin", ["validations"=> $validations]);
         };
 
         $cpf = $form["cpf"] ?? "";
@@ -51,37 +50,36 @@ class UserController extends BaseController
             $validations["cpf"] = "campo cpf não pode ser vazio";
             $validations["invalid"] = true;
             $validations["success"] = false;
-            return view("user", ["validations"=> $validations]);
+            return view("signin", ["validations"=> $validations]);
         };
 
-        $address = $form["address"] ?? "";
-        if (empty($address)) {
-            $validations["address"] = "campo endereço não pode ser vazio";
-            $validations["invalid"] = true;
-            $validations["success"] = false;
-            return view("user", ["validations"=> $validations]);
-        };
+        // $address = $form["address"] ?? "";
+        // if (empty($address)) {
+        //     $validations["address"] = "campo endereço não pode ser vazio";
+        //     $validations["invalid"] = true;
+        //     $validations["success"] = false;
+        //     return view("signin", ["validations"=> $validations]);
+        // };
 
         $fone = $form["fone"] ?? "";
         if (empty($fone)) {
             $validations["fone"] = "campo telefone não pode ser vazio";
             $validations["invalid"] = true;
             $validations["success"] = false;
-            return view("user", ["validations"=> $validations]);
+            return view("signin", ["validations"=> $validations]);
         };
 
-        $message = $form["message"] ?? "";
-        if (empty($message)) {
-            $validations["message"] = "campo menssagem não pode ser vazio";
-            $validations["invalid"] = true;
-            $validations["success"] = false;
-            return view("user", ["validations"=> $validations]);
-        };
+        // $message = $form["message"] ?? "";
+        // if (empty($message)) {
+        //     $validations["message"] = "campo menssagem não pode ser vazio";
+        //     $validations["invalid"] = true;
+        //     $validations["success"] = false;
+        //     return view("signin", ["validations"=> $validations]);
+        // };
         
         $validations["invalid"] = false;
         $validations["success"] = true;
-        // return view("user");
-        return view("user", ["validations"=> $validations]);
+        return view("signin", ["validations"=> $validations]);
     }
 
     public function auth(Request $request) {
