@@ -61,9 +61,32 @@ class UserController extends BaseController
             return view("signin", ["validations"=> $validations]);
         };
 
-        $fone = $form["fone"] ?? "";
+        $fone = $form["fone"] ?? "";// operador de coalescência (??) / null coalesce
         if (empty($fone)) {
             $validations["fone"] = "campo telefone não pode ser vazio";
+            $validations["invalid"] = true;
+            $validations["success"] = false;
+            return view("signin", ["validations"=> $validations]);
+        };
+
+        $password = $form["password"] ?? "";// operador de coalescência (??) / null coalesce
+        if (empty($password)) {
+            $validations["password"] = "campo senha não pode ser vazio";
+            $validations["invalid"] = true;
+            $validations["success"] = false;
+            return view("signin", ["validations"=> $validations]);
+        };
+
+        $confirm_password = $form["confirm_password"] ?? "";// operador de coalescência (??) / null coalesce
+        if (empty($confirm_password)) {
+            $validations["confirm_password"] = "campo senha não pode ser vazio";
+            $validations["invalid"] = true;
+            $validations["success"] = false;
+            return view("signin", ["validations"=> $validations]);
+        };
+
+        if ($password != $confirm_password) {
+            $validations["confirm_password"] = "As senhas não podem ser diferentes";
             $validations["invalid"] = true;
             $validations["success"] = false;
             return view("signin", ["validations"=> $validations]);
@@ -73,7 +96,14 @@ class UserController extends BaseController
         $validations["success"] = true;
 
         $user = new User();
+        $user->firstName = $firstName;
+        $user->lastName = $lastName;
+        $user->email = $email;
+        $user->fone = $fone;
+        $user->cpf = $cpf;
+        $user->password = Hash::make($password);
 
+        $user->save();
 
         return view("signin", ["validations"=> $validations]);
     }

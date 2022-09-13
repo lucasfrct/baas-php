@@ -25,7 +25,7 @@
 
         <div class="d-flex align-itens-center justify-content-center border border-danger">
 
-            <form action="/" method="POST" class="border border-grey-200 py-4 px-5 rounded-3 shadow m-4"
+            <form action="/signin" method="POST" class="border border-grey-200 py-4 px-5 rounded-3 shadow m-4"
                 style="width: 680px;">
 
                 <div class="row">
@@ -62,8 +62,8 @@
 
                     <div class="form-group mb-4  col-12">
                         <label class="mb-2 ms-1" for="email">E-Mail:</label>
-                        <input required type="email" id="email" name="email" placeholder="E-Mail" value="abc@abc.com"                        
-                            @class([
+                        <input required type="email" id="email" name="email" placeholder="E-Mail"
+                            value="abc@abc.com" @class([
                                 'is-valid' => $validations['success'],
                                 'is-invalid' => $validations['invalid'],
                                 'form-control',
@@ -75,7 +75,7 @@
 
                     <div class="form-group mb-4 col-6">
                         <label class="mb-2 ms-1" for="cpf">CPF:</label>
-                        <input type="text" id="cpf" name="cpf" placeholder="cpf" value="902.948.740-20"                        
+                        <input type="text" id="cpf" name="cpf" placeholder="cpf" value="90294874020"
                             @class([
                                 'is-valid' => $validations['success'],
                                 'is-invalid' => $validations['invalid'],
@@ -96,6 +96,32 @@
                             ])>
                         @isset($validations['fone'])
                             <div class="feedback text-danger">{{ $validations['fone'] }}</div>
+                        @endisset
+                    </div>
+
+                    <div class="form-group mb-4 col-6">
+                        <label class="mb-2 ms-1" class="mb-2 ms-1" for="password">Senha:</label>
+                        <input type="password" id="password" name="password" placeholder="Senha" value="Alterar@123"
+                            @class([
+                                'is-valid' => $validations['success'],
+                                'is-invalid' => $validations['invalid'],
+                                'form-control',
+                            ])>
+                        @isset($validations['password'])
+                            <div class="feedback text-danger">{{ $validations['password'] }}</div>
+                        @endisset
+                    </div>
+
+                    <div class="form-group mb-4 col-6">
+                        <label class="mb-2 ms-1" class="mb-2 ms-1" for="confirm_password">Confirme a senha:</label>
+                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirme Senha" value="Alterar@123"
+                            @class([
+                                'is-valid' => $validations['success'],
+                                'is-invalid' => $validations['invalid'],
+                                'form-control',
+                            ])>
+                        @isset($validations['confirm_password'])
+                            <div class="feedback text-danger">{{ $validations['confirm_password'] }}</div>
                         @endisset
                     </div>
 
@@ -120,7 +146,8 @@
                     <h2 class="display-5">Another headline</h2>
                     <p class="lead">And an even wittier subheading.</p>
                 </div>
-                <div class="bg-body shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;">
+                <div class="bg-body shadow-sm mx-auto"
+                    style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;">
                 </div>
             </div>
             <div class="bg-light me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
@@ -128,7 +155,8 @@
                     <h2 class="display-5">Another headline</h2>
                     <p class="lead">And an even wittier subheading.</p>
                 </div>
-                <div class="bg-body shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;">
+                <div class="bg-body shadow-sm mx-auto"
+                    style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;">
                 </div>
             </div>
         </div>
