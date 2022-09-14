@@ -148,14 +148,45 @@ class UserController extends BaseController
         $validations["invalid"] = false;
         $validations["success"] = false;
         
-        $userData = User::where("name", "=", $form["username"])->first();
-        dd($userData->name, $userData->password, Hash::make(trim($form["password"])));
-        if($userData->password == Hash::make($form["password"])){
+        $email = $form["email"] ?? "";
+        if (empty($email)) {
+            $validations["email"] = "campo email não pode ser vazio";
             $validations["invalid"] = true;
-            return view("home");
+            $validations["success"] = false;
+            return view("login", ["validations"=> $validations]);
+        };
+
+        $password = $form["password"] ?? "";
+        if (empty($password)) {
+            $validations["password"] = "campo senha não pode ser vazio";
+            $validations["invalid"] = true;
+            $validations["success"] = false;
+            return view("login", ["validations"=> $validations]);
+        };
+
+        $userData = User::where("email", "=", $email)->first();
+        if(!isset($userData->email)){
+            $validations["email"] = "Este usuario não existe na base de dados";
+            $validations["invalid"] = true;
+            $validations["success"] = false;
+            return view("login", ["validations"=> $validations]);
         }
 
-        return view("login", ["validations", $validations]);
+        if(!isset($userData->password)){
+            $validations["password"] = "Este usuario não existe na base de dados";
+            $validations["invalid"] = true;
+            $validations["success"] = false;
+            return view("login", ["validations"=> $validations]);
+        }
 
+        if($userData->password != Hash::make($password)){
+            $validations["password"] = "Senha invalida";
+            $validations["invalid"] = true;
+            $validations["success"] = false;
+            return view("login", ["validations"=> $validations]);
+        }
+
+        $validations["invalid"] = true;
+        return view("home");
     }
 }
