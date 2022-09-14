@@ -14,12 +14,24 @@ class UserController extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
     
+    /**
+     * Get da rota sign in
+     * return: retorna a view sign in
+     */
     public function index(){
         $validations = [];
         $validations["invalid"] = false;
         $validations["success"] = false;
 
         return view("signin", ["validations"=> $validations]);
+    }
+
+    public function init(){
+        $validations = [];
+        $validations["invalid"] = false;
+        $validations["success"] = false;
+
+        return view("login");
     }
 
     public function store(Request $request){
