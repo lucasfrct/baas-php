@@ -31,7 +31,7 @@ class UserController extends BaseController
         $validations["invalid"] = false;
         $validations["success"] = false;
 
-        return view("login");
+        return view("login", ["validations"=> $validations]);
     }
 
     public function store(Request $request){
@@ -114,7 +114,6 @@ class UserController extends BaseController
         $user->fone = $fone;
         $user->cpf = $cpf;
         $user->password = Hash::make($password);
-
         $user->save();
 
         return view("signin", ["validations"=> $validations]);
@@ -179,7 +178,7 @@ class UserController extends BaseController
             return view("login", ["validations"=> $validations]);
         }
 
-        if($userData->password != Hash::make($password)){
+        if(!Hash::check($password, $userData->password)){
             $validations["password"] = "Senha invalida";
             $validations["invalid"] = true;
             $validations["success"] = false;
@@ -188,5 +187,6 @@ class UserController extends BaseController
 
         $validations["invalid"] = true;
         return view("home");
+        // https://github.com/emarref/jwt
     }
 }

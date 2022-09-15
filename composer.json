@@ -12,6 +12,7 @@
         "laravel/passport": "^11.0",
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
+        "lcobucci/jwt": "^4.2",
         "ramsey/uuid": "^4.4"
     },
     "require-dev": {
