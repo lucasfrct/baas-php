@@ -9,6 +9,7 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Emarref\Jwt\Token;
 
 class UserController extends BaseController
 {
@@ -185,6 +186,16 @@ class UserController extends BaseController
             return view("login", ["validations"=> $validations]);
         }
 
+        $token = new Emarref\Jwt\Token();
+
+        $jwt = new Emarref\Jwt\Jwt();
+
+        $algorithm = new Emarref\Jwt\Algorithm\None();
+        $encryption = Emarref\Jwt\Encryption\Factory::create($algorithm);
+        $serializedToken = $jwt->serialize($token, $encryption);
+
+        dd($serializedToken);
+        
         $validations["invalid"] = true;
         return view("home");
         // https://github.com/emarref/jwt
