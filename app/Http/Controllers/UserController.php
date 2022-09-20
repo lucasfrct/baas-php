@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Emarref\Jwt\Token;
 
+
 class UserController extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
@@ -18,7 +19,7 @@ class UserController extends BaseController
     /**
      * retorn uma formuláriop de SIGNIN
      */
-    public function signinForm(){
+    public function signinCreate(){
         $validations = [];
         $validations["invalid"] = false;
         $validations["success"] = false;
@@ -27,7 +28,7 @@ class UserController extends BaseController
     }
     
     /**
-     * Amazena uma novo usuário do formulário SIGNIN
+     * Amazena um novo usuário do formulário SIGNIN
      * @params {Array}: [ firsName, lastName, email, cpf, telefone senha, confir_senha ]
      * @returs: retorn um formulário de signin
      */
@@ -119,7 +120,7 @@ class UserController extends BaseController
     /**
      * retorna uma formulário de LOGIN
      */
-    public function loginForm(){
+    public function loginCreate(){
         $validations = [];
         $validations["invalid"] = false;
         $validations["success"] = false;
@@ -135,59 +136,40 @@ class UserController extends BaseController
 
         $form = $request->all();
 
-        $validations = [];
-        $validations["invalid"] = false;
-        $validations["success"] = false;
-        
-        $email = $form["email"] ?? "";
-        if (empty($email)) {
-            $validations["email"] = "campo email não pode ser vazio";
-            $validations["invalid"] = true;
-            $validations["success"] = false;
-            return view("login", ["validations"=> $validations]);
-        };
-
-        $password = $form["password"] ?? "";
-        if (empty($password)) {
-            $validations["password"] = "campo senha não pode ser vazio";
-            $validations["invalid"] = true;
-            $validations["success"] = false;
-            return view("login", ["validations"=> $validations]);
-        };
+        $request->validate(
+            [
+                'email' => ['required', 'max:50'],
+                'password' => ['required'],
+            ],
+            [
+                'email.required' => 'email é obrigatório',
+                'email.max' => 'O email tem no máximo 50 caracteres',
+                'password.required' => 'A senha é obrigatória',
+            ]
+        );
 
         $userData = User::where("email", "=", $email)->first();
-        if(!isset($userData->email)){
-            $validations["email"] = "Este usuario não existe na base de dados";
-            $validations["invalid"] = true;
-            $validations["success"] = false;
-            return view("login", ["validations"=> $validations]);
-        }
 
         if(!isset($userData->password)){
-            $validations["password"] = "Este usuario não existe na base de dados";
-            $validations["invalid"] = true;
-            $validations["success"] = false;
-            return view("login", ["validations"=> $validations]);
-        }
+            return redirect()->back()->withErrors(['email' => 'Este usuário não existe na base de dados']);
+        };
 
         if(!Hash::check($password, $userData->password)){
-            $validations["password"] = "Senha invalida";
-            $validations["invalid"] = true;
-            $validations["success"] = false;
-            return view("login", ["validations"=> $validations]);
-        }
+            return redirect()->back()->withErrors(['password' => 'Senha inválida']);
+        };
 
-        $token = new Emarref\Jwt\Token();
+        // $token = new Emarref\Jwt\Token();
 
-        $jwt = new Emarref\Jwt\Jwt();
+        // $jwt = new Emarref\Jwt\Jwt();
 
-        $algorithm = new Emarref\Jwt\Algorithm\None();
-        $encryption = Emarref\Jwt\Encryption\Factory::create($algorithm);
-        $serializedToken = $jwt->serialize($token, $encryption);
+        // $algorithm = new Emarref\Jwt\Algorithm\None();
+        // $encryption = Emarref\Jwt\Encryption\Factory::create($algorithm);
+        // $serializedToken = $jwt->serialize($token, $encryption);
 
-        dd($serializedToken);
+        // dd($serializedToken);
+        //! php artisan vendor:publish --provider="Laravel\Tinker\TinkerServiceProvider"
         
-        $validations["invalid"] = true;
+        // $validations["invalid"] = true;
         return view("home");
         // https://github.com/emarref/jwt
     }

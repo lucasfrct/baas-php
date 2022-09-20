@@ -19,10 +19,10 @@ Route::get('/', function () { return view('home'); });
 
 Route::get('/home', function () { return view('home'); });
 
-Route::get('/login', [UserController::class, 'loginForm']);
+Route::get('/login', [UserController::class, 'loginCreate']);
 Route::post('/login', [UserController::class, 'loginValid']);
 
-Route::get('/signin', [UserController::class, 'signinForm']);
+Route::get('/signin', [UserController::class, 'signinCreate']);
 Route::post('/signin', [UserController::class, 'signinStore']);
 
 Route::resource('/bank-account', BankAccountController::class);
