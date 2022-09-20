@@ -16,26 +16,22 @@ class UserController extends BaseController
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
     
     /**
-     * Get da rota sign in
-     * return: retorna a view sign in
+     * retorn uma formuláriop de SIGNIN
      */
-    public function index(){
+    public function signinForm(){
         $validations = [];
         $validations["invalid"] = false;
         $validations["success"] = false;
 
         return view("signin", ["validations"=> $validations]);
     }
-
-    public function init(){
-        $validations = [];
-        $validations["invalid"] = false;
-        $validations["success"] = false;
-
-        return view("login", ["validations"=> $validations]);
-    }
-
-    public function store(Request $request){
+    
+    /**
+     * Amazena uma novo usuário do formulário SIGNIN
+     * @params {Array}: [ firsName, lastName, email, cpf, telefone senha, confir_senha ]
+     * @returs: retorn um formulário de signin
+     */
+    public function signinStore(Request $request){
         $form = $request->all();
         
         $validations = [];
@@ -120,27 +116,22 @@ class UserController extends BaseController
         return view("signin", ["validations"=> $validations]);
     }
 
-    public function auth(Request $request) {
+    /**
+     * retorna uma formulário de LOGIN
+     */
+    public function loginForm(){
+        $validations = [];
+        $validations["invalid"] = false;
+        $validations["success"] = false;
 
-        $user = new User();
-        $user->name = "Lucas";
-        $user->email = "abc@abc.com";
-        $user->password = Hash::make("Alterar@123");
-
-        $user->save();
-
-        return view("home");
+        return view("login", ["validations"=> $validations]);
     }
 
-    public function list() {
-
-        foreach (User::all() as $user ) {
-            var_dump($user);
-        }
-
-    }
-
-    public function login(Request $request) {
+    /**
+     * Valida o login de uma usuário
+     * @params { Array }: [ email, senha ]
+     */
+    public function loginValid(Request $request) {
 
         $form = $request->all();
 
@@ -199,5 +190,22 @@ class UserController extends BaseController
         $validations["invalid"] = true;
         return view("home");
         // https://github.com/emarref/jwt
+    }
+
+    /**
+     * retorn uma usuário com base na ID
+     * @params { Array }: [ id]
+     */
+    public function show(Request $request) { }
+
+    /**
+     * mostrar aum alista de usuário
+     */
+    public function list() {
+
+        foreach (User::all() as $user ) {
+            var_dump($user);
+        }
+
     }
 }

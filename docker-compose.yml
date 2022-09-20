@@ -44,7 +44,7 @@ services:
       MYSQL_USER: "laravel"
       MYSQL_PASSWORD: "Alterar@123"
       # MYSQL_ROOT_PASSWORD: ""
-    command: --default-authentication-plugin=mysql_native_password  --explicit_defaults_for_timestamp
+    command: --default-authentication-plugin=mysql_native_password  --explicit_defaults_for_timestamp --local-infile
     restart: always
     ports:
       - 3306:3306 # host:container     
