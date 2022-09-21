@@ -21,11 +21,11 @@
 <body>
     @include('header')
 
-    <main class="container-fluid my-2 row" style="min-height: 100vh">
+    <main class="container-fluid my-2" style="min-height: 100vh">
 
-        <div class="d-flex align-itens-center justify-content-center border border-danger">
+        <div class="d-flex align-itens-center justify-content-center">
 
-            <form action="/signin" method="POST" class="border border-grey-200 py-4 px-5 rounded-3 shadow m-4"
+            <form action="{{route('user.signin')}}" method="POST" class="border border-grey-200 py-4 px-5 rounded-3 shadow m-4"
                 style="width: 680px;">
 
                 <div class="row">
@@ -166,3 +166,5 @@
     @include('footer')
 
 </body>
+
+</html>

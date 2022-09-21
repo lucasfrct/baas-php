@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Emarref\Jwt\Token;
 
+use Ramsey\Uuid\Uuid;
 
 class UserController extends BaseController
 {
@@ -105,6 +106,12 @@ class UserController extends BaseController
         $validations["invalid"] = false;
         $validations["success"] = true;
 
+        $userData = User::where("email", "=", $email)->first();
+
+        if(isset($userData->email)){
+            return redirect()->back()->withErrors(['email' => 'Este email já existe na base de dados']);
+        };
+
         $user = new User();
         $user->firstName = $firstName;
         $user->lastName = $lastName;
@@ -112,9 +119,11 @@ class UserController extends BaseController
         $user->fone = $fone;
         $user->cpf = $cpf;
         $user->password = Hash::make($password);
+        $user->uuid = Uuid::uuid4();
+
         $user->save();
 
-        return view("signin", ["validations"=> $validations]);
+        return redirect()->route('user.login');
     }
 
     /**
@@ -148,13 +157,13 @@ class UserController extends BaseController
             ]
         );
 
-        $userData = User::where("email", "=", $email)->first();
+        $userData = User::where("email", "=", $form['email'])->first();
 
         if(!isset($userData->password)){
             return redirect()->back()->withErrors(['email' => 'Este usuário não existe na base de dados']);
         };
 
-        if(!Hash::check($password, $userData->password)){
+        if(!Hash::check($form['password'], $userData->password)){
             return redirect()->back()->withErrors(['password' => 'Senha inválida']);
         };
 
@@ -170,7 +179,7 @@ class UserController extends BaseController
         //! php artisan vendor:publish --provider="Laravel\Tinker\TinkerServiceProvider"
         
         // $validations["invalid"] = true;
-        return view("home");
+        return view("dashboard");
         // https://github.com/emarref/jwt
     }
 
