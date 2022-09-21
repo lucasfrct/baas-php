@@ -20,4 +20,10 @@ Homestead.yaml
 Homestead.json
 /.vagrant
 .phpunit.result.cache
+
+## Database mysql
 data/mysql.sock
+data/*.pem
+data/*.cnf
+data/ib*
+
