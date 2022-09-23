@@ -6,10 +6,13 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Emarref\Jwt\Token;
+
+use Illuminate\Support\Facades\Auth;
 
 use Ramsey\Uuid\Uuid;
 
@@ -123,18 +126,16 @@ class UserController extends BaseController
 
         $user->save();
 
-        return redirect()->route('user.login');
+        auth()->login($user);
+
+        return redirect()->route('login');
     }
 
     /**
      * retorna uma formulário de LOGIN
      */
     public function loginCreate(){
-        $validations = [];
-        $validations["invalid"] = false;
-        $validations["success"] = false;
-
-        return view("login", ["validations"=> $validations]);
+        return view("login");
     }
 
     /**
@@ -142,8 +143,6 @@ class UserController extends BaseController
      * @params { Array }: [ email, senha ]
      */
     public function loginValid(Request $request) {
-
-        $form = $request->all();
 
         $request->validate(
             [
@@ -157,30 +156,29 @@ class UserController extends BaseController
             ]
         );
 
-        $userData = User::where("email", "=", $form['email'])->first();
+        $credentials = $request->only('email', 'password');
 
-        if(!isset($userData->password)){
-            return redirect()->back()->withErrors(['email' => 'Este usuário não existe na base de dados']);
+        $valid = Auth::validate($credentials);
+
+        if(!Auth::validate($credentials)) {
+            return redirect()->back()->withErrors(['email' => 'Verifique se o email foi digitado corretamente.', 'password' => 'Verifique se a senha foi digitada corretamnete.']);
         };
 
-        if(!Hash::check($form['password'], $userData->password)){
-            return redirect()->back()->withErrors(['password' => 'Senha inválida']);
-        };
+        $user = Auth::getProvider()->retrieveByCredentials($credentials);
+        Auth::login($user);
 
-        // $token = new Emarref\Jwt\Token();
-
-        // $jwt = new Emarref\Jwt\Jwt();
-
-        // $algorithm = new Emarref\Jwt\Algorithm\None();
-        // $encryption = Emarref\Jwt\Encryption\Factory::create($algorithm);
-        // $serializedToken = $jwt->serialize($token, $encryption);
-
-        // dd($serializedToken);
-        //! php artisan vendor:publish --provider="Laravel\Tinker\TinkerServiceProvider"
+        return redirect()->intended('dashboard');
         
-        // $validations["invalid"] = true;
-        return view("dashboard");
-        // https://github.com/emarref/jwt
+    }
+
+    public function logout() {
+
+        Session::flush();
+        Auth::logout();
+
+        return redirect()->intended('home');
+
+
     }
 
     /**

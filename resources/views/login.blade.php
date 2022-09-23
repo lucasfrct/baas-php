@@ -111,6 +111,10 @@
                             Entrar</button>
                     </div>
 
+                    <div class="col-12 mt-4">
+                        <a href="/signin">Criar uma conta</a>
+                    </div>
+
                 </form>
 
             </div>

@@ -20,12 +20,13 @@ Route::get('/', function () { return view('home'); });
 
 Route::get('/home', function () { return view('home'); });
 
-Route::get('/login', [UserController::class, 'loginCreate'])->name('user.login');
-Route::post('/login', [UserController::class, 'loginValid'])->name('user.login');
+Route::get('/login', [UserController::class, 'loginCreate'])->name('login');
+Route::post('/login', [UserController::class, 'loginValid'])->name('login');
+Route::get('/logout', [UserController::class, 'logout'])->name('logout');
 
-Route::get('/signin', [UserController::class, 'signinCreate'])->name('user.signin');
-Route::post('/signin', [UserController::class, 'signinStore'])->name('user.signin');
+Route::get('/signin', [UserController::class, 'signinCreate'])->name('signin');
+Route::post('/signin', [UserController::class, 'signinStore'])->name('signin');
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('user.dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
 
 Route::resource('/bank-account', BankAccountController::class);

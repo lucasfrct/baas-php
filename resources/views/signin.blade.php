@@ -134,6 +134,9 @@
                     @endisset
                 </div>
 
+                <div class="col-12 mt-4">
+                    <a href="/login">Entrar numa conta já existente</a>
+                </div>
 
             </form>
 

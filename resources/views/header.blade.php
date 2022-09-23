@@ -5,11 +5,11 @@
       </a>
       <a class="py-2 d-none d-md-inline-block" href="/home">Home</a>
       <a class="py-2 d-none d-md-inline-block" href="/dashboard">Dashboard</a>
-      <a class="py-2 d-none d-md-inline-block" href="/signin">Sign in</a>
-      <a class="py-2 d-none d-md-inline-block" href="/login">Log in</a>
       <a class="py-2 d-none d-md-inline-block" href="/contact">Contato</a>
       <a class="py-2 d-none d-md-inline-block" href="/aboutus">Sobre nós</a>
       <a class="py-2 d-none d-md-inline-block" href="/support">Suporte</a>
+      <a class="py-2 d-none d-md-inline-block" href="/login">Log in</a>
+      <a class="py-2 d-none d-md-inline-block" href="/logout">Log out</a>
       {{-- <a class="py-2 d-none d-md-inline-block" href="#">Pricing</a> --}}
       {{-- <a class="py-2 d-none d-md-inline-block" href="#">Carrinho</a> --}}
     </nav>
