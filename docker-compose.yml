@@ -34,8 +34,8 @@ services:
     container_name: environment-mysql
     labels:
       description: environment-mysql
-    volumes:
-      - ./data:/var/lib/mysql
+    # volumes:
+    #   - ./data:/var/lib/mysql
     env_file:
       - ./.env
     environment:
