@@ -25,7 +25,7 @@
 
         <div class="d-flex align-itens-center justify-content-center">
 
-            <form action="{{route('user.signin')}}" method="POST" class="border border-grey-200 py-4 px-5 rounded-3 shadow m-4"
+            <form action="{{route('signin')}}" method="POST" class="border border-grey-200 py-4 px-5 rounded-3 shadow m-4"
                 style="width: 680px;">
 
                 <div class="row">
@@ -34,95 +34,186 @@
 
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
-                    <div class="form-group mb-4 col-6">
-                        <label class="mb-2 ms-1" class="mb-2 ms-1" for="firstName">Primeiro Nome:</label>
-                        <input type="text" id="firstName" name="firstName" placeholder="Primeiro Nome" value="Marcus"
-                            @class([
-                                'is-valid' => $validations['success'],
-                                'is-invalid' => $validations['invalid'],
-                                'form-control',
-                            ])>
-                        @isset($validations['firstName'])
-                            <div class="feedback text-danger">{{ $validations['firstName'] }}</div>
-                        @endisset
+                    <div class="mb-4 col-6">
+                        <div class="form-group">
+                            <label class="mb-2 ms-1" class="mb-2 ms-1" for="firstName">Primeiro Nome:</label>
+                            <input type="text" id="firstName" name="firstName" placeholder="Primeiro Nome" value="Marcus"
+                                @class([
+                                    'is-valid' => !$errors->has('firstName'),
+                                    'is-invalid' => $errors->has('firstName'),
+                                    'form-control',
+                                ])>
+                        </div>
+                        @error('firstName')
+                            <div class="feedback text-danger">
+                                <span class="ms-2 me-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                        fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
+                                        <path
+                                            d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
+                                        <path
+                                            d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+                                    </svg>
+                                </span>
+                                <span style="font-size: 11px;">{{ $message }}</span>
+                            </div>
+                        @enderror
+                    </div>
+                    
+                    <div class="mb-4 col-6">
+                        <div class="form-group">
+                            <label class="mb-2 ms-1" class="mb-2 ms-1" for="lastName">Ultimo Nome:</label>
+                            <input type="text" id="lastName" name="lastName" placeholder="Ultimo Nome" value="Mariano"
+                                @class([
+                                    'is-valid' => !$errors->has('lastName'),
+                                    'is-invalid' => $errors->has('lastName'),
+                                    'form-control',
+                                ])>
+                        </div>
+                        @error('lastName')
+                            <div class="feedback text-danger">
+                                <span class="ms-2 me-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                        fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
+                                        <path
+                                            d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
+                                        <path
+                                            d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+                                    </svg>
+                                </span>
+                                <span style="font-size: 11px;">{{ $message }}</span>
+                            </div>
+                        @enderror
                     </div>
 
-                    <div class="form-group mb-4 col-6">
-                        <label class="mb-2 ms-1" class="mb-2 ms-1" for="lastName">Ultimo Nome:</label>
-                        <input type="text" id="lastName" name="lastName" placeholder="Ultimo Nome" value="Mariano"
-                            @class([
-                                'is-valid' => $validations['success'],
-                                'is-invalid' => $validations['invalid'],
-                                'form-control',
-                            ])>
-                        @isset($validations['lastName'])
-                            <div class="feedback text-danger">{{ $validations['lastName'] }}</div>
-                        @endisset
+                    <div class="mb-4 col-12">
+                        <div class="form-group">
+                            <label class="mb-2 ms-1" for="email">E-Mail:</label>
+                            <input type="email" id="email" name="email" placeholder="E-Mail" value="abc@abc.com" 
+                                @class([
+                                    'is-valid' => !$errors->has('email'),
+                                    'is-invalid' => $errors->has('email'),
+                                    'form-control',
+                                ])>
+                        </div>
+                        @error('email')
+                            <div class="feedback text-danger">
+                                <span class="ms-2 me-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                        fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
+                                        <path
+                                            d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
+                                        <path
+                                            d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+                                    </svg>
+                                </span>
+                                <span style="font-size: 11px;">{{ $message }}</span>
+                            </div>
+                        @enderror
                     </div>
 
-                    <div class="form-group mb-4  col-12">
-                        <label class="mb-2 ms-1" for="email">E-Mail:</label>
-                        <input required type="email" id="email" name="email" placeholder="E-Mail"
-                            value="abc@abc.com" @class([
-                                'is-valid' => $validations['success'],
-                                'is-invalid' => $validations['invalid'],
-                                'form-control',
-                            ])>
-                        @isset($validations['email'])
-                            <div class="feedback text-danger">{{ $validations['email'] }}</div>
-                        @endisset
+                    <div class="mb-4 col-6">
+                        <div class="form-group">
+                            <label class="mb-2 ms-1" for="cpf">CPF:</label>
+                            <input type="text" id="cpf" name="cpf" placeholder="cpf" value="90294874020"
+                                @class([
+                                    'is-valid' => !$errors->has('cpf'),
+                                    'is-invalid' => $errors->has('cpf'),
+                                    'form-control',
+                                ])>
+                        </div>
+                        @error('cpf')
+                            <div class="feedback text-danger">
+                                <span class="ms-2 me-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                        fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
+                                        <path
+                                            d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
+                                        <path
+                                            d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+                                    </svg>
+                                </span>
+                                <span style="font-size: 11px;">{{ $message }}</span>
+                            </div>
+                        @enderror
                     </div>
 
-                    <div class="form-group mb-4 col-6">
-                        <label class="mb-2 ms-1" for="cpf">CPF:</label>
-                        <input type="text" id="cpf" name="cpf" placeholder="cpf" value="90294874020"
-                            @class([
-                                'is-valid' => $validations['success'],
-                                'is-invalid' => $validations['invalid'],
-                                'form-control',
-                            ])>
-                        @isset($validations['cpf'])
-                            <div class="feedback text-danger">{{ $validations['cpf'] }}</div>
-                        @endisset
+                    <div class="mb-4 col-6">
+                        <div class="form-group">
+                            <label class="mb-2 ms-1" for="fone">Telefone:</label>
+                            <input type="text" id="fone" name="fone" placeholder="fone" value="22912345678"
+                                @class([
+                                    'is-valid' => !$errors->has('fone'),
+                                    'is-invalid' => $errors->has('fone'),
+                                    'form-control',
+                                ])>
+                        </div>
+                        @error('fone')
+                            <div class="feedback text-danger">
+                                <span class="ms-2 me-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                        fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
+                                        <path
+                                            d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
+                                        <path
+                                            d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+                                    </svg>
+                                </span>
+                                <span style="font-size: 11px;">{{ $message }}</span>
+                            </div>
+                        @enderror
                     </div>
 
-                    <div class="form-group mb-4 col-6">
-                        <label class="mb-2 ms-1" for="fone">Telefone:</label>
-                        <input type="text" id="fone" name="fone" placeholder="fone" value="22912345678"
-                            @class([
-                                'is-valid' => $validations['success'],
-                                'is-invalid' => $validations['invalid'],
-                                'form-control',
-                            ])>
-                        @isset($validations['fone'])
-                            <div class="feedback text-danger">{{ $validations['fone'] }}</div>
-                        @endisset
+                    <div class="mb-4 col-6">
+                        <div class="form-group">
+                            <label class="mb-2 ms-1" class="mb-2 ms-1" for="password">Senha:</label>
+                            <input type="password" id="password" name="password" placeholder="Senha" value="Alterar@123"
+                                @class([
+                                    'is-valid' => !$errors->has('password'),
+                                    'is-invalid' => $errors->has('password'),
+                                    'form-control',
+                                ])>
+                        </div>
+                        @error('password')
+                            <div class="feedback text-danger">
+                                <span class="ms-2 me-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                        fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
+                                        <path
+                                            d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
+                                        <path
+                                            d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+                                    </svg>
+                                </span>
+                                <span style="font-size: 11px;">{{ $message }}</span>
+                            </div>
+                        @enderror
                     </div>
 
-                    <div class="form-group mb-4 col-6">
-                        <label class="mb-2 ms-1" class="mb-2 ms-1" for="password">Senha:</label>
-                        <input type="password" id="password" name="password" placeholder="Senha" value="Alterar@123"
-                            @class([
-                                'is-valid' => $validations['success'],
-                                'is-invalid' => $validations['invalid'],
-                                'form-control',
-                            ])>
-                        @isset($validations['password'])
-                            <div class="feedback text-danger">{{ $validations['password'] }}</div>
-                        @endisset
-                    </div>
-
-                    <div class="form-group mb-4 col-6">
-                        <label class="mb-2 ms-1" class="mb-2 ms-1" for="confirm_password">Confirme a senha:</label>
-                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirme Senha" value="Alterar@123"
-                            @class([
-                                'is-valid' => $validations['success'],
-                                'is-invalid' => $validations['invalid'],
-                                'form-control',
-                            ])>
-                        @isset($validations['confirm_password'])
-                            <div class="feedback text-danger">{{ $validations['confirm_password'] }}</div>
-                        @endisset
+                    <div class="mb-4 col-6">
+                        <div class="form-group">
+                            <label class="mb-2 ms-1" class="mb-2 ms-1" for="confirm_password">Confirme a senha:</label>
+                            <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirme Senha" value="Alterar@123"
+                                @class([
+                                    'is-valid' => !$errors->has('confirm_password'),
+                                    'is-invalid' => $errors->has('confirm_password'),
+                                    'form-control',
+                                ])>
+                        </div>
+                        @error('confirm_password')
+                            <div class="feedback text-danger">
+                                <span class="ms-2 me-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                        fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
+                                        <path
+                                            d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
+                                        <path
+                                            d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+                                    </svg>
+                                </span>
+                                <span style="font-size: 11px;">{{ $message }}</span>
+                            </div>
+                        @enderror
                     </div>
 
                     <div class="d-flex flex-row-reverse mt-4">

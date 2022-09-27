@@ -6,8 +6,11 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\ValidatedInput;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\MessageBag;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Emarref\Jwt\Token;
@@ -37,91 +40,52 @@ class UserController extends BaseController
      * @returs: retorn um formulário de signin
      */
     public function signinStore(Request $request){
+        
+        $request->validate(
+            [
+                'firstName' => ['required', 'max:50'],
+                'lastName' => ['required', 'max:50'],
+                'email' => ['required', 'max:50'],
+                'cpf' => ['required', 'max:50'],
+                'fone' => ['required', 'max:50'],
+                'password' => ['required', 'max:50'],
+                'confirm_password' => ['required', 'max:50'],
+                
+            ],
+            [
+                'firstName.required' => 'O primeiro nome é obrigatório',
+                'firstName.max' => 'O primeiro nome tem no máximo 50 caracteres',
+                'lastName.required' => 'O ultimo nome é obrigatório',
+                'lastName.max' => 'O ultimo nome tem no máximo 50 caracteres',
+                'email.required' => 'email é obrigatório',
+                'email.max' => 'O email tem no máximo 50 caracteres',
+                'cpf.required' => 'cpf é obrigatório',
+                'cpf.max' => 'O cpf tem no máximo 50 caracteres',
+                'fone.required' => 'O telefone é obrigatório',
+                'fone.max' => 'O telefone tem no máximo 50 caracteres',
+                'password.required' => 'A senha é obrigatório',
+                'password.max' => 'A senha tem no máximo 50 caracteres',
+                'confirm_password.required' => 'A confirmação de senha é obrigatório',
+                'confirm_password.max' => 'A confirmação de senha tem no máximo 50 caracteres'
+            ]
+        );
+
         $form = $request->all();
         
-        $validations = [];
-        $validations["invalid"] = false;
-        $validations["success"] = false;
-
-        $firstName = $form["firstName"] ?? "";
-        if (empty($firstName)) {
-            $validations["firstName"] = "campo do primeiro nome não pode ser vazio";
-            $validations["invalid"] = true;
-            $validations["success"] = false;
-            return view("signin", ["validations"=> $validations]);
-        };
-
-        $lastName = $form["lastName"] ?? "";
-        if (empty($lastName)) {
-            $validations["lastName"] = "campo do ultimo nome não pode ser vazio";
-            $validations["invalid"] = true;
-            $validations["success"] = false;
-            return view("signin", ["validations"=> $validations]);
-        };
-
-        $email = $form["email"] ?? "";
-        if (empty($email)) {
-            $validations["email"] = "campo email não pode ser vazio";
-            $validations["invalid"] = true;
-            $validations["success"] = false;
-            return view("signin", ["validations"=> $validations]);
-        };
-
-        $cpf = $form["cpf"] ?? "";
-        if (empty($cpf)) {
-            $validations["cpf"] = "campo cpf não pode ser vazio";
-            $validations["invalid"] = true;
-            $validations["success"] = false;
-            return view("signin", ["validations"=> $validations]);
-        };
-
-        $fone = $form["fone"] ?? "";// operador de coalescência (??) / null coalesce
-        if (empty($fone)) {
-            $validations["fone"] = "campo telefone não pode ser vazio";
-            $validations["invalid"] = true;
-            $validations["success"] = false;
-            return view("signin", ["validations"=> $validations]);
-        };
-
-        $password = $form["password"] ?? "";// operador de coalescência (??) / null coalesce
-        if (empty($password)) {
-            $validations["password"] = "campo senha não pode ser vazio";
-            $validations["invalid"] = true;
-            $validations["success"] = false;
-            return view("signin", ["validations"=> $validations]);
-        };
-
-        $confirm_password = $form["confirm_password"] ?? "";// operador de coalescência (??) / null coalesce
-        if (empty($confirm_password)) {
-            $validations["confirm_password"] = "campo senha não pode ser vazio";
-            $validations["invalid"] = true;
-            $validations["success"] = false;
-            return view("signin", ["validations"=> $validations]);
-        };
-
-        if ($password != $confirm_password) {
-            $validations["confirm_password"] = "As senhas não podem ser diferentes";
-            $validations["invalid"] = true;
-            $validations["success"] = false;
-            return view("signin", ["validations"=> $validations]);
-        };
+        $userData = User::where("email", "=", $form["email"])->first();
         
-        $validations["invalid"] = false;
-        $validations["success"] = true;
-
-        $userData = User::where("email", "=", $email)->first();
-
         if(isset($userData->email)){
             return redirect()->back()->withErrors(['email' => 'Este email já existe na base de dados']);
         };
+        dd("funfou");
 
         $user = new User();
-        $user->firstName = $firstName;
-        $user->lastName = $lastName;
-        $user->email = $email;
-        $user->fone = $fone;
-        $user->cpf = $cpf;
-        $user->password = Hash::make($password);
+        $user->firstName = $form["firstName"];
+        $user->lastName = $form["lastName"];
+        $user->email = $form["email"];
+        $user->fone = $form["fone"];
+        $user->cpf = $form["cpf"];
+        $user->password = Hash::make($form["password"]);
         $user->uuid = Uuid::uuid4();
 
         $user->save();
