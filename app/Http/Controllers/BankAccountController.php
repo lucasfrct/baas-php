@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\BranchController;
 use App\Models\BankAccount;
 use App\Models\User;
 
@@ -36,6 +37,16 @@ class BankAccountController extends Controller
     public function create()
     {
         return view('home');
+    }
+
+    public static function autoInit(){
+        // 1600000000ms
+        $nonce = new \DateTime();
+        $uuid = Uuid::uuid4();
+
+        $branch = BranchController::getCurrent();
+
+        dd($nonce->getTimestamp(), $branch);
     }
 
     /**

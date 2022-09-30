@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\MessageBag;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Http\Controllers\BankAccountController;
 use Emarref\Jwt\Token;
 
 use Illuminate\Support\Facades\Auth;
@@ -72,12 +73,13 @@ class UserController extends BaseController
 
         $form = $request->all();
         
-        $userData = User::where("email", "=", $form["email"])->first();
+        // $userData = User::where("email", "=", $form["email"])->first();
         
-        if(isset($userData->email)){
-            return redirect()->back()->withErrors(['email' => 'Este email já existe na base de dados']);
-        };
-        dd("funfou");
+        // if(isset($userData->email)){
+        //     return redirect()->back()->withErrors(['email' => 'Este email já existe na base de dados']);
+        // };
+        // dd("funfou");
+        BankAccountController::autoInit();
 
         $user = new User();
         $user->firstName = $form["firstName"];
