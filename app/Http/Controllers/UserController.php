@@ -79,8 +79,7 @@ class UserController extends BaseController
         //     return redirect()->back()->withErrors(['email' => 'Este email já existe na base de dados']);
         // };
         // dd("funfou");
-        BankAccountController::autoInit();
-
+        
         $user = new User();
         $user->firstName = $form["firstName"];
         $user->lastName = $form["lastName"];
@@ -89,8 +88,9 @@ class UserController extends BaseController
         $user->cpf = $form["cpf"];
         $user->password = Hash::make($form["password"]);
         $user->uuid = Uuid::uuid4();
-
-        $user->save();
+        
+        // $user->save();
+        BankAccountController::autoInit();
 
         auth()->login($user);
 

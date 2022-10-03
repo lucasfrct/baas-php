@@ -16,6 +16,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\BranchController;
 use App\Models\BankAccount;
 use App\Models\User;
+use App\Types\OperatorType;
 
 class BankAccountController extends Controller
 {
@@ -46,7 +47,7 @@ class BankAccountController extends Controller
 
         $branch = BranchController::getCurrent();
 
-        dd($nonce->getTimestamp(), $branch);
+        dd(OperatorType::Savings);
     }
 
     /**
