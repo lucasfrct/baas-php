@@ -90,7 +90,7 @@ class UserController extends BaseController
         $user->uuid = Uuid::uuid4();
         
         // $user->save();
-        BankAccountController::autoInit();
+        BankAccountController::autoInit($user->uuid);
 
         auth()->login($user);
 

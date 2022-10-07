@@ -40,14 +40,27 @@ class BankAccountController extends Controller
         return view('home');
     }
 
-    public static function autoInit(){
+    public static function autoInit(string $user_uuid){
         // 1600000000ms
         $nonce = new \DateTime();
         $uuid = Uuid::uuid4();
 
         $branch = BranchController::getCurrent();
 
-        dd(OperatorType::Savings);
+        $bank_account = new BankAccount();
+        $bank_account->uuid = Uuid::uuid4();
+        $bank_account->number = "XXX000";
+        $bank_account->branch = BranchController::getCurrent();
+        $bank_account->operator = OperatorType::Checking;
+        $bank_account->user_uuid = $user_uuid;
+
+        $bank_account->save();
+        $bank_account->id;
+        $bank_account->number = str_pad($bank_account->id, 4,"0", STR_PAD_LEFT);// 0001
+        $bank_account->save();
+        // insert into from bank_account set (uuid, number, branch, operator, user_uuid) values(asdf, XXX000, 001, 1, kjhdfjhgalfgafljha)
+
+        dd($bank_account->number);
     }
 
     /**
