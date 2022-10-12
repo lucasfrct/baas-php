@@ -42,7 +42,7 @@ class BankAccountController extends Controller
 
     public static function autoInit(string $user_uuid){
         // 1600000000ms
-        $nonce = new \DateTime();
+        $date = new \DateTime();
         $uuid = Uuid::uuid4();
 
         $branch = BranchController::getCurrent();
@@ -54,13 +54,26 @@ class BankAccountController extends Controller
         $bank_account->operator = OperatorType::Checking;
         $bank_account->user_uuid = $user_uuid;
 
+        $monthSeconds = 2592000;
+        $yearSeconds = 31536000;
+
+        $toekn = BankAccountController::certificateMount(strval($date->getTimestamp()), strval($date->getTimestamp()), $bank_account->branch, $bank_account->number, "XXX12345678900", "01234567890001", "XX");
+        
+        $expirationTimestamp = BankAccountController::getExpirationTimestamp($date->getTimestamp(), $monthSeconds);
+
+        list($timestamp) = BankAccountController::certificateDisruption($toekn);
+
+        // dd($date->getTimestamp(), $expirationTimestamp);
+        // dd($toekn);
+        dd(BankAccountController::certificateDisruption($toekn)['timestamp']);
         $bank_account->save();
         $bank_account->id;
         $bank_account->number = str_pad($bank_account->id, 4,"0", STR_PAD_LEFT);// 0001
         $bank_account->save();
         // insert into from bank_account set (uuid, number, branch, operator, user_uuid) values(asdf, XXX000, 001, 1, kjhdfjhgalfgafljha)
 
-        dd($bank_account->number);
+        // funcao expiration timestamp
+        // timestamp: pad 10 + data de expiração pad 10 + agencia pad 4 + conta pad 6 + documento issuer pad 14 + documento receiver pad 14 + versão pad 2
     }
 
     /**
@@ -134,5 +147,29 @@ class BankAccountController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    // funcao expiration timestamp
+    // timestamp: pad 10 + data de expiração pad 10 + agencia pad 4 + conta pad 6 + documento issuer pad 14 + documento receiver pad 14 + versão pad 2
+    public static function certificateMount(String $timestamp, $expiration, $branch, $number, $document_issuer, $document_receiver, $version){
+        return $certificate = $timestamp . $expiration . $branch . $number . $document_issuer . $document_receiver . $version;
+    }
+
+    public static function certificateDisruption(String $certificate){
+
+        return $certificateProperies = array(
+        'timestamp' => substr($certificate, 0, 10),
+        'expiration' => substr($certificate, 10, 10),
+        'branch' => substr($certificate, 20, 4),
+        'number' => substr($certificate, 24, 6),
+        'document_issuer' => substr($certificate, 30, 14),
+        'document_receiver' => substr($certificate, 44, 14),
+        'version' => substr($certificate, 58, 2),
+        );
+        
+    }
+
+    public static function getExpirationTimestamp($timestamp, $vigor){
+        return $expirationTimestamp = $timestamp + $vigor;
     }
 }
