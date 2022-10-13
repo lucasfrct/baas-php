@@ -14,6 +14,7 @@ use Ramsey\Uuid\Uuid;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\BranchController;
+use App\Http\Controllers\AccountController;
 use App\Models\BankAccount;
 use App\Models\User;
 use App\Types\OperatorType;
@@ -44,6 +45,7 @@ class BankAccountController extends Controller
         // 1600000000ms
         $date = new \DateTime();
         $uuid = Uuid::uuid4();
+        $account = new AccountController();
 
         $branch = BranchController::getCurrent();
 
@@ -56,16 +58,16 @@ class BankAccountController extends Controller
 
         $monthSeconds = 2592000;
         $yearSeconds = 31536000;
-
-        $toekn = BankAccountController::certificateMount(strval($date->getTimestamp()), strval($date->getTimestamp()), $bank_account->branch, $bank_account->number, "XXX12345678900", "01234567890001", "XX");
         
         $expirationTimestamp = BankAccountController::getExpirationTimestamp($date->getTimestamp(), $monthSeconds);
-
-        list($timestamp) = BankAccountController::certificateDisruption($toekn);
+        // {a,65}
+        
+        $certificate = $account->generateCertificate($bank_account->branch, $bank_account->number, "XXX12345678900", "01234567890001");
+        // list() = BankAccountController::certificateDisruption($toekn);
 
         // dd($date->getTimestamp(), $expirationTimestamp);
-        // dd($toekn);
-        dd(BankAccountController::certificateDisruption($toekn)['timestamp']);
+        dd($toekn);
+        // dd(list());
         $bank_account->save();
         $bank_account->id;
         $bank_account->number = str_pad($bank_account->id, 4,"0", STR_PAD_LEFT);// 0001
