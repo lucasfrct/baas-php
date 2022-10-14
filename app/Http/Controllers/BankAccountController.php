@@ -17,6 +17,7 @@ use App\Http\Controllers\BranchController;
 use App\Http\Controllers\AccountController;
 use App\Models\BankAccount;
 use App\Models\User;
+use App\Models\Parents;
 use App\Types\OperatorType;
 
 class BankAccountController extends Controller
@@ -41,11 +42,12 @@ class BankAccountController extends Controller
         return view('home');
     }
 
-    public static function autoInit(string $user_uuid){
+    public static function autoInit(string $user_uuid, $document){
         // 1600000000ms
         $date = new \DateTime();
         $uuid = Uuid::uuid4();
         $account = new AccountController();
+        $parent = new Parents;
 
         $branch = BranchController::getCurrent();
 
@@ -56,26 +58,25 @@ class BankAccountController extends Controller
         $bank_account->operator = OperatorType::Checking;
         $bank_account->user_uuid = $user_uuid;
 
-        $monthSeconds = 2592000;
-        $yearSeconds = 31536000;
+        $parentData = $parent::where("document", "=", "01234567890001")->first();
+        $issuer = $parentData->document;
         
-        $expirationTimestamp = BankAccountController::getExpirationTimestamp($date->getTimestamp(), $monthSeconds);
-        // {a,65}
-        
-        $certificate = $account->generateCertificate($bank_account->branch, $bank_account->number, "XXX12345678900", "01234567890001");
+        $certificate = $account->generateCertificate($bank_account->branch, $bank_account->number, $issuer, $document);
+        dd($certificate);
         // list() = BankAccountController::certificateDisruption($toekn);
-
-        // dd($date->getTimestamp(), $expirationTimestamp);
-        dd($toekn);
+        
         // dd(list());
         $bank_account->save();
         $bank_account->id;
         $bank_account->number = str_pad($bank_account->id, 4,"0", STR_PAD_LEFT);// 0001
         $bank_account->save();
         // insert into from bank_account set (uuid, number, branch, operator, user_uuid) values(asdf, XXX000, 001, 1, kjhdfjhgalfgafljha)
-
+        
         // funcao expiration timestamp
         // timestamp: pad 10 + data de expiração pad 10 + agencia pad 4 + conta pad 6 + documento issuer pad 14 + documento receiver pad 14 + versão pad 2
+        
+        
+
     }
 
     /**

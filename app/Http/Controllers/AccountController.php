@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Routing\AccountController as BaseController;
+use Illuminate\Routing\Controller as BaseController;
 
 class AccountController extends BaseController
 {
@@ -22,7 +22,7 @@ class AccountController extends BaseController
         $createdAt = $this->padTimestamp($createdAt);
         $expirationAt = $this->padTimestamp($expirationAt);
 
-        $verion = $this->getVersion();
+        $version = $this->getVersion();
 
         return "{$createdAt}{$expirationAt}{$branch}{$number}{$document_issuer}{$document_receiver}{$version}";
     }
@@ -39,5 +39,17 @@ class AccountController extends BaseController
         return "00";
     }
 
+    public function certificateDisruption($certificate){
 
+        return $certificateProperies = array(
+        'timestamp' => substr($certificate, 0, 10),
+        'expiration' => substr($certificate, 10, 10),
+        'branch' => substr($certificate, 20, 4),
+        'number' => substr($certificate, 24, 6),
+        'document_issuer' => substr($certificate, 30, 14),
+        'document_receiver' => substr($certificate, 44, 14),
+        'version' => substr($certificate, 58, 2),
+        );
+        
+    }
 }
