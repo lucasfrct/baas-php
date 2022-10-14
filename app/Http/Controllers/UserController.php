@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\MessageBag;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Shared\Str;
 use App\Http\Controllers\BankAccountController;
 use Emarref\Jwt\Token;
 
@@ -47,7 +48,7 @@ class UserController extends BaseController
                 'firstName' => ['required', 'max:50'],
                 'lastName' => ['required', 'max:50'],
                 'email' => ['required', 'max:50'],
-                'cpf' => ['required', 'max:50'],
+                'document' => ['required', 'max:50'],
                 'fone' => ['required', 'max:50'],
                 'password' => ['required', 'max:50'],
                 'confirm_password' => ['required', 'max:50'],
@@ -60,8 +61,8 @@ class UserController extends BaseController
                 'lastName.max' => 'O ultimo nome tem no máximo 50 caracteres',
                 'email.required' => 'email é obrigatório',
                 'email.max' => 'O email tem no máximo 50 caracteres',
-                'cpf.required' => 'cpf é obrigatório',
-                'cpf.max' => 'O cpf tem no máximo 50 caracteres',
+                'document.required' => 'cpf/cnpj é obrigatório',
+                'document.max' => 'O cpf/cnpj tem no máximo 50 caracteres',
                 'fone.required' => 'O telefone é obrigatório',
                 'fone.max' => 'O telefone tem no máximo 50 caracteres',
                 'password.required' => 'A senha é obrigatório',
@@ -85,12 +86,14 @@ class UserController extends BaseController
         $user->lastName = $form["lastName"];
         $user->email = $form["email"];
         $user->fone = $form["fone"];
-        $user->cpf = $form["cpf"];
+        $user->document = Str::padDocument($form["document"]);
         $user->password = Hash::make($form["password"]);
         $user->uuid = Uuid::uuid4();
+
+        
         
         // $user->save();
-        BankAccountController::autoInit($user->uuid, $user->cpf);
+        BankAccountController::autoInit($user->uuid, $user->document);
 
         auth()->login($user);
 

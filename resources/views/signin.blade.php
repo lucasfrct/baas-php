@@ -114,15 +114,15 @@
 
                     <div class="mb-4 col-6">
                         <div class="form-group">
-                            <label class="mb-2 ms-1" for="cpf">CPF:</label>
-                            <input type="text" id="cpf" name="cpf" placeholder="cpf" value="90294874020"
+                            <label class="mb-2 ms-1" for="cpf/cnpj">CPF/CNPJ:</label>
+                            <input type="text" id="document" name="document" placeholder="CPF/CNPJ" value="90294874020"
                                 @class([
-                                    'is-valid' => !$errors->has('cpf'),
-                                    'is-invalid' => $errors->has('cpf'),
+                                    'is-valid' => !$errors->has('document'),
+                                    'is-invalid' => $errors->has('document'),
                                     'form-control',
                                 ])>
                         </div>
-                        @error('cpf')
+                        @error('document')
                             <div class="feedback text-danger">
                                 <span class="ms-2 me-1">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
