@@ -15,6 +15,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Shared\Str;
 use App\Http\Controllers\BankAccountController;
+use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\AccountController;
 use Emarref\Jwt\Token;
 
 use Illuminate\Support\Facades\Auth;
@@ -93,6 +95,7 @@ class UserController extends BaseController
         
         
         // $user->save();
+        // createAccount();
         BankAccountController::autoInit($user->uuid, $user->document);
 
         auth()->login($user);

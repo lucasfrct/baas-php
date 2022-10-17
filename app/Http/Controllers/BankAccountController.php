@@ -64,7 +64,7 @@ class BankAccountController extends Controller
         $certificate = $account->generateCertificate($bank_account->branch, $bank_account->number, $issuer, $document);
         dd($certificate);
         // list() = BankAccountController::certificateDisruption($toekn);
-        
+        // 
         // dd(list());
         $bank_account->save();
         $bank_account->id;

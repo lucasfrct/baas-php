@@ -30,8 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::drop('bank_accounts', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('bank_accounts');
     }
 };
