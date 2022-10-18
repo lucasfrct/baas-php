@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\MessageBag;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Parents;
 use App\Shared\Str;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\CertificateController;
@@ -84,6 +85,11 @@ class UserController extends BaseController
         // dd("funfou");
         
         $user = new User();
+        $parent = new Parents();
+        $account = new AccountController();
+        $certificate = new CertificateController();
+        $bankAccount = new BankAccountController();
+
         $user->firstName = $form["firstName"];
         $user->lastName = $form["lastName"];
         $user->email = $form["email"];
@@ -91,12 +97,15 @@ class UserController extends BaseController
         $user->document = Str::padDocument($form["document"]);
         $user->password = Hash::make($form["password"]);
         $user->uuid = Uuid::uuid4();
+        $user->save();
 
+        $account->init($user->uuid);
+
+        $bAccount = $bankAccount->init($user->uuid, $user->document);
         
-        
-        // $user->save();
+        $certificate->generate($bAccount->branch, $bAccount->number, $document_issuer, $user->document);
         // createAccount();
-        BankAccountController::autoInit($user->uuid, $user->document);
+        // dd("funfou");
 
         auth()->login($user);
 

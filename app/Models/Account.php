@@ -37,5 +37,7 @@ class Account extends Model
      */
     protected $casts = [
         'birthday' => 'datetime',
+        'permitions' => 'array',
+        'without_permitions' => 'array'
     ];
 }

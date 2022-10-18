@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('bank_accounts', function (Blueprint $table) {
             $table->id();
+            $table->string('uid');
             $table->string('uuid');
             $table->string('number');
             $table->string('branch');

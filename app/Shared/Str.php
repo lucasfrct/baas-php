@@ -10,4 +10,8 @@ class Str{
     public static function padTimestamp(int | string $timestamp): string {
         return str_pad($timestamp, 10, '0', STR_PAD_LEFT);
     }
+
+    public static function padBankAccountNumber(int | string $number): string {
+        return str_pad($number, 6, '0', STR_PAD_LEFT);
+    }
 }

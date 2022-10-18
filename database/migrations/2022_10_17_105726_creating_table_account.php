@@ -15,11 +15,11 @@ return new class extends Migration
     {
         Schema::create('accounts', function (Blueprint $table) {
             $table->id();
-            $table->string('uuid');// uuid da tabela usuario
+            $table->string('uuid')->unique();// uuid da tabela usuario
             $table->string('rg');
             $table->date('birthday');
             $table->string('gender');
-            $table->string('cretificate');
+            $table->string('certificate');
             $table->string('permitions');// armazenar uma string de json
             $table->string('without_permitions');// armazenar uma string de json
             $table->timestamps();
