@@ -7,6 +7,8 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 
+use App\Shared\Str;
+
 class CertificateController extends BaseController
 {
     public function generate($branch, $number, $document_issuer, $document_receiver){

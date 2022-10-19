@@ -21,19 +21,31 @@ class AccountController extends BaseController
         $account->birthday = new \DateTime();
         $account->gender = GenderType::Male;
         $account->certificate = 'lucasfeio';
-        $account->permitions = ['1','2','3'];
-        $account->without_permitions = ['1','2','3'];
+        $account->permitions = [];
+        $account->without_permitions = [];
 
         $account->save();
     }
 
-    public function init(string $uuid){
+    public function init(string $uuid): int{
 
         $account = new Account();
         $account->uuid = $uuid;
+        $account->rg = '12.760.364-5';
+        $account->birthday = new \DateTime();
+        $account->gender = GenderType::Male;
+        $account->certificate = 'lucasfeio';
         $account->permitions = [];
         $account->without_permitions = [];
 
+        $account->save();
+
+        return $account->id;
+    }
+
+    public function insertCertificate(int $id, string $certificate){
+        $account = Account::find($id);
+        $account->certificate = $certificate;
         $account->save();
     }
 }

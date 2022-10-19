@@ -17,6 +17,7 @@ use App\Http\Controllers\BranchController;
 use App\Http\Controllers\AccountController;
 use App\Models\BankAccount;
 use App\Models\User;
+use App\Shared\Str;
 use App\Models\Parents;
 use App\Types\OperatorType;
 
@@ -57,8 +58,8 @@ class BankAccountController extends Controller
         $bank_account->branch = $branch->getCurrent();
         $bank_account->operator = OperatorType::Checking;
 
-        $parentData = $parent::where("document", "=", "01234567890001")->first();
-        $issuer = $parentData->document;
+        // $parentData = $parent::where("document", "=", "01234567890001")->first();
+        // $issuer = $parentData->document;
         
         $bank_account->save();
         $bank_account->id;

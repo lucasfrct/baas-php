@@ -18,6 +18,7 @@ use App\Shared\Str;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\ParentController;
 use Emarref\Jwt\Token;
 
 use Illuminate\Support\Facades\Auth;
@@ -86,6 +87,7 @@ class UserController extends BaseController
         
         $user = new User();
         $parent = new Parents();
+        $parentController = new ParentController();
         $account = new AccountController();
         $certificate = new CertificateController();
         $bankAccount = new BankAccountController();
@@ -97,16 +99,20 @@ class UserController extends BaseController
         $user->document = Str::padDocument($form["document"]);
         $user->password = Hash::make($form["password"]);
         $user->uuid = Uuid::uuid4();
-        $user->save();
+        // $user->save();
 
-        $account->init($user->uuid);
+        $id = $account->init($user->uuid);        
 
         $bAccount = $bankAccount->init($user->uuid, $user->document);
-        
-        $certificate->generate($bAccount->branch, $bAccount->number, $document_issuer, $user->document);
-        // createAccount();
-        // dd("funfou");
 
+        // $parentController->store();
+        $documentIssuer = $parentController->findDocument();
+        
+        $cert = $certificate->generate($bAccount->branch, $bAccount->number, $documentIssuer, $user->document);
+        $account->insertCertificate($id, $cert);
+        dd($cert);
+        // createAccount();
+        
         auth()->login($user);
 
         return redirect()->route('login');
