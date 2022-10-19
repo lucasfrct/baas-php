@@ -184,4 +184,30 @@ class UserController extends BaseController
         }
 
     }
+
 }
+
+// transacao bancaria:
+// created_at, 
+// updated_at, 
+// amount, 
+// payer_document, 
+// payer_uuid,
+// payer_bank_name,
+// payer_bank_code,
+// payer_bank_ispb,
+// payer_bank_branch,
+// payer_bank_number,
+// payer_bank_operator,
+// receipient_document, 
+// receipient_uuid,
+// receipient_bank_name,
+// receipient_bank_code,
+// receipient_bank_ispb,
+// receipient_bank_branch,
+// receipient_bank_number,
+// receipient_bank_operator. 
+// tax_package, 
+// tax_amount,
+// status, 
+     
