@@ -19,6 +19,7 @@ use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\ParentController;
+use App\Http\Controllers\TransactionController;
 use Emarref\Jwt\Token;
 
 use Illuminate\Support\Facades\Auth;
@@ -83,7 +84,9 @@ class UserController extends BaseController
         // if(isset($userData->email)){
         //     return redirect()->back()->withErrors(['email' => 'Este email já existe na base de dados']);
         // };
-        // dd("funfou");
+        $transaction = new TransactionController();
+        $transaction->store();
+        dd("funfou");
         
         $user = new User();
         $parent = new Parents();
@@ -91,7 +94,7 @@ class UserController extends BaseController
         $account = new AccountController();
         $certificate = new CertificateController();
         $bankAccount = new BankAccountController();
-
+        
         $user->firstName = $form["firstName"];
         $user->lastName = $form["lastName"];
         $user->email = $form["email"];
@@ -99,7 +102,7 @@ class UserController extends BaseController
         $user->document = Str::padDocument($form["document"]);
         $user->password = Hash::make($form["password"]);
         $user->uuid = Uuid::uuid4();
-        // $user->save();
+        $user->save();
 
         $id = $account->init($user->uuid);        
 
@@ -187,27 +190,3 @@ class UserController extends BaseController
 
 }
 
-// transacao bancaria:
-// created_at, 
-// updated_at, 
-// amount, 
-// payer_document, 
-// payer_uuid,
-// payer_bank_name,
-// payer_bank_code,
-// payer_bank_ispb,
-// payer_bank_branch,
-// payer_bank_number,
-// payer_bank_operator,
-// receipient_document, 
-// receipient_uuid,
-// receipient_bank_name,
-// receipient_bank_code,
-// receipient_bank_ispb,
-// receipient_bank_branch,
-// receipient_bank_number,
-// receipient_bank_operator. 
-// tax_package, 
-// tax_amount,
-// status, 
-     
