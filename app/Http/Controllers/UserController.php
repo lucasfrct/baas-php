@@ -19,6 +19,8 @@ use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\ParentController;
+use App\Http\Controllers\PackageController;
+use App\Http\Controllers\TaxController;
 use App\Http\Controllers\TransactionController;
 use Emarref\Jwt\Token;
 
@@ -84,9 +86,15 @@ class UserController extends BaseController
         // if(isset($userData->email)){
         //     return redirect()->back()->withErrors(['email' => 'Este email já existe na base de dados']);
         // };
+        $package = new PackageController();
+        $package->store();
+
+        $tax = new TaxController();
+        $tax->store();
+        dd("funfou");
+
         $transaction = new TransactionController();
         $transaction->store();
-        dd("funfou");
         
         $user = new User();
         $parent = new Parents();
@@ -120,6 +128,23 @@ class UserController extends BaseController
 
         return redirect()->route('login');
     }
+
+    // pacotes:
+    // name
+    // code
+    // uid
+    // description
+    // category
+    // tax codes(array json)
+
+    // taxes:
+    // uid
+    // code
+    // name
+    // description
+    // amount
+    
+    // colocar na tabela de account o campo packages_codes
 
     /**
      * retorna uma formulário de LOGIN
