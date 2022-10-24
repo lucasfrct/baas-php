@@ -17,10 +17,10 @@ class TaxController extends BaseController
         $tax = new Tax();
     
         $tax->uid = Uuid::uuid4();
-        $tax->name = 'name';
-        $tax->code = 'code';
+        $tax->name = 'taxa transacao';
+        $tax->code = '0001';
         $tax->description = 'description';
-        $tax->amount = 12345678;
+        $tax->amount = 500;
 
         $tax->save();
 
