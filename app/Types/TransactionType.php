@@ -4,7 +4,7 @@ namespace App\Types;
 
 enum OperatorType: string
 {
-    case Cashin = 'cashin';
-    case Cashout = 'cashout';
+    case CashIn = 'cashin';
+    case CashOut = 'cashout';
     case Bankslip = 'bankslip';
 }

@@ -113,6 +113,7 @@ class UserController extends BaseController
         $account->insertCertificate($id, $cert);
         dd($cert);
         // createAccount();
+        $this->porcaria();
         
         auth()->login($user);
 
@@ -125,10 +126,20 @@ class UserController extends BaseController
 
         $tax = new TaxController();
         $tax->store();
-        dd("funfou");
+        // dd("funfou");
 
         $transaction = new TransactionController();
         $transaction->store();
+        // iniciando a transacao
+        // consulta se o usuario emitente existe
+        // puxa os pacotes desse usuario
+        // somar a transacao mais o valor do pacote
+        // consulta se o usuario tem saldo para pagar a transacao mais a tarifa do pacote
+        // carrega o banco do emissor
+        // consulta se o usuario receipient existe 
+        // carrega o banco do receptor
+        // registra a transacao
+        // atualizar status da transacao
     }
 
     // colocar na tabela de account o campo packages_codes

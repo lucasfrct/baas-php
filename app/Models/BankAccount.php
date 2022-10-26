@@ -18,7 +18,9 @@ class BankAccount extends Model
         'uuid',
         'number',
         'branch',
-        'operator'
+        'operator',
+        'prev_balance',
+        'balance'
     ];
 
     /**

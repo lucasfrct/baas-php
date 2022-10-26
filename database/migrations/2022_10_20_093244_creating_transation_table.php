@@ -36,6 +36,7 @@ return new class extends Migration
             $table->string('tax_package', 50);
             $table->unsignedBigInteger('tax_amount');
             $table->string('status', 50);
+            $table->string('type', 50);
             $table->timestamps();
         });
     }

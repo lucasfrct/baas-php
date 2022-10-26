@@ -18,7 +18,8 @@ class Account extends Model
         'gender',
         'cretificate',
         'permitions',
-        'without_permitions'
+        'without_permitions',
+        'packages'
     ];
 
     /**
@@ -38,6 +39,7 @@ class Account extends Model
     protected $casts = [
         'birthday' => 'datetime',
         'permitions' => 'array',
-        'without_permitions' => 'array'
+        'without_permitions' => 'array',
+        'packages' => 'array'
     ];
 }

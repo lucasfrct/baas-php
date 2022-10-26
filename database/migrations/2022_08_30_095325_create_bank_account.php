@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('number');
             $table->string('branch');
             $table->string('operator');
+            $table->unsignedBigInteger('prev_balance');
+            $table->unsignedBigInteger('balance');
             $table->timestamps();
         });
     }
