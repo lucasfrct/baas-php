@@ -121,15 +121,19 @@ class UserController extends BaseController
     }
 
     public function porcaria() {
-        $package = new PackageController();
-        $package->store();
 
         $tax = new TaxController();
+        $package = new PackageController();
+        $transaction = new TransactionController();
+        
         $tax->store();
+        $package->store('pkg01', '001');
+        $transaction->store();
+        
+        
         // dd("funfou");
 
-        $transaction = new TransactionController();
-        $transaction->store();
+
         // iniciando a transacao
         // consulta se o usuario emitente existe
         // puxa os pacotes desse usuario

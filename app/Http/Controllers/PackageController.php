@@ -13,13 +13,13 @@ use Ramsey\Uuid\Uuid;
 
 class PackageController extends BaseController
 {
-    public function store(){
+    public function store(string $name, $code){
         
         $package = new Package();
     
         $package->uid = Uuid::uuid4();
-        $package->name = 'transacoes cashin';
-        $package->code = '0001';
+        $package->name = $name;
+        $package->code = $code;
         $package->description = 'description';
         $package->category = 'cashin';
         $package->tax_codes = ['0001'];
@@ -28,8 +28,8 @@ class PackageController extends BaseController
 
     }
 
-    public function showByCode(string $code):Package{
-        $packageData = Package::where("tax_codes", "=", $code)->first();
+    public function showByCode(string $pkgCode):Package{
+        $packageData = Package::where("code", "=", $pkgCode)->first();
 
         foreach ($packageData->tax_codes as &$code) {
             $taxData = TaxController::where("code", "=", $code)->first();
@@ -39,6 +39,11 @@ class PackageController extends BaseController
 
         }
         return $packageData;
+    }
+
+    public function addTaxCode(string $pkgCode, $taxCode){
+        $packageData = Package::where("code", "=", $pkgCode)->first();
+        $packageData->tax_codes[] = $taxCode;
     }
 }
     // 'name',
