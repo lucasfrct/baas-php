@@ -37,6 +37,7 @@ class AccountController extends BaseController
         $account->certificate = 'lucasfeio';
         $account->permitions = [];
         $account->without_permitions = [];
+        $account->packages = [];
 
         $account->save();
 

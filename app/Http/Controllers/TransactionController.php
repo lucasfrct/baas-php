@@ -35,6 +35,7 @@ class TransactionController extends BaseController
         $transaction->receipient_bank_operator = 're';
         $transaction->tax_package = 'tax_package';
         $transaction->tax_amount = 54;
+        $transaction->type = 'type';
         $transaction->status = 'status';
 
         $transaction->save();

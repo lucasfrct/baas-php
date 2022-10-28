@@ -35,6 +35,7 @@ class Transaction extends Model
         'receipient_bank_operator',
         'tax_package',
         'tax_amount',
+        'type',
         'status'
     ];
 

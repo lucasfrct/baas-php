@@ -93,6 +93,8 @@ class UserController extends BaseController
         $certificate = new CertificateController();
         $bankAccount = new BankAccountController();
         
+        // $parentController->store();
+
         $user->firstName = $form["firstName"];
         $user->lastName = $form["lastName"];
         $user->email = $form["email"];
@@ -106,14 +108,13 @@ class UserController extends BaseController
 
         $bAccount = $bankAccount->init($user->uuid, $user->document);
 
-        // $parentController->store();
         $documentIssuer = $parentController->findDocument();
         
         $cert = $certificate->generate($bAccount->branch, $bAccount->number, $documentIssuer, $user->document);
         $account->insertCertificate($id, $cert);
-        dd($cert);
         // createAccount();
         $this->porcaria();
+        dd($cert);
         
         auth()->login($user);
 
@@ -125,6 +126,18 @@ class UserController extends BaseController
         $tax = new TaxController();
         $package = new PackageController();
         $transaction = new TransactionController();
+
+        $payerUuid = '645786df-b8f3-4be5-b043-ebb6267e9d1c';
+        $amount = 500;
+        $payerBankBranch = '001';
+        $payerBankNumber = '000001';
+        $payerBankOperator = '1';
+        $payerPackages = [];
+
+        $receipientBankBranch = '001';
+        $receipientBankNumber = '000002';
+        $receipientBankOperator = '1';
+
         
         $tax->store();
         $package->store('pkg01', '001');
@@ -134,7 +147,8 @@ class UserController extends BaseController
         // dd("funfou");
 
 
-        // iniciando a transacao
+        //# iniciando a transacao: 
+        // 
         // consulta se o usuario emitente existe
         // puxa os pacotes desse usuario
         // somar a transacao mais o valor do pacote

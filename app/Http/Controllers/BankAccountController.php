@@ -84,6 +84,8 @@ class BankAccountController extends Controller
         $bank_account->number = $form['number'];
         $bank_account->branch = $form['branch'];
         $bank_account->operator = $form['operator'];
+        $bank_account->prev_balance = [];
+        $bank_account->balance = [];
 
         $bank_account->save();
 
