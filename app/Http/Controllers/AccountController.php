@@ -35,6 +35,7 @@ class AccountController extends BaseController
         $account->birthday = new \DateTime();
         $account->gender = GenderType::Male;
         $account->certificate = 'lucasfeio';
+        $account->enabled = 1;
         $account->permitions = [];
         $account->without_permitions = [];
         $account->packages = [];

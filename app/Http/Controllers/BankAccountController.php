@@ -57,6 +57,7 @@ class BankAccountController extends Controller
         $bank_account->number = "XXX000";
         $bank_account->branch = $branch->getCurrent();
         $bank_account->operator = OperatorType::Checking;
+        $bank_account->enabled = 1;
 
         // $parentData = $parent::where("document", "=", "01234567890001")->first();
         // $issuer = $parentData->document;
@@ -84,6 +85,7 @@ class BankAccountController extends Controller
         $bank_account->number = $form['number'];
         $bank_account->branch = $form['branch'];
         $bank_account->operator = $form['operator'];
+        $bank_account->enabled = 1;
         $bank_account->prev_balance = [];
         $bank_account->balance = [];
 

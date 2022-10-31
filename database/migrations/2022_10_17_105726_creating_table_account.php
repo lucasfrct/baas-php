@@ -20,6 +20,7 @@ return new class extends Migration
             $table->date('birthday');
             $table->string('gender');
             $table->string('certificate');
+            $table->integer('enabled');
             $table->json('permitions');// armazenar uma string de json
             $table->json('without_permitions');// armazenar uma string de json
             $table->json('packages');

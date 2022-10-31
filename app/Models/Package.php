@@ -20,6 +20,7 @@ class Package extends Model
         'uid',
         'description',
         'category',
+        'enabled',
         'tax_codes'
     ];
     // pacotes:

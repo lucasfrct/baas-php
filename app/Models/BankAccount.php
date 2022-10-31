@@ -19,6 +19,7 @@ class BankAccount extends Model
         'number',
         'branch',
         'operator',
+        'enabled',
         'prev_balance',
         'balance'
     ];

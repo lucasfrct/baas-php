@@ -7,6 +7,8 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 
+use Ramsey\Uuid\Uuid;
+
 use App\Models\Transaction;
 
 class TransactionController extends BaseController
@@ -15,7 +17,7 @@ class TransactionController extends BaseController
         
         $transaction = new Transaction();
     
-        $transaction->uid = '1gf4gjf14jf51j45f';
+        $transaction->uid = Uuid::uuid4();
         $transaction->amount = 12345678;
         $transaction->payer_document = '1234567890';
         $transaction->payer_uuid = 'payer';

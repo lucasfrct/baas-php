@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('name', 50);
             $table->string('code', 4);
             $table->string('description', 50);
+            $table->integer('enabled');
             $table->unsignedBigInteger('amount');
             $table->timestamps();
         });

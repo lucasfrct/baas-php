@@ -17,6 +17,7 @@ class Account extends Model
         'birthday',
         'gender',
         'cretificate',
+        'enabled',
         'permitions',
         'without_permitions',
         'packages'

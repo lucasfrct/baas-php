@@ -20,6 +20,7 @@ class TaxController extends BaseController
         $tax->name = 'taxa transacao';
         $tax->code = '0001';
         $tax->description = 'description';
+        $tax->enabled = 1;
         $tax->amount = 500;
 
         $tax->save();

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('code', 4);
             $table->string('description', 50);
             $table->string('category', 50);
+            $table->integer('enabled');
             $table->json('tax_codes', 4);
             $table->timestamps();
         });

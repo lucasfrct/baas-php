@@ -95,6 +95,7 @@ class UserController extends BaseController
         
         // $parentController->store();
 
+        $this->porcaria();
         $user->firstName = $form["firstName"];
         $user->lastName = $form["lastName"];
         $user->email = $form["email"];
@@ -113,7 +114,6 @@ class UserController extends BaseController
         $cert = $certificate->generate($bAccount->branch, $bAccount->number, $documentIssuer, $user->document);
         $account->insertCertificate($id, $cert);
         // createAccount();
-        $this->porcaria();
         dd($cert);
         
         auth()->login($user);
@@ -123,28 +123,49 @@ class UserController extends BaseController
 
     public function porcaria() {
 
+        $user = new User();
         $tax = new TaxController();
         $package = new PackageController();
         $transaction = new TransactionController();
 
-        $payerUuid = '645786df-b8f3-4be5-b043-ebb6267e9d1c';
+        $payerUuid = '0bc33ab0-d059-4ca6-aad3-ea7b04ceb656';
         $amount = 500;
         $payerBankBranch = '001';
         $payerBankNumber = '000001';
         $payerBankOperator = '1';
-        $payerPackages = [];
-
+        
         $receipientBankBranch = '001';
         $receipientBankNumber = '000002';
         $receipientBankOperator = '1';
 
+        // ! ####################################################################################################
+        // ! CONSULTA SE O USUARIO EMITENTE EXISTE
+        // ! ####################################################################################################
+
+        $payerData = User::where("uuid", "=", $payerUuid)->first();
+        if (!$payerData) {
+            throw new Exeption('usuario emitente nao encontrado!');
+        }
+
+        if ($payerData->enabled) {
+            throw new Exeption('usuario inativo! transacao nao pode ser realizada');
+        }
+
+        // ! ####################################################################################################
+        // ! CONSULTA SE O USUARIO EMITENTE EXISTE
+        // ! ####################################################################################################
+
+        
+
+        
+        $payerPackages = [];
+        dd("funfou");
         
         $tax->store();
         $package->store('pkg01', '001');
         $transaction->store();
         
         
-        // dd("funfou");
 
 
         //# iniciando a transacao: 

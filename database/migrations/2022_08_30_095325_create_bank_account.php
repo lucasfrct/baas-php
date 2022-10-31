@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('number');
             $table->string('branch');
             $table->string('operator');
+            $table->integer('enabled')->defaultValue(1);
             $table->unsignedBigInteger('prev_balance')->nullable();
             $table->unsignedBigInteger('balance')->nullable();
             $table->timestamps();

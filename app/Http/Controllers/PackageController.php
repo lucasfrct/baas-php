@@ -22,6 +22,7 @@ class PackageController extends BaseController
         $package->code = $code;
         $package->description = 'description';
         $package->category = 'cashin';
+        $package->enabled = 1;
         $package->tax_codes = ['0001'];
 
         $package->save();

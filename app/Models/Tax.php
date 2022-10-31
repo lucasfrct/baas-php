@@ -19,6 +19,7 @@ class Tax extends Model
         'name',
         'code',
         'description',
+        'enabled',
         'amount'
     ];
     // taxes:
