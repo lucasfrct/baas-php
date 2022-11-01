@@ -13,9 +13,12 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\MessageBag;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Account;
 use App\Models\Parents;
+use App\Models\Package;
 use App\Shared\Str;
 use App\Http\Controllers\BankAccountController;
+use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\ParentController;
@@ -87,11 +90,13 @@ class UserController extends BaseController
         //     return redirect()->back()->withErrors(['email' => 'Este email já existe na base de dados']);
         // };        
         $user = new User();
+        $account = new Account();
         $parent = new Parents();
         $parentController = new ParentController();
-        $account = new AccountController();
+        $accountController = new AccountController();
         $certificate = new CertificateController();
         $bankAccount = new BankAccountController();
+        $balance = new BalanceController();
         
         // $parentController->store();
 
@@ -144,19 +149,62 @@ class UserController extends BaseController
 
         $payerData = User::where("uuid", "=", $payerUuid)->first();
         if (!$payerData) {
-            throw new Exeption('usuario emitente nao encontrado!');
+            throw new Exeption('O usuario emitente nao foi encontrado!');
         }
 
-        if ($payerData->enabled) {
-            throw new Exeption('usuario inativo! transacao nao pode ser realizada');
+        $payerAccountData = Account::where("uuid", "=", $payerUuid)->first();
+        if (!$payerAccountData) {
+            throw new Exeption('A conta emitente nao foi encontrada!');
+        }
+
+        if (!$payerAccountData->enabled) {
+            throw new Exeption('A conta do usuario esta desativada por tempo indeterminado!');
         }
 
         // ! ####################################################################################################
-        // ! CONSULTA SE O USUARIO EMITENTE EXISTE
+        // ! BUSCA OS PACOTES DO USUARIO EMITENTE
         // ! ####################################################################################################
 
-        
+        $packages = [];
+        $packagesAmount = 0;
 
+        if (count($payerAccountData->packages) > 0) {
+
+            foreach ($payerAccountData->packages as $value) {
+                $payerPackageData = $package->showByCode($value);
+                $packages[] = $payerPackageData;
+                $packagesAmount += $payerPackageData->amount;
+            }
+        }
+
+        $amountCharge = $amount + $packagesAmount;
+
+        // ! ####################################################################################################
+        // ! CONSULTA A CONTA BANCARIA DO USUARIO EMITENTE
+        // ! ####################################################################################################
+
+        $payerBankAccount = $bankAccount->showByUuid($payerUuid);
+        if (!$payerBankAccount) {
+            throw new Exeption('A conta bancaria do usuario nao existe!');
+        }
+
+        if (!$payerBankAccount->enabled) {
+            throw new Exeption('A conta bancaria do usuario esta desativada por tempo indeterminado!');
+        }
+
+        // ! ####################################################################################################
+        // ! CONSULTA AO SALDO DO USUARIO
+        // ! ####################################################################################################
+
+        $savings = $balance->currentMonth($payerUuid);
+        if ($savings < $amountCharge) {
+            throw new Exeption('Saldo insuficiente!');
+
+        }
+
+        // ? ####################################################################################################
+        // ? CONSULTA A CONTA BANCARIA DO USUARIO RECEBEDOR
+        // ? ####################################################################################################
         
         $payerPackages = [];
         dd("funfou");
@@ -173,8 +221,8 @@ class UserController extends BaseController
         // consulta se o usuario emitente existe
         // puxa os pacotes desse usuario
         // somar a transacao mais o valor do pacote
-        // consulta se o usuario tem saldo para pagar a transacao mais a tarifa do pacote
         // carrega o banco do emissor
+        // consulta se o usuario tem saldo para pagar a transacao mais a tarifa do pacote
         // consulta se o usuario receipient existe 
         // carrega o banco do receptor
         // registra a transacao
