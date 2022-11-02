@@ -8,6 +8,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 
 use App\Models\Package;
+use App\Models\Tax;
 use App\Http\Controllers\TaxController;
 use Ramsey\Uuid\Uuid;
 
@@ -29,11 +30,17 @@ class PackageController extends BaseController
 
     }
 
-    public function showByCode(string $pkgCode):Package{
+    public function showByCode(string $pkgCode):Package | null {
         $packageData = Package::where("code", "=", $pkgCode)->first();
+        if (!$packageData) {
+            return null;
+        }
 
-        foreach ($packageData->tax_codes as &$code) {
-            $taxData = TaxController::where("code", "=", $code)->first();
+        foreach ($packageData->tax_codes as $code) {
+            $taxData = Tax::where("code", "=", $code)->first();
+            if (!$taxData) {
+                continue;
+            }
 
             $packageData->taxes[] = $taxData;
             $packageData->amount += $taxData->amount;

@@ -2,7 +2,7 @@
 
 namespace App\Types;
 
-enum OperatorType: string
+enum TransactionType: string
 {
     case CashIn = 'cashin';
     case CashOut = 'cashout';

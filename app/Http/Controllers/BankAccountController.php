@@ -46,7 +46,7 @@ class BankAccountController extends Controller
     public function init(string $uuid, $document):BankAccount{
         // 1600000000ms
         $date = new \DateTime();
-        $uuid = Uuid::uuid4();
+        // $uuid = Uuid::uuid4();
         $parent = new Parents;
         $branch = new BranchController();
 
@@ -112,9 +112,14 @@ class BankAccountController extends Controller
         return view("home", ["bankAccount" => $bankAccount]);
     }
 
-    public function showByUuid($uuid): BankAccount
+    public function showByUuid($uuid)
     {
-       return BankAccount::where("uuid", "=", $uuid)->first();        
+       return BankAccount::where("uuid", "=", $uuid)->first();
+    }
+
+    public function showByNumber($branch, $number): BankAccount | null
+    {
+       return BankAccount::whereRaw("branch = ? and number = ?", [$branch, $number])->first();
     }
 
     /**

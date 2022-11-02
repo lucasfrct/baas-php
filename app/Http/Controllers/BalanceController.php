@@ -11,8 +11,8 @@ use App\Http\Controllers\TransactionController;
 
 class BalanceController extends BaseController
 {
-    public function currentMonth(string $uuid): int{
-        $this->processTransactions($uuid);
+    public function currentMonth(string $uuid) {
+        // $this->processTransactions($uuid);
         $bankAccount = BankAccount::where("uuid", "=", $uuid)->first();
 
         return $bankAccount->balance;

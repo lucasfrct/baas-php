@@ -14,6 +14,7 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Account;
+use App\Models\BankAccount;
 use App\Models\Parents;
 use App\Models\Package;
 use App\Shared\Str;
@@ -95,7 +96,7 @@ class UserController extends BaseController
         $parentController = new ParentController();
         $accountController = new AccountController();
         $certificate = new CertificateController();
-        $bankAccount = new BankAccountController();
+        $bankAccountController = new BankAccountController();
         $balance = new BalanceController();
         
         // $parentController->store();
@@ -109,32 +110,35 @@ class UserController extends BaseController
         $user->password = Hash::make($form["password"]);
         $user->uuid = Uuid::uuid4();
         $user->save();
-
-        $id = $account->init($user->uuid);        
-
-        $bAccount = $bankAccount->init($user->uuid, $user->document);
-
+        
+        $id = $accountController->init($user->uuid);        
+        
+        $bAccount = $bankAccountController->init($user->uuid, $user->document);
+        
         $documentIssuer = $parentController->findDocument();
         
         $cert = $certificate->generate($bAccount->branch, $bAccount->number, $documentIssuer, $user->document);
-        $account->insertCertificate($id, $cert);
+        $accountController->insertCertificate($id, $cert);
         // createAccount();
         dd($cert);
         
         auth()->login($user);
-
+        
         return redirect()->route('login');
     }
-
+    
     public function porcaria() {
-
+        
         $user = new User();
+        $bankAccount = new BankAccount();
         $tax = new TaxController();
         $package = new PackageController();
         $transaction = new TransactionController();
-
+        $balanceController = new BalanceController();
+        $bankAccountController = new BankAccountController();
+        
         $payerUuid = '0bc33ab0-d059-4ca6-aad3-ea7b04ceb656';
-        $amount = 500;
+        $amount = 5000;
         $payerBankBranch = '001';
         $payerBankNumber = '000001';
         $payerBankOperator = '1';
@@ -142,72 +146,95 @@ class UserController extends BaseController
         $receipientBankBranch = '001';
         $receipientBankNumber = '000002';
         $receipientBankOperator = '1';
-
-        // ! ####################################################################################################
-        // ! CONSULTA SE O USUARIO EMITENTE EXISTE
-        // ! ####################################################################################################
-
+        
+        // ? ####################################################################################################
+        // ? CONSULTA SE O USUARIO EMITENTE EXISTE
+        // ? ####################################################################################################
+        
         $payerData = User::where("uuid", "=", $payerUuid)->first();
         if (!$payerData) {
             throw new Exeption('O usuario emitente nao foi encontrado!');
         }
-
+        
         $payerAccountData = Account::where("uuid", "=", $payerUuid)->first();
         if (!$payerAccountData) {
             throw new Exeption('A conta emitente nao foi encontrada!');
         }
-
+        
         if (!$payerAccountData->enabled) {
             throw new Exeption('A conta do usuario esta desativada por tempo indeterminado!');
         }
-
-        // ! ####################################################################################################
-        // ! BUSCA OS PACOTES DO USUARIO EMITENTE
-        // ! ####################################################################################################
-
+        
+        // ? ####################################################################################################
+        // ? BUSCA OS PACOTES DO USUARIO EMITENTE
+        // ? ####################################################################################################
+        
         $packages = [];
         $packagesAmount = 0;
-
+        
         if (count($payerAccountData->packages) > 0) {
-
+            
             foreach ($payerAccountData->packages as $value) {
                 $payerPackageData = $package->showByCode($value);
+                if (!$payerPackageData) {
+                    continue;
+                }
                 $packages[] = $payerPackageData;
                 $packagesAmount += $payerPackageData->amount;
             }
         }
-
+        
         $amountCharge = $amount + $packagesAmount;
-
-        // ! ####################################################################################################
-        // ! CONSULTA A CONTA BANCARIA DO USUARIO EMITENTE
-        // ! ####################################################################################################
-
-        $payerBankAccount = $bankAccount->showByUuid($payerUuid);
-        if (!$payerBankAccount) {
-            throw new Exeption('A conta bancaria do usuario nao existe!');
-        }
-
-        if (!$payerBankAccount->enabled) {
-            throw new Exeption('A conta bancaria do usuario esta desativada por tempo indeterminado!');
-        }
-
-        // ! ####################################################################################################
-        // ! CONSULTA AO SALDO DO USUARIO
-        // ! ####################################################################################################
-
-        $savings = $balance->currentMonth($payerUuid);
-        if ($savings < $amountCharge) {
-            throw new Exeption('Saldo insuficiente!');
-
-        }
-
+        
         // ? ####################################################################################################
-        // ? CONSULTA A CONTA BANCARIA DO USUARIO RECEBEDOR
+        // ? CONSULTA A CONTA BANCARIA DO USUARIO EMITENTE
         // ? ####################################################################################################
         
-        $payerPackages = [];
+        $payerBankAccount = $bankAccountController->showByUuid($payerUuid);
+        if (!$payerBankAccount) {
+            throw new Exeption('A conta bancaria do usuario emissor nao existe!');
+        }
+        
+        if (!$payerBankAccount->enabled) {
+            throw new Exeption('A conta bancaria do usuario emissor esta desativada por tempo indeterminado!');
+        }
+        
+        // ? ####################################################################################################
+        // ? CONSULTA AO SALDO DO USUARIO EMISSOR
+        // ? ####################################################################################################
+        
+        $savings = $balanceController->currentMonth($payerUuid);
+        if ($savings < $amountCharge) {
+            throw new Exeption('Saldo insuficiente!');            
+        }
+        
+        // ? ####################################################################################################
+        // ? CONSULTA A CONTA BANCARIA DO USUARIO RECEBEDOR / CARREGA O BANCO DO RECEBEDOR
+        // ? ####################################################################################################
+        
+        $receipientBankAccount = $bankAccountController->showByNumber($receipientBankBranch, $receipientBankNumber);
+        if (!$receipientBankAccount) {
+            throw new Exeption('A conta bancaria do usuario recebedor nao existe!');
+        }
+        
+        if (!$receipientBankAccount->enabled) {
+            throw new Exeption('A conta bancaria do usuario recebedor esta desativada por tempo indeterminado!');
+        }
+        
+        $receipientUuid = $receipientBankAccount->uuid;
+        
+        // ? ####################################################################################################
+        // ? REGISTRA A TRANSACAO
+        // ? ####################################################################################################
+
+        $payer = $this->showByUuid($payerUuid);
+        $receipient = $this->showByUuid($receipientUuid);
+
+        $transaction->insert($amountCharge, $payer->document, $payerUuid, $payerBankAccount, $receipient->document, $receipientUuid, $receipientBankAccount, $payerAccountData->packages, $packagesAmount);
+        
         dd("funfou");
+        
+        $payerPackages = [];
         
         $tax->store();
         $package->store('pkg01', '001');
@@ -227,6 +254,11 @@ class UserController extends BaseController
         // carrega o banco do receptor
         // registra a transacao
         // atualizar status da transacao
+    }
+
+    public function showByUuid($uuid)
+    {
+       return User::where("uuid", "=", $uuid)->first();
     }
 
     // colocar na tabela de account o campo packages_codes

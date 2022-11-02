@@ -10,6 +10,8 @@ use Illuminate\Routing\Controller as BaseController;
 use Ramsey\Uuid\Uuid;
 
 use App\Models\Transaction;
+use App\Types\TransactionStatusType;
+use App\Types\TransactionType;
 
 class TransactionController extends BaseController
 {
@@ -38,7 +40,40 @@ class TransactionController extends BaseController
         $transaction->tax_package = 'tax_package';
         $transaction->tax_amount = 54;
         $transaction->type = 'type';
-        $transaction->status = 'status';
+        $transaction->status = TransactionStatusType::Processing;
+
+        $transaction->save();
+
+    }
+
+    public function insert($amount, $payer_document, $payer_uuid, $payerBank, $receipient_document, $receipient_uuid, $receipientBank, $tax_package, $tax_amount){
+        
+        $transaction = new Transaction();
+    
+        $transaction->uid = Uuid::uuid4();
+        $transaction->amount = $amount;
+        $transaction->payer_document = $payer_document;
+        $transaction->payer_uuid = $payer_uuid;
+        $transaction->payer_bank_name = "Jumeci";
+        $transaction->payer_bank_code = "001";
+        $transaction->payer_bank_ispb = 1;
+        $transaction->payer_bank_branch = $payerBank->branch;
+        $transaction->payer_bank_number = $payerBank->number;
+        $transaction->payer_bank_operator = $payerBank->operator;
+        $transaction->receipient_document = $receipient_document;
+        $transaction->receipient_uuid = $receipient_uuid;
+        $transaction->receipient_bank_name = "Jumeci";
+        $transaction->receipient_bank_code = "001";
+        $transaction->receipient_bank_ispb = 2;
+        $transaction->receipient_bank_branch = $receipientBank->branch;
+        $transaction->receipient_bank_number = $receipientBank->number;
+        $transaction->receipient_bank_operator = $receipientBank->operator;
+        $transaction->tax_package = implode(";", $tax_package);
+        $transaction->tax_amount = $tax_amount;
+        $transaction->type = TransactionType::CashOut;
+        $transaction->status = TransactionStatusType::Processing;
+        
+        // dd("funfou", $transaction->tax_package);
 
         $transaction->save();
 
