@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('accounts', function (Blueprint $table) {
             $table->id();
-            $table->string('uuid')->unique();// uuid da tabela usuario
+            $table->string('uuid');// uuid da tabela usuario
             $table->string('rg');
             $table->date('birthday');
             $table->string('gender');
@@ -24,6 +24,7 @@ return new class extends Migration
             $table->json('permitions');// armazenar uma string de json
             $table->json('without_permitions');// armazenar uma string de json
             $table->json('packages');
+            $table->json('integrations');// ! adicionar na model
             $table->timestamps();
         });
     }

@@ -222,7 +222,7 @@ class UserController extends BaseController
         }
         
         $receipientUuid = $receipientBankAccount->uuid;
-        
+
         // ? ####################################################################################################
         // ? REGISTRA A TRANSACAO
         // ? ####################################################################################################
@@ -252,7 +252,10 @@ class UserController extends BaseController
         // consulta se o usuario tem saldo para pagar a transacao mais a tarifa do pacote
         // consulta se o usuario receipient existe 
         // carrega o banco do receptor
-        // registra a transacao
+        // carregar a integracao do pacote(qual a rede bancaria utilizada)
+        // selecionar as contas bolsao e distribuir o markup daas taxas
+        // registra a transacao do emitente para o recebedor
+        // registrar as transacoes do emitente para as itegracoes
         // atualizar status da transacao
     }
 

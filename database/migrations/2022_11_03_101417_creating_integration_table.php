@@ -13,14 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('taxes', function (Blueprint $table) {
+        Schema::create('integrations', function (Blueprint $table) {
             $table->id();
             $table->string('uid');
-            $table->string('name', 50);
-            $table->string('code', 4);
+            $table->string('code', 6);
             $table->string('description', 50);
             $table->integer('enabled');
-            $table->unsignedBigInteger('amount');
+            $table->json('network_codes');
+            $table->string('type');
             $table->timestamps();
         });
     }
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('taxes');
+        Schema::dropIfExists('integrations');
     }
 };

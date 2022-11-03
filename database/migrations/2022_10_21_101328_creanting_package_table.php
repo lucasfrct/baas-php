@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('packages', function (Blueprint $table) {
             $table->id();
-            $table->string('uid')->unique();
+            $table->string('uid');
             $table->string('name', 50);
             $table->string('code', 4);
             $table->string('description', 50);
