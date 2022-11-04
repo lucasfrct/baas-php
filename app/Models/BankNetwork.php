@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Account extends Model
+class BankAccount extends Model
 {
+    use HasFactory;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -13,15 +16,15 @@ class Account extends Model
      */
     protected $fillable = [
         'uuid',
-        'rg',
-        'birthday',
-        'gender',
-        'cretificate',
+        'number',
+        'branch',
+        'operator',
+        'bank_ispb',
+        'code',
+        'tax_codes',
         'enabled',
-        'permitions',
-        'without_permitions',
-        'packages',
-        'integrations'
+        'prev_balance',
+        'balance'
     ];
 
     /**
@@ -29,9 +32,7 @@ class Account extends Model
      *
      * @var array<int, string>
      */
-    protected $hidden = [
-        
-    ];
+    protected $hidden = ['id'];
 
     /**
      * The attributes that should be cast.
@@ -39,10 +40,8 @@ class Account extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'birthday' => 'datetime',
-        'permitions' => 'array',
-        'without_permitions' => 'array',
-        'packages' => 'array',
-        'integrations'  => 'array'
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'tax_codes'  => 'array'
     ];
 }

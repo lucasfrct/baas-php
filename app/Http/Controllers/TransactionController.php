@@ -37,7 +37,7 @@ class TransactionController extends BaseController
         $transaction->receipient_bank_branch = 'rece';
         $transaction->receipient_bank_number = 'recei';
         $transaction->receipient_bank_operator = 're';
-        $transaction->tax_package = 'tax_package';
+        $transaction->tax_package = [];
         $transaction->tax_amount = 54;
         $transaction->type = 'type';
         $transaction->status = TransactionStatusType::Processing;
@@ -68,7 +68,7 @@ class TransactionController extends BaseController
         $transaction->receipient_bank_branch = $receipientBank->branch;
         $transaction->receipient_bank_number = $receipientBank->number;
         $transaction->receipient_bank_operator = $receipientBank->operator;
-        $transaction->tax_package = implode(";", $tax_package);
+        $transaction->tax_package = $tax_package;
         $transaction->tax_amount = $tax_amount;
         $transaction->type = TransactionType::CashOut;
         $transaction->status = TransactionStatusType::Processing;

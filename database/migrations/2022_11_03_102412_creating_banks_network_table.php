@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('operator');
             $table->integer('bank_ispb');
             $table->string('code', 6);
+            $table->json('tax_codes');
             $table->integer('enabled')->defaultValue(1);
             $table->unsignedBigInteger('prev_balance')->nullable();
             $table->unsignedBigInteger('balance')->nullable();

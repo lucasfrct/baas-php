@@ -3,26 +3,46 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 use Ramsey\Uuid\Uuid;
 
+use App\Shared\Str;
+use App\Models\User;
+use App\Models\Parents;
+use App\Models\BankAccount;
+use App\Types\OperatorType;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\AccountController;
-use App\Models\BankAccount;
-use App\Models\User;
-use App\Shared\Str;
-use App\Models\Parents;
-use App\Types\OperatorType;
 
 class BankAccountController extends Controller
 {
+    public function seed(string $uuid):BankAccount{
+    
+        $branch = new BranchController();    
+    
+        $bank_account = new BankAccount();
+        $bank_account->uid = Uuid::uuid4();
+        $bank_account->uuid = $uuid;
+        $bank_account->number = "XXX000";
+        $bank_account->branch = $branch->getCurrent();
+        $bank_account->operator = OperatorType::Checking;
+        $bank_account->enabled = 1;
+        
+        $bank_account->save();
+        $bank_account->id;
+        $bank_account->number = Str::padBankAccountNumber($bank_account->id);// 0001
+        $bank_account->save();        
+    
+        return $bank_account;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -43,32 +63,6 @@ class BankAccountController extends Controller
         return view('home');
     }
 
-    public function init(string $uuid, $document):BankAccount{
-        // 1600000000ms
-        $date = new \DateTime();
-        // $uuid = Uuid::uuid4();
-        $parent = new Parents;
-        $branch = new BranchController();
-
-
-        $bank_account = new BankAccount();
-        $bank_account->uid = Uuid::uuid4();
-        $bank_account->uuid = $uuid;
-        $bank_account->number = "XXX000";
-        $bank_account->branch = $branch->getCurrent();
-        $bank_account->operator = OperatorType::Checking;
-        $bank_account->enabled = 1;
-
-        // $parentData = $parent::where("document", "=", "01234567890001")->first();
-        // $issuer = $parentData->document;
-        
-        $bank_account->save();
-        $bank_account->id;
-        $bank_account->number = Str::padBankAccountNumber($bank_account->id);// 0001
-        $bank_account->save();        
-
-        return $bank_account;
-    }
 
     /**
      * Store a newly created resource in storage.

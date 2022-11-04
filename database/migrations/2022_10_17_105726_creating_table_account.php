@@ -24,7 +24,7 @@ return new class extends Migration
             $table->json('permitions');// armazenar uma string de json
             $table->json('without_permitions');// armazenar uma string de json
             $table->json('packages');
-            $table->json('integrations');// ! adicionar na model
+            $table->json('integrations');
             $table->timestamps();
         });
     }

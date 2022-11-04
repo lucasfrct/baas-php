@@ -33,7 +33,7 @@ return new class extends Migration
             $table->string('receipient_bank_branch', 4);
             $table->string('receipient_bank_number', 6);
             $table->string('receipient_bank_operator', 2);
-            $table->json('tax_package');// ! adicionar na model
+            $table->json('tax_package');
             $table->unsignedBigInteger('tax_amount');
             $table->string('status', 50);
             $table->string('type', 50);

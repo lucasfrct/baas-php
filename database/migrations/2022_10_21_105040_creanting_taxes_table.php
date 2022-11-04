@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('uid');
             $table->string('name', 50);
-            $table->string('code', 4);
+            $table->string('code', 6);
             $table->string('description', 50);
             $table->integer('enabled');
             $table->unsignedBigInteger('amount');

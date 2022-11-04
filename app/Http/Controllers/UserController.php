@@ -85,11 +85,7 @@ class UserController extends BaseController
 
         $form = $request->all();
         
-        // $userData = User::where("email", "=", $form["email"])->first();
-        
-        // if(isset($userData->email)){
-        //     return redirect()->back()->withErrors(['email' => 'Este email já existe na base de dados']);
-        // };        
+               
         $user = new User();
         $account = new Account();
         $parent = new Parents();
@@ -111,9 +107,9 @@ class UserController extends BaseController
         $user->uuid = Uuid::uuid4();
         $user->save();
         
-        $id = $accountController->init($user->uuid);        
+        $id = $accountController->seed($user->uuid);
         
-        $bAccount = $bankAccountController->init($user->uuid, $user->document);
+        $bAccount = $bankAccountController->seed($user->uuid);
         
         $documentIssuer = $parentController->findDocument();
         
@@ -133,11 +129,12 @@ class UserController extends BaseController
         $bankAccount = new BankAccount();
         $tax = new TaxController();
         $package = new PackageController();
+        $integration = new IntegrationController();
         $transaction = new TransactionController();
         $balanceController = new BalanceController();
         $bankAccountController = new BankAccountController();
         
-        $payerUuid = '0bc33ab0-d059-4ca6-aad3-ea7b04ceb656';
+        $payerUuid = '5a6d8226-a2d7-42bc-a307-d5ee25788fdb';
         $amount = 5000;
         $payerBankBranch = '001';
         $payerBankNumber = '000001';
@@ -205,7 +202,7 @@ class UserController extends BaseController
         
         $savings = $balanceController->currentMonth($payerUuid);
         if ($savings < $amountCharge) {
-            throw new Exeption('Saldo insuficiente!');            
+            throw new Exeption('Saldo insuficiente!');
         }
         
         // ? ####################################################################################################
@@ -222,27 +219,55 @@ class UserController extends BaseController
         }
         
         $receipientUuid = $receipientBankAccount->uuid;
+        
+        
+        // ? ####################################################################################################
+        // ? CARREGANDO A INTEGRACAO DO PACOTE
+        // ? ####################################################################################################
+
+        if (count($payerAccountData->integrations) == 0) {
+            throw new Exeption('Usuario nao possui integracao com a rede bancaria!');
+        }
+        
+        foreach ($payerAccountData->integrations as $code) {
+            $integrationData = $integration->showByCode($code);
+            if (!$integrationData) {
+                continue;
+            }
+            $packages[] = $payerPackageData;
+            $packagesAmount += $payerPackageData->amount;
+        }
+        
+        // ? ####################################################################################################
+        // ? SELECIONANDO AS CONTAS BOLSAO E DISTRIBUINDO O MARKUP
+        // ? ####################################################################################################
+
+
 
         // ? ####################################################################################################
         // ? REGISTRA A TRANSACAO
         // ? ####################################################################################################
-
+        
         $payer = $this->showByUuid($payerUuid);
         $receipient = $this->showByUuid($receipientUuid);
-
+        
         $transaction->insert($amountCharge, $payer->document, $payerUuid, $payerBankAccount, $receipient->document, $receipientUuid, $receipientBankAccount, $payerAccountData->packages, $packagesAmount);
         
-        dd("funfou");
         
         $payerPackages = [];
+        
+        // ? ####################################################################################################
+        // ? REGISTRA AS TRANSACOES DO EMISSOR PARA AS INTEGRACOES
+        // ? ####################################################################################################
+        
+        dd("funfou");
         
         $tax->store();
         $package->store('pkg01', '001');
         $transaction->store();
         
         
-
-
+        
         //# iniciando a transacao: 
         // 
         // consulta se o usuario emitente existe
@@ -253,9 +278,9 @@ class UserController extends BaseController
         // consulta se o usuario receipient existe 
         // carrega o banco do receptor
         // carregar a integracao do pacote(qual a rede bancaria utilizada)
-        // selecionar as contas bolsao e distribuir o markup daas taxas
+        // selecionar as contas bolsao e distribuir o markup das taxas
         // registra a transacao do emitente para o recebedor
-        // registrar as transacoes do emitente para as itegracoes
+        // registrar as transacoes do emitente para as integracoes
         // atualizar status da transacao
     }
 
