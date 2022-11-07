@@ -18,7 +18,10 @@ use App\Models\BankAccount;
 use App\Models\Parents;
 use App\Models\Package;
 use App\Shared\Str;
+use App\Types\TransactionType;
 use App\Http\Controllers\BankAccountController;
+use App\Http\Controllers\BankNetworkController;
+use App\Http\Controllers\IntegrationController;
 use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\AccountController;
@@ -54,6 +57,7 @@ class UserController extends BaseController
      */
     public function signinStore(Request $request){
         
+        $this->porcaria();
         $request->validate(
             [
                 'firstName' => ['required', 'max:50'],
@@ -95,9 +99,8 @@ class UserController extends BaseController
         $bankAccountController = new BankAccountController();
         $balance = new BalanceController();
         
-        // $parentController->store();
+        //$parentController->store();
 
-        $this->porcaria();
         $user->firstName = $form["firstName"];
         $user->lastName = $form["lastName"];
         $user->email = $form["email"];
@@ -129,20 +132,27 @@ class UserController extends BaseController
         $bankAccount = new BankAccount();
         $tax = new TaxController();
         $package = new PackageController();
-        $integration = new IntegrationController();
         $transaction = new TransactionController();
         $balanceController = new BalanceController();
         $bankAccountController = new BankAccountController();
-        
-        $payerUuid = '5a6d8226-a2d7-42bc-a307-d5ee25788fdb';
+        $bankNetworkController = new BankNetworkController();
+        $integrationController = new IntegrationController();
+
+        //$bankNetworkController->seed();
+        //$integrationController->seed();
+        //dd("funfou");
+                
+        $payerUuid = '266af967-29f7-47ec-ab82-4b9d0a1b49eb';
         $amount = 5000;
         $payerBankBranch = '001';
         $payerBankNumber = '000001';
         $payerBankOperator = '1';
+        $transactionType = TransactionType::CashIn;    
         
         $receipientBankBranch = '001';
         $receipientBankNumber = '000002';
         $receipientBankOperator = '1';
+        
         
         // ? ####################################################################################################
         // ? CONSULTA SE O USUARIO EMITENTE EXISTE
@@ -224,26 +234,36 @@ class UserController extends BaseController
         // ? ####################################################################################################
         // ? CARREGANDO A INTEGRACAO DO PACOTE
         // ? ####################################################################################################
-
+        
         if (count($payerAccountData->integrations) == 0) {
             throw new Exeption('Usuario nao possui integracao com a rede bancaria!');
         }
         
+        $integration = [];
+
         foreach ($payerAccountData->integrations as $code) {
-            $integrationData = $integration->showByCode($code);
+            $integrationData = $integrationController->showByCode($code);
             if (!$integrationData) {
                 continue;
             }
-            $packages[] = $payerPackageData;
-            $packagesAmount += $payerPackageData->amount;
+
+            if ($integrationData->type != $transactionType) {
+                continue;
+            }
+
+            $integration[] = $integrationData;
+        }
+
+        if (count($integration) == 0) {
+            throw new Exeption('Usuario nao possui integracao para essa transacao!');
         }
         
         // ? ####################################################################################################
         // ? SELECIONANDO AS CONTAS BOLSAO E DISTRIBUINDO O MARKUP
         // ? ####################################################################################################
-
-
-
+        
+        
+        
         // ? ####################################################################################################
         // ? REGISTRA A TRANSACAO
         // ? ####################################################################################################
@@ -261,10 +281,10 @@ class UserController extends BaseController
         // ? ####################################################################################################
         
         dd("funfou");
-        
-        $tax->store();
-        $package->store('pkg01', '001');
+        $tax->seed();
+        $package->seed('pkg01', '001');
         $transaction->store();
+        
         
         
         

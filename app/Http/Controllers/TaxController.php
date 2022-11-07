@@ -12,7 +12,7 @@ use Ramsey\Uuid\Uuid;
 
 class TaxController extends BaseController
 {
-    public function store(){
+    public function seed(){
         
         $tax = new Tax();
     

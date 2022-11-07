@@ -6,6 +6,7 @@ use Illuminate\Routing\Controller as BaseController;
 
 use Ramsey\Uuid\Uuid;
 use App\Models\Integration;
+use App\Models\BanksNetwork;
 use App\Types\TransactionType;
 
 class IntegrationController extends BaseController
@@ -34,16 +35,19 @@ class IntegrationController extends BaseController
             return null;
         }
 
-        // foreach ($integrationData->tax_codes as $code) {
-        //     $taxData = Tax::where("code", "=", $code)->first();
-        //     if (!$taxData || $taxData->enabled == 0) {
-        //         continue;
-        //     }
+        $banksNetworkCodes = [];
 
-        //     $integrationData->taxes[] = $taxData;
-        //     $integrationData->amount += $taxData->amount;
+        foreach ($integrationData->network_codes as $code) {
+            $banksNetworkData = BanksNetwork::where("code", "=", $code)->first();
+            if (!$banksNetworkData || $banksNetworkData->enabled == 0) {
+                continue;
+            }
 
-        // }
+            $banksNetworkCodes[] = $code;
+        }
+        $integrationData->banks = $banksNetworkCodes;
+        dd("funfou", $integrationData);
+
         return $integrationData;
     }
 }

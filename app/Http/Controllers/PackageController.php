@@ -14,7 +14,7 @@ use Ramsey\Uuid\Uuid;
 
 class PackageController extends BaseController
 {
-    public function store(string $name, $code){
+    public function seed(string $name, $code){
         
         $package = new Package();
     
