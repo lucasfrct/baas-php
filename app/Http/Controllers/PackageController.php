@@ -38,7 +38,7 @@ class PackageController extends BaseController
 
         foreach ($packageData->tax_codes as $code) {
             $taxData = Tax::where("code", "=", $code)->first();
-            if (!$taxData || $taxData->enabled == 0) {
+            if (!$taxData || $taxData->enabled == FALSE) {
                 continue;
             }
 

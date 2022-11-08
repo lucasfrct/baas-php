@@ -147,7 +147,7 @@ class UserController extends BaseController
         $payerBankBranch = '001';
         $payerBankNumber = '000001';
         $payerBankOperator = '1';
-        $transactionType = TransactionType::CashIn;    
+        $transactionType = TransactionType::CashIn->value;
         
         $receipientBankBranch = '001';
         $receipientBankNumber = '000002';
@@ -237,32 +237,38 @@ class UserController extends BaseController
         
         if (count($payerAccountData->integrations) == 0) {
             throw new Exeption('Usuario nao possui integracao com a rede bancaria!');
-        }
+        };
         
-        $integration = [];
+        $integrations = [];
 
         foreach ($payerAccountData->integrations as $code) {
+
             $integrationData = $integrationController->showByCode($code);
-            if (!$integrationData) {
+            if (!$integrationData || $integrationData->type != $transactionType) {
                 continue;
-            }
-
-            if ($integrationData->type != $transactionType) {
-                continue;
-            }
-
-            $integration[] = $integrationData;
-        }
-
-        if (count($integration) == 0) {
+            };
+            
+            $integrations[] = $integrationData;
+        };
+        
+        if (count($integrations) == 0) {
             throw new Exeption('Usuario nao possui integracao para essa transacao!');
-        }
+        };
+        
         
         // ? ####################################################################################################
         // ? SELECIONANDO AS CONTAS BOLSAO E DISTRIBUINDO O MARKUP
         // ? ####################################################################################################
         
-        
+        // Normalmente havera uma integracao para cada transacao
+        // Ainda esta em analise para multiplas integracoes
+
+        foreach ($integrations as $integration) {// 2^2
+            $bankNetworkController->taxFilter($integration, $packages);
+        };
+
+        dd('funfou');
+
         
         // ? ####################################################################################################
         // ? REGISTRA A TRANSACAO
@@ -278,6 +284,10 @@ class UserController extends BaseController
         
         // ? ####################################################################################################
         // ? REGISTRA AS TRANSACOES DO EMISSOR PARA AS INTEGRACOES
+        // ? ####################################################################################################
+
+        // ? ####################################################################################################
+        // ? ATUALIZA STATUS DA TRANSACAO
         // ? ####################################################################################################
         
         dd("funfou");

@@ -23,30 +23,25 @@ class IntegrationController extends BaseController
         $integration->type = TransactionType::CashIn;
 
         $integration->save();
-
     }
 
-    public function showByCode(string $intCode):Integration | null {
-
-        
+    public function showByCode(string $intCode):Integration | null {        
 
         $integrationData = Integration::where("code", "=", $intCode)->first();
         if (!$integrationData) {
             return null;
-        }
+        };
 
-        $banksNetworkCodes = [];
+        $integrationData->bankNetwork = [];
 
         foreach ($integrationData->network_codes as $code) {
             $banksNetworkData = BanksNetwork::where("code", "=", $code)->first();
-            if (!$banksNetworkData || $banksNetworkData->enabled == 0) {
+            if (!$banksNetworkData || $banksNetworkData->enabled == FALSE) {
                 continue;
             }
 
-            $banksNetworkCodes[] = $code;
-        }
-        $integrationData->banks = $banksNetworkCodes;
-        dd("funfou", $integrationData);
+            $integrationData->bankNetwork[] = $banksNetworkData;
+        };
 
         return $integrationData;
     }

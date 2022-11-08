@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Integration extends Model
 {
-    use HasFactory;
+    public array $bankNetwork;
 
     /**
      * The attributes that are mass assignable.
