@@ -78,4 +78,19 @@ class TransactionController extends BaseController
         $transaction->save();
 
     }
+
+    public function insertMarkup($integration, array $packages, $payer_document, $payerUuid, $payerBankAccount, $tax_package, $tax_amount){
+
+        foreach ($integration->bankNetwork as $bank) {// 2^2*2^3
+            foreach ($bank->tax_codes as $code) {// 2^3*2^4
+                foreach ($packages as $package) {// 2^4*2^5
+                    foreach ($package->taxes as $tax) {// 2^5*2^6
+                        
+                        $this->insert($tax->amount, $payer->document, $payerUuid, $payerBankAccount, "", $bank->uid, $bank, $tax_package, $tax_amount);
+                    }
+                }                
+            }
+        }
+    }
+
 }

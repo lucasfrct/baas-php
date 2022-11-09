@@ -25,7 +25,7 @@ class BankAccountController extends Controller
 {
     public function seed(string $uuid):BankAccount{
     
-        $branch = new BranchController();    
+        $branch = new BranchController();
     
         $bank_account = new BankAccount();
         $bank_account->uid = Uuid::uuid4();
@@ -33,6 +33,7 @@ class BankAccountController extends Controller
         $bank_account->number = "XXX000";
         $bank_account->branch = $branch->getCurrent();
         $bank_account->operator = OperatorType::Checking;
+        $bank_account->document = "73437854000103";
         $bank_account->enabled = 1;
         
         $bank_account->save();
@@ -172,5 +173,26 @@ class BankAccountController extends Controller
 
     public static function getExpirationTimestamp($timestamp, $vigor){
         return $expirationTimestamp = $timestamp + $vigor;
+    }
+
+    public function record(string $uuid):BankAccount
+    {
+        $branch = new BranchController();
+
+        $bank_account = new BankAccount();
+        $bank_account->uid = Uuid::uuid4();
+        $bank_account->uuid = $uuid;
+        $bank_account->branch = $branch->getCurrent();
+        $bank_account->operator = OperatorType::Checking;
+        $bank_account->enabled = TRUE;
+        $bank_account->prev_balance = [];
+        $bank_account->balance = [];
+
+        $bank_account->save();
+        $bank_account->id;
+        $bank_account->number = Str::padBankAccountNumber($bank_account->id);// 0001
+        $bank_account->save();  
+
+        return $bank_account;
     }
 }

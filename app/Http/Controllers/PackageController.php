@@ -2,29 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 
 use App\Models\Package;
 use App\Models\Tax;
-use App\Http\Controllers\TaxController;
+use App\Types\TransactionType;
 use Ramsey\Uuid\Uuid;
 
 class PackageController extends BaseController
 {
-    public function seed(string $name, $code){
+    public function seed(){
+
+        $this->record('pkg01', '001', 'description', TransactionType::CashIn, ['001']);
+    }
+
+    public function record(string $name, string $code, string $description, TransactionType $category, array $tax_codes){
         
         $package = new Package();
     
         $package->uid = Uuid::uuid4();
         $package->name = $name;
         $package->code = $code;
-        $package->description = 'description';
-        $package->category = 'cashin';
-        $package->enabled = 1;
-        $package->tax_codes = ['0001'];
+        $package->description = $description;
+        $package->category = $category;
+        $package->enabled = TRUE;
+        $package->tax_codes = $tax_codes;
 
         $package->save();
 

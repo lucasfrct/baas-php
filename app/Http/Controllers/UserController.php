@@ -29,6 +29,7 @@ use App\Http\Controllers\ParentController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\TransactionController;
+use App\Types\GenderType;
 use Emarref\Jwt\Token;
 
 use Illuminate\Support\Facades\Auth;
@@ -57,7 +58,8 @@ class UserController extends BaseController
      */
     public function signinStore(Request $request){
         
-        $this->porcaria();
+        $this->intercept();
+        $this->sumulationTransaction();
         $request->validate(
             [
                 'firstName' => ['required', 'max:50'],
@@ -87,19 +89,13 @@ class UserController extends BaseController
             ]
         );
 
-        $form = $request->all();
-        
+        $form = $request->all();        
                
         $user = new User();
-        $account = new Account();
-        $parent = new Parents();
         $parentController = new ParentController();
         $accountController = new AccountController();
-        $certificate = new CertificateController();
+        $certificateController = new CertificateController();
         $bankAccountController = new BankAccountController();
-        $balance = new BalanceController();
-        
-        //$parentController->store();
 
         $user->firstName = $form["firstName"];
         $user->lastName = $form["lastName"];
@@ -109,28 +105,24 @@ class UserController extends BaseController
         $user->password = Hash::make($form["password"]);
         $user->uuid = Uuid::uuid4();
         $user->save();
-        
-        $id = $accountController->seed($user->uuid);
-        
-        $bAccount = $bankAccountController->seed($user->uuid);
-        
+
+        $accountId = $accountController->record($user->uuid, '', '', GenderType::Empty, [], []);        
+        $bankAccount = $bankAccountController->record($user->uuid);        
         $documentIssuer = $parentController->findDocument();
-        
-        $cert = $certificate->generate($bAccount->branch, $bAccount->number, $documentIssuer, $user->document);
-        $accountController->insertCertificate($id, $cert);
-        // createAccount();
-        dd($cert);
-        
+        $certificate = $certificateController->generate($bankAccount->branch, $bankAccount->number, $documentIssuer, $user->document);
+        $accountController->insertCertificate($accountId, $certificate);
+
         auth()->login($user);
+
         
-        return redirect()->route('login');
+        //return redirect()->route('login');
     }
     
-    public function porcaria() {
+    public function sumulationTransaction() {
         
         $user = new User();
         $bankAccount = new BankAccount();
-        $tax = new TaxController();
+        $taxController = new TaxController();
         $package = new PackageController();
         $transaction = new TransactionController();
         $balanceController = new BalanceController();
@@ -138,8 +130,7 @@ class UserController extends BaseController
         $bankNetworkController = new BankNetworkController();
         $integrationController = new IntegrationController();
 
-        //$bankNetworkController->seed();
-        //$integrationController->seed();
+        
         //dd("funfou");
                 
         $payerUuid = '266af967-29f7-47ec-ab82-4b9d0a1b49eb';
@@ -263,8 +254,9 @@ class UserController extends BaseController
         // Normalmente havera uma integracao para cada transacao
         // Ainda esta em analise para multiplas integracoes
 
+        $banksReceipients = [];
         foreach ($integrations as $integration) {// 2^2
-            $bankNetworkController->taxFilter($integration, $packages);
+            $banksReceipients = array_merge($banksReceipients, $bankNetworkController->taxFilter($integration, $packages));            
         };
 
         dd('funfou');
@@ -278,22 +270,23 @@ class UserController extends BaseController
         $receipient = $this->showByUuid($receipientUuid);
         
         $transaction->insert($amountCharge, $payer->document, $payerUuid, $payerBankAccount, $receipient->document, $receipientUuid, $receipientBankAccount, $payerAccountData->packages, $packagesAmount);
-        
-        
-        $payerPackages = [];
-        
+                
         // ? ####################################################################################################
         // ? REGISTRA AS TRANSACOES DO EMISSOR PARA AS INTEGRACOES
         // ? ####################################################################################################
+
+        foreach ($banksReceipients as $bank) {
+
+            $transaction->insert($bank->tax_amount, $payer->document, $payerUuid, $payerBankAccount, $bank->document, $bank->uid, $bank, $payerAccountData->packages, 0);
+        }
+
 
         // ? ####################################################################################################
         // ? ATUALIZA STATUS DA TRANSACAO
         // ? ####################################################################################################
         
         dd("funfou");
-        $tax->seed();
-        $package->seed('pkg01', '001');
-        $transaction->store();
+        
         
         
         
@@ -312,6 +305,23 @@ class UserController extends BaseController
         // registra a transacao do emitente para o recebedor
         // registrar as transacoes do emitente para as integracoes
         // atualizar status da transacao
+    }
+
+    public function intercept() {
+
+        $parentController = new ParentController();
+        $taxController = new TaxController();
+        $package = new PackageController();
+        $bankNetworkController = new BankNetworkController();
+        $integrationController = new IntegrationController();
+
+        $parentController->seed();
+
+        $taxController->seed();
+        $package->seed();
+
+        $bankNetworkController->seed();
+        $integrationController->seed();
     }
 
     public function showByUuid($uuid)

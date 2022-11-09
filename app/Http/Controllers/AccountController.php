@@ -2,48 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 
 use App\Models\Account;
 use App\Types\GenderType;
-use App\Shared\Str;
 
 class AccountController extends BaseController
 {
-    public function seed(string $uuid): int{
+    public function seed(string $uuid): int{        
+
+        return $this->record($uuid, '12.760.364-5', new \DateTime(), GenderType::Male, ['001'], ['001']);
+    }
+
+    public function record(string $uuid, string $rg, $birthday, GenderType $gender, array $packages, array $integrations): int{
 
         $account = new Account();
         $account->uuid = $uuid;
-        $account->rg = '12.760.364-5';
-        $account->birthday = new \DateTime();
-        $account->gender = GenderType::Male;
-        $account->certificate = 'lucasfeio';
+        $account->rg = $rg;
+        $account->birthday = $birthday;
+        $account->gender = $gender;
+        $account->permitions = [];
+        $account->without_permitions = [];
+        $account->packages = $packages;
+        $account->integrations = $integrations;
         $account->enabled = 1;
-        $account->permitions = [];
-        $account->without_permitions = [];
-        $account->packages = ['001'];
-        $account->integrations = [];
 
         $account->save();
-
         return $account->id;
-    }
-
-    public function store(){
-
-        $account = new Account();
-        $account->uuid = '';
-        $account->rg = '12.760.364-5';
-        $account->birthday = new \DateTime();
-        $account->gender = GenderType::Male;
-        $account->certificate = 'lucasfeio';
-        $account->permitions = [];
-        $account->without_permitions = [];
-
-        $account->save();
     }
 
     public function insertCertificate(int $id, string $certificate){

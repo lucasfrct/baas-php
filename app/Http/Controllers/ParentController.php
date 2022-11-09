@@ -10,12 +10,14 @@ use App\Shared\Str;
 
 class ParentController extends BaseController
 {
-    public function store(){
+    public function seed(){
+        $this->record('jumeci cred', '04732012000161');
+    }
+
+    public function record(string $business, string $cnpj){
 
         $parent = new Parents();
 
-        $business = 'jumeci cred';
-        $cnpj = '04732012000161';
         $coreIp = Str::padCoreIp($business, $cnpj);
         $subIp = Str::padSubIp($coreIp, '00');
 

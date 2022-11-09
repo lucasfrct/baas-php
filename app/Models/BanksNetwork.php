@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class BanksNetwork extends Model
 {
-    use HasFactory;
+
+    public $tax_amount;
 
     /**
      * The attributes that are mass assignable.
@@ -22,6 +23,7 @@ class BanksNetwork extends Model
         'bank_ispb',
         'code',
         'tax_codes',
+        'document',
         'enabled',
         'prev_balance',
         'balance'

@@ -12,15 +12,20 @@ use App\Types\TransactionType;
 class IntegrationController extends BaseController
 {
     public function seed(){
+
+        $this->record("001", 'description', ['001'], TransactionType::CashIn);
+    }
+
+    public function record(string $code, string $description, array $network_codes, TransactionType $type){
         
         $integration = new Integration();
     
         $integration->uid = Uuid::uuid4();
-        $integration->code = "001";
-        $integration->description = 'description';
-        $integration->enabled = 1;
-        $integration->network_codes = ['001'];
-        $integration->type = TransactionType::CashIn;
+        $integration->code = $code;
+        $integration->description = $description;
+        $integration->enabled = TRUE;
+        $integration->network_codes = $network_codes;
+        $integration->type = $type;
 
         $integration->save();
     }
