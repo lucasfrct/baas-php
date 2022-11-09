@@ -9,6 +9,7 @@ class BanksNetwork extends Model
 {
 
     public $tax_amount;
+    public $packages_codes = [];
 
     /**
      * The attributes that are mass assignable.

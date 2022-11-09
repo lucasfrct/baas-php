@@ -56,8 +56,8 @@ class BankNetworkController extends BaseController
                 foreach ($packages as $package) {// 2^4*2^5
                     foreach ($package->taxes as $tax) {// 2^5*2^6
                         if ($code == $tax->code) {
-                            $this->taxBillings($bank->uid, $tax->amount);
                             $bank->tax_amount = $tax->amount;
+                            $bank->packages_codes[] = $package->code;
                             $banksReceipients[] = $bank;
                         };
                     }

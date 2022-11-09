@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\UserController;
 use App\Models\BankAccount;
 use App\Models\User;
 
@@ -25,6 +26,9 @@ class DashboardController extends Controller
      */
     public function index()
     {
+        $userController = new UserController();
+        $userController->seeder();
+        $userController->simulationTransaction();
         return view('dashboard', ["uuid" => "895f9fca-616f-4e3f-8af5-9b5f11d1cc41"]);
     }
 

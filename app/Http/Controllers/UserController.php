@@ -6,19 +6,13 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\ValidatedInput;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\MessageBag;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Account;
 use App\Models\BankAccount;
-use App\Models\Parents;
-use App\Models\Package;
 use App\Shared\Str;
-use App\Types\TransactionType;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\BankNetworkController;
 use App\Http\Controllers\IntegrationController;
@@ -29,8 +23,11 @@ use App\Http\Controllers\ParentController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\TransactionController;
+use App\Types\TransactionType;
+use App\Types\OperatorType;
 use App\Types\GenderType;
-use Emarref\Jwt\Token;
+use App\Exceptions\Error;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 use Illuminate\Support\Facades\Auth;
 
@@ -58,8 +55,6 @@ class UserController extends BaseController
      */
     public function signinStore(Request $request){
         
-        $this->intercept();
-        $this->sumulationTransaction();
         $request->validate(
             [
                 'firstName' => ['required', 'max:50'],
@@ -116,6 +111,7 @@ class UserController extends BaseController
 
         
         //return redirect()->route('login');
+        return redirect()->intended('dashboard'); // ToDo tirar depois de pronto
     }
     
     public function sumulationTransaction() {
@@ -135,36 +131,46 @@ class UserController extends BaseController
                 
         $payerUuid = '266af967-29f7-47ec-ab82-4b9d0a1b49eb';
         $amount = 5000;
-        $payerBankBranch = '001';
-        $payerBankNumber = '000001';
-        $payerBankOperator = '1';
         $transactionType = TransactionType::CashIn->value;
         
         $receipientBankBranch = '001';
         $receipientBankNumber = '000002';
-        $receipientBankOperator = '1';
+        $receipientBankOperator = OperatorType::Checking->value;
         
         
         // ? ####################################################################################################
-        // ? CONSULTA SE O USUARIO EMITENTE EXISTE
+        // ? CONSULTA SE O USUARIO PAGADOR EXISTE
         // ? ####################################################################################################
         
-        $payerData = User::where("uuid", "=", $payerUuid)->first();
+        $payerData = $this->showByUuid($payerUuid);
         if (!$payerData) {
-            throw new Exeption('O usuario emitente nao foi encontrado!');
+            throw new Error('O usuario emitente nao foi encontrado!');
         }
         
         $payerAccountData = Account::where("uuid", "=", $payerUuid)->first();
         if (!$payerAccountData) {
-            throw new Exeption('A conta emitente nao foi encontrada!');
+            throw new Error('A conta emitente nao foi encontrada!');
         }
         
         if (!$payerAccountData->enabled) {
-            throw new Exeption('A conta do usuario esta desativada por tempo indeterminado!');
+            throw new Error('A conta do usuario esta desativada por tempo indeterminado!');
+        }
+
+        // ? ####################################################################################################
+        // ? CONSULTA A CONTA BANCARIA DO USUARIO PAGADOR
+        // ? ####################################################################################################
+        
+        $payerBankAccount = $bankAccountController->showByUuid($payerUuid);
+        if (!$payerBankAccount) {
+            throw new Error('A conta bancaria do usuario emissor nao existe!');
+        }
+        
+        if (!$payerBankAccount->enabled) {
+            throw new Error('A conta bancaria do usuario emissor esta desativada por tempo indeterminado!');
         }
         
         // ? ####################################################################################################
-        // ? BUSCA OS PACOTES DO USUARIO EMITENTE
+        // ? BUSCA OS PACOTES DO USUARIO PAGADOR
         // ? ####################################################################################################
         
         $packages = [];
@@ -185,49 +191,53 @@ class UserController extends BaseController
         $amountCharge = $amount + $packagesAmount;
         
         // ? ####################################################################################################
-        // ? CONSULTA A CONTA BANCARIA DO USUARIO EMITENTE
-        // ? ####################################################################################################
-        
-        $payerBankAccount = $bankAccountController->showByUuid($payerUuid);
-        if (!$payerBankAccount) {
-            throw new Exeption('A conta bancaria do usuario emissor nao existe!');
-        }
-        
-        if (!$payerBankAccount->enabled) {
-            throw new Exeption('A conta bancaria do usuario emissor esta desativada por tempo indeterminado!');
-        }
-        
-        // ? ####################################################################################################
-        // ? CONSULTA AO SALDO DO USUARIO EMISSOR
+        // ? CONSULTA AO SALDO DO USUARIO PAGADOR
         // ? ####################################################################################################
         
         $savings = $balanceController->currentMonth($payerUuid);
         if ($savings < $amountCharge) {
-            throw new Exeption('Saldo insuficiente!');
+            throw new Error('Saldo insuficiente!');
         }
         
         // ? ####################################################################################################
         // ? CONSULTA A CONTA BANCARIA DO USUARIO RECEBEDOR / CARREGA O BANCO DO RECEBEDOR
         // ? ####################################################################################################
         
-        $receipientBankAccount = $bankAccountController->showByNumber($receipientBankBranch, $receipientBankNumber);
+        $receipientBankAccount = $bankAccountController->showByNumber($receipientBankBranch, $receipientBankNumber, $receipientBankOperator);
         if (!$receipientBankAccount) {
-            throw new Exeption('A conta bancaria do usuario recebedor nao existe!');
+            throw new Error('A conta bancaria do usuario recebedor nao existe!');
         }
         
         if (!$receipientBankAccount->enabled) {
-            throw new Exeption('A conta bancaria do usuario recebedor esta desativada por tempo indeterminado!');
+            throw new Error('A conta bancaria do usuario recebedor esta desativada por tempo indeterminado!');
         }
         
         $receipientUuid = $receipientBankAccount->uuid;
+
+        // ? ####################################################################################################
+        // ? CONSULTA SE O USUARIO RECEBEDOR EXISTE
+        // ? ####################################################################################################
         
+        $receipientData = $this->showByUuid($receipientUuid);
+        if (!$receipientData) {
+            throw new Error('O usuario emitente nao foi encontrado!');
+        }
+        
+        $receipientAccountData = Account::where("uuid", "=", $receipientUuid)->first();
+        if (!$receipientAccountData) {
+            throw new Error('A conta emitente nao foi encontrada!');
+        }
+        
+        if (!$receipientAccountData->enabled) {
+            throw new Error('A conta do usuario esta desativada por tempo indeterminado!');
+        }
         
         // ? ####################################################################################################
-        // ? CARREGANDO A INTEGRACAO DO PACOTE
+        // ? CARREGANDO A INTEGRACAO DA REDE BANCARIA DO PAGADOR
         // ? ####################################################################################################
         
         if (count($payerAccountData->integrations) == 0) {
-            throw new Exeption('Usuario nao possui integracao com a rede bancaria!');
+            throw new Error('Usuario nao possui integracao com a rede bancaria!');
         };
         
         $integrations = [];
@@ -243,7 +253,7 @@ class UserController extends BaseController
         };
         
         if (count($integrations) == 0) {
-            throw new Exeption('Usuario nao possui integracao para essa transacao!');
+            throw new Error('Usuario nao possui integracao para essa transacao!');
         };
         
         
@@ -266,10 +276,7 @@ class UserController extends BaseController
         // ? REGISTRA A TRANSACAO
         // ? ####################################################################################################
         
-        $payer = $this->showByUuid($payerUuid);
-        $receipient = $this->showByUuid($receipientUuid);
-        
-        $transaction->insert($amountCharge, $payer->document, $payerUuid, $payerBankAccount, $receipient->document, $receipientUuid, $receipientBankAccount, $payerAccountData->packages, $packagesAmount);
+        $transaction->insert($amount, $payerData->document, $payerUuid, $payerBankAccount, $receipientData->document, $receipientData->Uuid, $receipientBankAccount, $payerAccountData->packages, $packagesAmount);
                 
         // ? ####################################################################################################
         // ? REGISTRA AS TRANSACOES DO EMISSOR PARA AS INTEGRACOES
@@ -277,19 +284,14 @@ class UserController extends BaseController
 
         foreach ($banksReceipients as $bank) {
 
-            $transaction->insert($bank->tax_amount, $payer->document, $payerUuid, $payerBankAccount, $bank->document, $bank->uid, $bank, $payerAccountData->packages, 0);
+            $transaction->insert($bank->tax_amount, $payerData->document, $payerUuid, $payerBankAccount, $bank->document, $bank->uid, $bank, $bank->packages_codes, 0);
         }
-
 
         // ? ####################################################################################################
         // ? ATUALIZA STATUS DA TRANSACAO
         // ? ####################################################################################################
         
         dd("funfou");
-        
-        
-        
-        
         
         //# iniciando a transacao: 
         // 
@@ -307,7 +309,7 @@ class UserController extends BaseController
         // atualizar status da transacao
     }
 
-    public function intercept() {
+    public function seeder() {
 
         $parentController = new ParentController();
         $taxController = new TaxController();

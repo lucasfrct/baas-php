@@ -112,9 +112,9 @@ class BankAccountController extends Controller
        return BankAccount::where("uuid", "=", $uuid)->first();
     }
 
-    public function showByNumber($branch, $number): BankAccount | null
+    public function showByNumber($branch, $number, $operator): BankAccount | null
     {
-       return BankAccount::whereRaw("branch = ? and number = ?", [$branch, $number])->first();
+       return BankAccount::whereRaw("branch = ? and number = ? and operator = ?", [$branch, $number, $operator])->first();
     }
 
     /**
