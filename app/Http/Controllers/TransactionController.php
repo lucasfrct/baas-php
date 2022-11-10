@@ -52,18 +52,18 @@ class TransactionController extends BaseController
     
         $transaction->uid = Uuid::uuid4();
         $transaction->amount = $amount;
-        $transaction->payer_document = $payer_document;
-        $transaction->payer_uuid = $payer_uuid;
+        $transaction->payer_document = $payer->document;
+        $transaction->payer_uuid = $payer->uuid;
         $transaction->payer_bank_name = "Jumeci";
-        $transaction->payer_bank_code = "001";
+        $transaction->payer_bank_code = $payerBank->code;
         $transaction->payer_bank_ispb = 1;
         $transaction->payer_bank_branch = $payerBank->branch;
         $transaction->payer_bank_number = $payerBank->number;
         $transaction->payer_bank_operator = $payerBank->operator;
-        $transaction->receipient_document = $receipient_document;
-        $transaction->receipient_uuid = $receipient_uuid;
+        $transaction->receipient_document = $receipient->document;
+        $transaction->receipient_uuid = $receipient->uuid;
         $transaction->receipient_bank_name = "Jumeci";
-        $transaction->receipient_bank_code = "001";
+        $transaction->receipient_bank_code = $receipientBank->code;
         $transaction->receipient_bank_ispb = 2;
         $transaction->receipient_bank_branch = $receipientBank->branch;
         $transaction->receipient_bank_number = $receipientBank->number;

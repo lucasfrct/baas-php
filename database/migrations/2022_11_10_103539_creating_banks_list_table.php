@@ -13,20 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('bank_accounts', function (Blueprint $table) {
+        Schema::create('banks_list', function (Blueprint $table) {
             $table->id();
-            $table->string('uid');
-            $table->string('uuid');
             $table->string('company');
             $table->string('reason_social')->nullable();
+            $table->string('document');
             $table->integer('code');
             $table->integer('ispb');
-            $table->string('number');
-            $table->string('branch');
-            $table->string('operator');
-            $table->integer('enabled')->defaultValue(true);
-            $table->unsignedBigInteger('prev_balance')->nullable();
-            $table->unsignedBigInteger('balance')->nullable();
             $table->timestamps();
         });
     }
@@ -38,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('bank_accounts');
+        Schema::dropIfExists('banks_list');
     }
 };

@@ -182,6 +182,10 @@ class BankAccountController extends Controller
         $bank_account = new BankAccount();
         $bank_account->uid = Uuid::uuid4();
         $bank_account->uuid = $uuid;
+        $bank_account->company = ;
+        $bank_account->reason_social = '';
+        $bank_account->code = ;
+        $bank_account->ispb = ;
         $bank_account->branch = $branch->getCurrent();
         $bank_account->operator = OperatorType::Checking;
         $bank_account->enabled = TRUE;
@@ -194,5 +198,12 @@ class BankAccountController extends Controller
         $bank_account->save();  
 
         return $bank_account;
+    }
+
+    public function showByCompany(string $company): BankAccount
+    {
+        $bank_account = new BankAccount();
+        $bank_account->company = ;
+
     }
 }

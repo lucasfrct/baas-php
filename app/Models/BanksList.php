@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class BankAccount extends Model
+class BanksList extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -12,17 +12,11 @@ class BankAccount extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'uuid',
         'company',
         'reason_social',
+        'document',
         'code',
-        'ispb',
-        'number',
-        'branch',
-        'operator',
-        'enabled',
-        'prev_balance',
-        'balance'
+        'ispb'
     ];
 
     /**

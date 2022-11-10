@@ -86,26 +86,18 @@ class UserController extends BaseController
 
         $form = $request->all();        
                
-        $user = new User();
         $parentController = new ParentController();
         $accountController = new AccountController();
         $certificateController = new CertificateController();
         $bankAccountController = new BankAccountController();
-
-        $user->firstName = $form["firstName"];
-        $user->lastName = $form["lastName"];
-        $user->email = $form["email"];
-        $user->fone = $form["fone"];
-        $user->document = Str::padDocument($form["document"]);
-        $user->password = Hash::make($form["password"]);
-        $user->uuid = Uuid::uuid4();
-        $user->save();
-
-        $accountId = $accountController->record($user->uuid, '', '', GenderType::Empty, [], []);        
-        $bankAccount = $bankAccountController->record($user->uuid);        
+        
         $documentIssuer = $parentController->findDocument();
+        
+        $user = $this->record($form["firstName"], $form["lastName"], $form["email"], $form["fone"], $form["document"], $form["password"]);
+        $accountController->record($user->uuid, '', '', GenderType::Empty, [], []);        
+        $bankAccount = $bankAccountController->record($user->uuid);        
         $certificate = $certificateController->generate($bankAccount->branch, $bankAccount->number, $documentIssuer, $user->document);
-        $accountController->insertCertificate($accountId, $certificate);
+        $accountController->insertCertificateByUuid($user->uuid, $certificate);
 
         auth()->login($user);
 
@@ -113,15 +105,31 @@ class UserController extends BaseController
         //return redirect()->route('login');
         return redirect()->intended('dashboard'); // ToDo tirar depois de pronto
     }
+
+    public function record(string $firstName, string $lastName, string $email, string $fone, string $document, string $password): User{
+
+        $user = new User();
+
+        $user->firstName = $firstName;
+        $user->lastName = $lastName;
+        $user->email = $email;
+        $user->fone = $fone;
+        $user->document = Str::padDocument($document);
+        $user->password = Hash::make($password);
+        $user->uuid = Uuid::uuid4();
+        $user->save();
+
+        return $user;
+    }
     
     public function sumulationTransaction() {
         
-        $user = new User();
         $bankAccount = new BankAccount();
         $taxController = new TaxController();
         $package = new PackageController();
         $transaction = new TransactionController();
         $balanceController = new BalanceController();
+        $accountController = new AccountController();
         $bankAccountController = new BankAccountController();
         $bankNetworkController = new BankNetworkController();
         $integrationController = new IntegrationController();
@@ -147,7 +155,7 @@ class UserController extends BaseController
             throw new Error('O usuario emitente nao foi encontrado!');
         }
         
-        $payerAccountData = Account::where("uuid", "=", $payerUuid)->first();
+        $payerAccountData = $accountController->showByUuid($payerUuid);
         if (!$payerAccountData) {
             throw new Error('A conta emitente nao foi encontrada!');
         }
@@ -212,18 +220,16 @@ class UserController extends BaseController
             throw new Error('A conta bancaria do usuario recebedor esta desativada por tempo indeterminado!');
         }
         
-        $receipientUuid = $receipientBankAccount->uuid;
-
         // ? ####################################################################################################
         // ? CONSULTA SE O USUARIO RECEBEDOR EXISTE
         // ? ####################################################################################################
         
-        $receipientData = $this->showByUuid($receipientUuid);
+        $receipientData = $this->showByUuid($receipientBankAccount->uuid);
         if (!$receipientData) {
             throw new Error('O usuario emitente nao foi encontrado!');
         }
         
-        $receipientAccountData = Account::where("uuid", "=", $receipientUuid)->first();
+        $receipientAccountData = $accountController->showByUuid($receipientData->uuid);
         if (!$receipientAccountData) {
             throw new Error('A conta emitente nao foi encontrada!');
         }
