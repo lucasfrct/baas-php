@@ -24,18 +24,9 @@ use App\Http\Controllers\AccountController;
 
 class BanksListController extends Controller
 {
-    public function seed(string $uuid):BankAccount{
-        
-        $banks_list = new BankAccount();
-        $banks_list->company = "73437854000103";
-        $banks_list->reason_social = "73437854000103";
-        $banks_list->document = "73437854000103";
-        $banks_list->code = 1;
-        $banks_list->ispb = 1;
-        
-        $banks_list->save();       
-    
-        return $banks_list;
+    public function seed(): BanksList
+    {
+        return $this->record('NU PAGAMENTOS - IP', '', '24410913000144', 260, 18236120);
     }
 
     /**
@@ -76,26 +67,9 @@ class BanksListController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show()
     {
-        $bankAccountData = BankAccount::where("uuid", "=", $id)->first();
-        // dd($bankAccountData->uuid, $bankAccountData->number);
-        $bankAccount = [
-            'number' => $bankAccountData->number,
-            'branch' => $bankAccountData->branch,
-            'operator' => $bankAccountData->operator
-        ];
-        return view("home", ["bankAccount" => $bankAccount]);
-    }
 
-    public function showByUuid($uuid)
-    {
-       return BankAccount::where("uuid", "=", $uuid)->first();
-    }
-
-    public function showByNumber($branch, $number, $operator): BankAccount | null
-    {
-       return BankAccount::whereRaw("branch = ? and number = ? and operator = ?", [$branch, $number, $operator])->first();
     }
 
     /**
@@ -132,10 +106,6 @@ class BanksListController extends Controller
         //
     }
 
-    public static function getExpirationTimestamp($timestamp, $vigor){
-        return $expirationTimestamp = $timestamp + $vigor;
-    }
-
     public function record(string $company, string $reason_social, string $document, int $code, int $ispb): BanksList
     {
         $banks_list = new BanksList();
@@ -153,5 +123,10 @@ class BanksListController extends Controller
     public function showByCompany(string $company): BanksList
     {
         return BanksList::where("company", "=", $company)->first();
+    }
+
+    public function showByIspb(string $ispb): BanksList
+    {
+        return BanksList::where("ispb", "=", $ispb)->first();
     }
 }

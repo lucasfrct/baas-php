@@ -17,10 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('uid');
             $table->string('uuid');
-            $table->string('company');
-            $table->string('reason_social')->nullable();
-            $table->integer('code');
-            $table->integer('ispb');
+            $table->string('parent_code');
             $table->string('number');
             $table->string('branch');
             $table->string('operator');

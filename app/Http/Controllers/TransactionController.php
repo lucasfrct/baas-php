@@ -46,51 +46,49 @@ class TransactionController extends BaseController
 
     }
 
-    public function insert($amount, $payer_document, $payer_uuid, $payerBank, $receipient_document, $receipient_uuid, $receipientBank, $tax_package, $tax_amount){
+    public function insert($amount, $payerData, $payerParentData, $payerBank, $receipientData, $receipientParentData, $receipientBank, $tax_package, $tax_amount): Transaction
+    {
         
         $transaction = new Transaction();
     
         $transaction->uid = Uuid::uuid4();
         $transaction->amount = $amount;
-        $transaction->payer_document = $payer->document;
-        $transaction->payer_uuid = $payer->uuid;
-        $transaction->payer_bank_name = "Jumeci";
+        $transaction->payer_document = $payerData->document;
+        $transaction->payer_uuid = $payerData->uuid;
+        $transaction->payer_bank_company = $payerParentData->company;
         $transaction->payer_bank_code = $payerBank->code;
-        $transaction->payer_bank_ispb = 1;
+        $transaction->payer_bank_ispb = $payerParentData->ispb;
         $transaction->payer_bank_branch = $payerBank->branch;
         $transaction->payer_bank_number = $payerBank->number;
         $transaction->payer_bank_operator = $payerBank->operator;
-        $transaction->receipient_document = $receipient->document;
-        $transaction->receipient_uuid = $receipient->uuid;
-        $transaction->receipient_bank_name = "Jumeci";
+        $transaction->receipient_document = $receipientData->document;
+        $transaction->receipient_uuid = $receipientData->uuid;
+        $transaction->receipient_bank_company = $receipientParentData->company;
         $transaction->receipient_bank_code = $receipientBank->code;
-        $transaction->receipient_bank_ispb = 2;
+        $transaction->receipient_bank_ispb = $receipientParentData->ispb;
         $transaction->receipient_bank_branch = $receipientBank->branch;
         $transaction->receipient_bank_number = $receipientBank->number;
         $transaction->receipient_bank_operator = $receipientBank->operator;
         $transaction->tax_package = $tax_package;
         $transaction->tax_amount = $tax_amount;
         $transaction->type = TransactionType::CashOut;
-        $transaction->status = TransactionStatusType::Processing;
+        $transaction->status = TransactionStatusType::Transient;
         
         // dd("funfou", $transaction->tax_package);
 
         $transaction->save();
 
+        return $transaction;
     }
 
-    public function insertMarkup($integration, array $packages, $payer_document, $payerUuid, $payerBankAccount, $tax_package, $tax_amount){
+    public function updateStatus(string $uid, string $status): Transaction
+    {
+        $transaction = Transaction::where("uid", "=", $uid)->first();
 
-        foreach ($integration->bankNetwork as $bank) {// 2^2*2^3
-            foreach ($bank->tax_codes as $code) {// 2^3*2^4
-                foreach ($packages as $package) {// 2^4*2^5
-                    foreach ($package->taxes as $tax) {// 2^5*2^6
-                        
-                        $this->insert($tax->amount, $payer->document, $payerUuid, $payerBankAccount, "", $bank->uid, $bank, $tax_package, $tax_amount);
-                    }
-                }                
-            }
-        }
+        $transaction->status = $status;
+
+        $transaction->save();
+
+        return $transaction;
     }
-
 }

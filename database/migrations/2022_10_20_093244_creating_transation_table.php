@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('amount');
             $table->string('payer_document', 14);
             $table->string('payer_uuid', 36);
-            $table->string('payer_bank_name', 50);
+            $table->string('payer_bank_company', 50);
             $table->string('payer_bank_code', 3);
             $table->integer('payer_bank_ispb');
             $table->string('payer_bank_branch', 4);
@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('payer_bank_operator', 2);
             $table->string('receipient_document', 14);
             $table->string('receipient_uuid', 36);
-            $table->string('receipient_bank_name', 50);
+            $table->string('receipient_bank_company', 50);
             $table->string('receipient_bank_code', 3);
             $table->integer('receipient_bank_ispb');
             $table->string('receipient_bank_branch', 4);

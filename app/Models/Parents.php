@@ -17,6 +17,10 @@ class Parents extends Model
     protected $fillable = [
         'core_ip',
         'sub_ip',
+        'company',
+        'reason_social',
+        'code',
+        'ispb',
         'document',
         'enabled'
     ];

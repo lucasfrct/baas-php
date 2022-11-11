@@ -18,29 +18,40 @@ use App\Models\Parents;
 use App\Models\BankAccount;
 use App\Types\OperatorType;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\BanksListController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\ParentController;
 
 class BankAccountController extends Controller
 {
-    public function seed(string $uuid):BankAccount{
-    
+    public function seed(string $uuid, int $parent_code): BankAccount
+    {
+        $banksList = new BanksListController;
+        //$banksList->showByCompany($company);
+
+        return $this->record($uuid, $parent_code);
+    }
+
+    public function record(string $uuid, string $parent_code): BankAccount
+    {
         $branch = new BranchController();
-    
+
         $bank_account = new BankAccount();
         $bank_account->uid = Uuid::uuid4();
         $bank_account->uuid = $uuid;
-        $bank_account->number = "XXX000";
-        $bank_account->branch = $branch->getCurrent();
+        $bank_account->parent_code = $parent_code;
+        $bank_account->branch = $branch->getCurrent($parent_code);
         $bank_account->operator = OperatorType::Checking;
-        $bank_account->document = "73437854000103";
-        $bank_account->enabled = 1;
-        
+        $bank_account->enabled = TRUE;
+        $bank_account->prev_balance = [];
+        $bank_account->balance = [];
+
         $bank_account->save();
         $bank_account->id;
         $bank_account->number = Str::padBankAccountNumber($bank_account->id);// 0001
-        $bank_account->save();        
-    
+        $bank_account->save();  
+
         return $bank_account;
     }
 
@@ -112,9 +123,9 @@ class BankAccountController extends Controller
        return BankAccount::where("uuid", "=", $uuid)->first();
     }
 
-    public function showByNumber($branch, $number, $operator): BankAccount | null
+    public function showByNumber($parent_code, $branch, $number, $operator): BankAccount | null
     {
-       return BankAccount::whereRaw("branch = ? and number = ? and operator = ?", [$branch, $number, $operator])->first();
+       return BankAccount::whereRaw("parent_code = ? and branch = ? and number = ? and operator = ?", [$parent_code, $branch, $number, $operator])->first();
     }
 
     /**
@@ -175,35 +186,4 @@ class BankAccountController extends Controller
         return $expirationTimestamp = $timestamp + $vigor;
     }
 
-    public function record(string $uuid):BankAccount
-    {
-        $branch = new BranchController();
-
-        $bank_account = new BankAccount();
-        $bank_account->uid = Uuid::uuid4();
-        $bank_account->uuid = $uuid;
-        $bank_account->company = ;
-        $bank_account->reason_social = '';
-        $bank_account->code = ;
-        $bank_account->ispb = ;
-        $bank_account->branch = $branch->getCurrent();
-        $bank_account->operator = OperatorType::Checking;
-        $bank_account->enabled = TRUE;
-        $bank_account->prev_balance = [];
-        $bank_account->balance = [];
-
-        $bank_account->save();
-        $bank_account->id;
-        $bank_account->number = Str::padBankAccountNumber($bank_account->id);// 0001
-        $bank_account->save();  
-
-        return $bank_account;
-    }
-
-    public function showByCompany(string $company): BankAccount
-    {
-        $bank_account = new BankAccount();
-        $bank_account->company = ;
-
-    }
 }

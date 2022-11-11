@@ -9,7 +9,7 @@ use Illuminate\Routing\Controller as BaseController;
 
 class BranchController extends BaseController
 {
-    public function getCurrent() { 
+    public function getCurrent(int $parent_code) { 
         return ["001", "002", "003", "004", "005", "006", "007"][0];
     }
     

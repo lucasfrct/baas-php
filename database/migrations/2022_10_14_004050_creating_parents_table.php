@@ -17,7 +17,11 @@ return new class extends Migration
             $table->id();
             $table->string('core_ip', 17)->unique();// LUC00000000000000
             $table->string('sub_ip', 19);// subXX00000000000000
-            $table->string('document', 14);
+            $table->string('company');
+            $table->string('reason_social')->nullable();
+            $table->string('code');
+            $table->string('ispb');
+            $table->string('document');
             $table->boolean('enabled');
             $table->timestamps();
         });
