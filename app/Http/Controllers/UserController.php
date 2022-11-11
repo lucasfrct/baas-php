@@ -28,6 +28,7 @@ use App\Types\TransactionType;
 use App\Types\TransactionStatusType;
 use App\Types\OperatorType;
 use App\Types\GenderType;
+use DateTime;
 use App\Exceptions\Error;
 
 use Illuminate\Support\Facades\Auth;
@@ -56,6 +57,8 @@ class UserController extends BaseController
      */
     public function signinStore(Request $request){
         
+        //$this->seeder();
+
         $request->validate(
             [
                 'firstName' => ['required', 'max:50'],
@@ -91,19 +94,33 @@ class UserController extends BaseController
         $accountController = new AccountController();
         $certificateController = new CertificateController();
         $bankAccountController = new BankAccountController();
-        $banksList = new BanksListController;
+        $banksListController = new BanksListController;
         $parentController = new ParentController;
         
-        $parentData = $parentController->showByCode(1);
-        
+        $birthday = new DateTime();
+
         $user = $this->record($form["firstName"], $form["lastName"], $form["email"], $form["fone"], $form["document"], $form["password"]);
-        $accountController->record($user->uuid, '', '', GenderType::Empty, [], []);        
-        $bankAccount = $bankAccountController->record($user->uuid, $parentData->code);
-        $certificate = $certificateController->generate($bankAccount->branch, $bankAccount->number, $parentData->document, $user->document);
-        $accountController->insertCertificateByUuid($user->uuid, $certificate);
+        $accountController->record($user->uuid, '', $birthday, GenderType::Empty, ["001"], ["001"]);        
+
+        $bankIspb = $parentController->currentBankIspb();
+        $bank = $banksListController->showByIspb($bankIspb);
+        if (!$bank) {
+            throw new Error('Nao foi encontrado um banco disponivel!');
+        }
+        
+        $bankAccount = $bankAccountController->record($user->uuid, $bank->code);
+        if (!$bankAccount) {
+            throw new Error('Nao foi possivel criar conta bancaria!');
+        }
+
+        $certificate = $certificateController->generate($bankAccount->branch, $bankAccount->number, $bank->document, $user->document);
+
+        $check = $accountController->insertCertificateByUuid($user->uuid, $certificate);
+        if (!$check) {
+            throw new Error('Nao foi possivel inserir certificado!');
+        }
 
         auth()->login($user);
-
         
         //return redirect()->route('login');
         return redirect()->intended('dashboard'); // ToDo tirar depois de pronto
@@ -136,17 +153,15 @@ class UserController extends BaseController
         $parentController = new ParentController;
         $bankAccountController = new BankAccountController();
         $bankNetworkController = new BankNetworkController();
+        $banksListController = new BanksListController();
         $integrationController = new IntegrationController();
-
         
-        //dd("funfou");
-                
-        $payerUuid = '266af967-29f7-47ec-ab82-4b9d0a1b49eb';
+        $payerUuid = '888786e7-b112-4683-abdc-ab77465a8abe';
         $amount = 5000;
         $transactionType = TransactionType::CashIn->value;
-        $payerBankIspb = 1;
+        $payerBankIspb = 18236120;
         
-        $receipientBankIspb = 1;
+        $receipientBankIspb = 18236120;
         $receipientBankBranch = '001';
         $receipientBankNumber = '000002';
         $receipientBankOperator = OperatorType::Checking->value;
@@ -169,13 +184,14 @@ class UserController extends BaseController
         if (!$payerAccountData->enabled) {
             throw new Error('A conta do usuario esta desativada por tempo indeterminado!');
         }
-
+        
         // ? ####################################################################################################
         // ? CONSULTA A CONTA BANCARIA DO USUARIO PAGADOR
         // ? ####################################################################################################
         
-        $payerParentData = $parentController->showByIspb($payerBankIspb);
-
+        // Banco emissor da conta do usuario pagador
+        $payerBank = $banksListController->showByIspb($payerBankIspb);
+        
         $payerBankAccount = $bankAccountController->showByUuid($payerUuid);
         if (!$payerBankAccount) {
             throw new Error('A conta bancaria do usuario emissor nao existe!');
@@ -211,7 +227,7 @@ class UserController extends BaseController
         // ? ####################################################################################################
         
         $savings = $balanceController->currentMonth($payerUuid);
-        if ($savings < $amountCharge) {
+        if ($savings <= $amountCharge) {
             throw new Error('Saldo insuficiente!');
         }
         
@@ -219,8 +235,12 @@ class UserController extends BaseController
         // ? CONSULTA A CONTA BANCARIA DO USUARIO RECEBEDOR / CARREGA O BANCO DO RECEBEDOR
         // ? ####################################################################################################
         
-        $receipientParentData = $parentController->showByIspb($receipientBankIspb);
-        $receipientBankAccount = $bankAccountController->showByNumber($receipientParentData->code, $receipientBankBranch, $receipientBankNumber, $receipientBankOperator);
+        $receipientBank = $banksListController->showByIspb($receipientBankIspb);
+        if (!$receipientBank) {
+            throw new Error('Banco recebedor nao encontrado!');
+        }
+        
+        $receipientBankAccount = $bankAccountController->showByNumber($receipientBank->code, $receipientBankBranch, $receipientBankNumber, $receipientBankOperator);
         if (!$receipientBankAccount) {
             throw new Error('A conta bancaria do usuario recebedor nao existe!');
         }
@@ -228,6 +248,7 @@ class UserController extends BaseController
         if (!$receipientBankAccount->enabled) {
             throw new Error('A conta bancaria do usuario recebedor esta desativada por tempo indeterminado!');
         }
+        //dd($receipientBank);
         
         // ? ####################################################################################################
         // ? CONSULTA SE O USUARIO RECEBEDOR EXISTE
@@ -256,9 +277,9 @@ class UserController extends BaseController
         };
         
         $integrations = [];
-
+        
         foreach ($payerAccountData->integrations as $code) {
-
+            
             $integrationData = $integrationController->showByCode($code);
             if (!$integrationData || $integrationData->type != $transactionType) {
                 continue;
@@ -271,52 +292,53 @@ class UserController extends BaseController
             throw new Error('Usuario nao possui integracao para essa transacao!');
         };
         
-        
         // ? ####################################################################################################
         // ? SELECIONANDO AS CONTAS BOLSAO E DISTRIBUINDO O MARKUP
         // ? ####################################################################################################
         
         // Normalmente havera uma integracao para cada transacao
         // Ainda esta em analise para multiplas integracoes
-
+        
         $banksReceipients = [];
         foreach ($integrations as $integration) {// 2^2
             $banksReceipients = array_merge($banksReceipients, $bankNetworkController->taxFilter($integration, $packages));            
         };
-
-        dd('funfou');
-
+        //dd("funfou!", $banksReceipients);
         
         // ? ####################################################################################################
         // ? REGISTRA A TRANSACAO
         // ? ####################################################################################################
         
         $transactionsPool = [];
-
-        $transactionData = $transactionController->insert($amount, $payerData, $payerParentData, $payerBankAccount, $receipientData, $receipientParentData, $receipientBankAccount, $payerAccountData->packages, $packagesAmount);
+        
+        $transactionData = $transactionController->insert($amount, $payerData, $payerBank , $payerBankAccount, $receipientData, $receipientBank, $receipientBankAccount, $packages, $packagesAmount);
         $transactionsPool[] = $transactionData;
-
+        
         // ? ####################################################################################################
         // ? REGISTRA AS TRANSACOES DO EMISSOR PARA AS INTEGRACOES
         // ? ####################################################################################################
-
+        
         foreach ($banksReceipients as $bank) {
-
-            $transactionsPool[] = $transactionController->insert($bank->tax_amount, $payerData, $payerParentData, $payerBankAccount, $payerParentData, $bank, $bank, $bank->packages_codes, 0);
-            sleep(1);
-        }
-
-        // ? ####################################################################################################
-        // ? ATUALIZA STATUS DA TRANSACAO
-        // ? ####################################################################################################
-
-        foreach ($transactionsPool as $transaction) {
-
-            $transactionController->updateStatus($transaction->uid, TransactionStatusType::Processing->value);
+            
+            $bankData = $banksListController->showByIspb($bank->ispb);
+            if (!$bankData) {
+                continue;
+            }
+            $transactionsPool[] = $transactionController->insert($bank->tax_amount, $payerData, $payerBank, $payerBankAccount, $bank, $bankData, $bank, $packages, 0);
             sleep(1);
         }
         
-        dd("funfou");
+        // ? ####################################################################################################
+        // ? ATUALIZA STATUS DA TRANSACAO
+        // ? ####################################################################################################
+        
+        foreach ($transactionsPool as $transaction) {
+            
+            $transactionController->updateStatus($transaction->uid, TransactionStatusType::Processing->value);
+            sleep(1);
+        }
+        dd("funfou", $transactionsPool);
+        
         
         //# iniciando a transacao: 
         // 
@@ -334,8 +356,8 @@ class UserController extends BaseController
         // atualizar status da transacao
     }
 
-    public function seeder() {
-
+    public function seeder() 
+    {
         $parentController = new ParentController();
         $taxController = new TaxController();
         $package = new PackageController();

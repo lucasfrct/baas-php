@@ -8,6 +8,8 @@ use Ramsey\Uuid\Uuid;
 use App\Models\Integration;
 use App\Models\BanksNetwork;
 use App\Types\TransactionType;
+use App\Http\Controllers\BankNetworkController;
+
 
 class IntegrationController extends BaseController
 {
@@ -23,7 +25,7 @@ class IntegrationController extends BaseController
         $integration->uid = Uuid::uuid4();
         $integration->code = $code;
         $integration->description = $description;
-        $integration->enabled = TRUE;
+        $integration->enabled = true;
         $integration->network_codes = $network_codes;
         $integration->type = $type;
 
@@ -39,9 +41,11 @@ class IntegrationController extends BaseController
 
         $integrationData->bankNetwork = [];
 
+        $bankNetworkController = new BankNetworkController();
+
         foreach ($integrationData->network_codes as $code) {
-            $banksNetworkData = BanksNetwork::where("code", "=", $code)->first();
-            if (!$banksNetworkData || $banksNetworkData->enabled == FALSE) {
+            $banksNetworkData = $bankNetworkController->showByCode($code);
+            if (!$banksNetworkData || $banksNetworkData->enabled == false) {
                 continue;
             }
 

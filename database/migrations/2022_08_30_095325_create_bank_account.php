@@ -17,8 +17,8 @@ return new class extends Migration
             $table->id();
             $table->string('uid');
             $table->string('uuid');
-            $table->string('parent_code');
-            $table->string('number');
+            $table->string('code');
+            $table->string('number')->nullable();
             $table->string('branch');
             $table->string('operator');
             $table->integer('enabled')->defaultValue(true);

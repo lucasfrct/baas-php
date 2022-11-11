@@ -13,7 +13,7 @@ class BankAccount extends Model
      */
     protected $fillable = [
         'uuid',
-        'parent_code',
+        'code',
         'number',
         'branch',
         'operator',

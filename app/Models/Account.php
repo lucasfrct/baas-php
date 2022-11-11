@@ -43,6 +43,8 @@ class Account extends Model
         'permitions' => 'array',
         'without_permitions' => 'array',
         'packages' => 'array',
-        'integrations'  => 'array'
+        'integrations'  => 'array',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime'
     ];
 }

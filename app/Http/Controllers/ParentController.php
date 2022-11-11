@@ -11,10 +11,10 @@ use App\Shared\Str;
 class ParentController extends BaseController
 {
     public function seed(){
-        $this->record('jumeci cred', '04732012000161', 'Jumeci Bank', '', 1, 1);
+        $this->record('jumeci cred', '04732012000161', 'Jumeci Bank', '', "001", 260);
     }
 
-    public function record(string $business, string $cnpj, string $company, string $reason_social, string $code, string $ispb,){
+    public function record(string $business, string $cnpj, string $company, string $reason_social, string $code, string $ispb){
 
         $parent = new Parents();
 
@@ -48,5 +48,10 @@ class ParentController extends BaseController
     public function showByIspb($ispb)
     {
        return Parents::where("ispb", "=", $ispb)->first();
+    }
+
+    public function currentBankIspb(): int
+    {
+        return 18236120;
     }
 }

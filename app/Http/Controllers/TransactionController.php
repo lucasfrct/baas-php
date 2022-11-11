@@ -46,7 +46,7 @@ class TransactionController extends BaseController
 
     }
 
-    public function insert($amount, $payerData, $payerParentData, $payerBank, $receipientData, $receipientParentData, $receipientBank, $tax_package, $tax_amount): Transaction
+    public function insert($amount, $payerData, $payerBank, $payerBankAccount, $receipientData, $receipientBank, $receipientBankAccount, $packages, $tax_amount): Transaction
     {
         
         $transaction = new Transaction();
@@ -54,29 +54,30 @@ class TransactionController extends BaseController
         $transaction->uid = Uuid::uuid4();
         $transaction->amount = $amount;
         $transaction->payer_document = $payerData->document;
-        $transaction->payer_uuid = $payerData->uuid;
-        $transaction->payer_bank_company = $payerParentData->company;
-        $transaction->payer_bank_code = $payerBank->code;
-        $transaction->payer_bank_ispb = $payerParentData->ispb;
-        $transaction->payer_bank_branch = $payerBank->branch;
-        $transaction->payer_bank_number = $payerBank->number;
-        $transaction->payer_bank_operator = $payerBank->operator;
+        $transaction->payer_uid = $payerData->uid ?? '';
+        $transaction->payer_uuid = $payerData->uuid ?? '';
+        $transaction->payer_bank_company = $payerBank->company;
+        $transaction->payer_bank_code = $payerBankAccount->parent_code ?? $payerBankAccount->code;
+        $transaction->payer_bank_ispb = $payerBank->ispb;
+        $transaction->payer_bank_branch = $payerBankAccount->branch;
+        $transaction->payer_bank_number = $payerBankAccount->number;
+        $transaction->payer_bank_operator = $payerBankAccount->operator;
         $transaction->receipient_document = $receipientData->document;
-        $transaction->receipient_uuid = $receipientData->uuid;
-        $transaction->receipient_bank_company = $receipientParentData->company;
-        $transaction->receipient_bank_code = $receipientBank->code;
-        $transaction->receipient_bank_ispb = $receipientParentData->ispb;
-        $transaction->receipient_bank_branch = $receipientBank->branch;
-        $transaction->receipient_bank_number = $receipientBank->number;
-        $transaction->receipient_bank_operator = $receipientBank->operator;
-        $transaction->tax_package = $tax_package;
+        $transaction->receipient_uid = $receipientData->uid ?? '';
+        $transaction->receipient_uuid = $receipientData->uuid ?? '';
+        $transaction->receipient_bank_company = $receipientBank->company;
+        $transaction->receipient_bank_code = $receipientBankAccount->parent_code ?? $receipientBankAccount->code;
+        $transaction->receipient_bank_ispb = $receipientBank->ispb;
+        $transaction->receipient_bank_branch = $receipientBankAccount->branch;
+        $transaction->receipient_bank_number = $receipientBankAccount->number;
+        $transaction->receipient_bank_operator = $receipientBankAccount->operator;
+        $transaction->packages = $packages;
         $transaction->tax_amount = $tax_amount;
-        $transaction->type = TransactionType::CashOut;
-        $transaction->status = TransactionStatusType::Transient;
+        $transaction->type = TransactionType::CashOut->value;
+        $transaction->status = TransactionStatusType::Transient->value;
         
-        // dd("funfou", $transaction->tax_package);
-
         $transaction->save();
+        //dd("funfou transaction", $transaction);
 
         return $transaction;
     }

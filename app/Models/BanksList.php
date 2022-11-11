@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class BanksList extends Model
 {
+    protected $table = 'banks_list';
+    
     /**
      * The attributes that are mass assignable.
      *

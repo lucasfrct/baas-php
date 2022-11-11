@@ -25,27 +25,27 @@ use App\Http\Controllers\ParentController;
 
 class BankAccountController extends Controller
 {
-    public function seed(string $uuid, int $parent_code): BankAccount
+    public function seed(string $uuid, int $code): BankAccount
     {
         $banksList = new BanksListController;
         //$banksList->showByCompany($company);
 
-        return $this->record($uuid, $parent_code);
+        return $this->record($uuid, $code);
     }
 
-    public function record(string $uuid, string $parent_code): BankAccount
+    public function record(string $uuid, string $code): BankAccount
     {
         $branch = new BranchController();
 
         $bank_account = new BankAccount();
         $bank_account->uid = Uuid::uuid4();
         $bank_account->uuid = $uuid;
-        $bank_account->parent_code = $parent_code;
-        $bank_account->branch = $branch->getCurrent($parent_code);
+        $bank_account->code = $code;
+        $bank_account->branch = $branch->getCurrent($code);
         $bank_account->operator = OperatorType::Checking;
-        $bank_account->enabled = TRUE;
-        $bank_account->prev_balance = [];
-        $bank_account->balance = [];
+        $bank_account->enabled = true;
+        $bank_account->prev_balance = 10000;
+        $bank_account->balance = 10000;
 
         $bank_account->save();
         $bank_account->id;
@@ -123,9 +123,9 @@ class BankAccountController extends Controller
        return BankAccount::where("uuid", "=", $uuid)->first();
     }
 
-    public function showByNumber($parent_code, $branch, $number, $operator): BankAccount | null
+    public function showByNumber($code, $branch, $number, $operator): BankAccount | null
     {
-       return BankAccount::whereRaw("parent_code = ? and branch = ? and number = ? and operator = ?", [$parent_code, $branch, $number, $operator])->first();
+       return BankAccount::whereRaw("code = ? and branch = ? and number = ? and operator = ?", [$code, $branch, $number, $operator])->first();
     }
 
     /**

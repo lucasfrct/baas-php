@@ -26,7 +26,7 @@ class BanksListController extends Controller
 {
     public function seed(): BanksList
     {
-        return $this->record('NU PAGAMENTOS - IP', '', '24410913000144', 260, 18236120);
+        return $this->record('NU PAGAMENTOS - IP', 'NUBANK', '24410913000144', "260", 18236120);
     }
 
     /**

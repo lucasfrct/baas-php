@@ -33,7 +33,7 @@ class Transaction extends Model
         'receipient_bank_branch',
         'receipient_bank_number',
         'receipient_bank_operator',
-        'tax_package',
+        'packages',
         'tax_amount',
         'type',
         'status'
@@ -54,6 +54,6 @@ class Transaction extends Model
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'tax_package'  => 'array'
+        'packages'  => 'array'
     ];
 }

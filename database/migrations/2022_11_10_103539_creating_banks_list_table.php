@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('company');
             $table->string('reason_social')->nullable();
             $table->string('document');
-            $table->integer('code');
+            $table->string('code');
             $table->integer('ispb');
             $table->timestamps();
         });

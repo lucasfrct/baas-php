@@ -6,17 +6,18 @@ use Illuminate\Routing\Controller as BaseController;
 
 use App\Models\Account;
 use App\Types\GenderType;
+use DateTime;
 
 class AccountController extends BaseController
 {
     public function seed(string $uuid): Account
-    {        
-        return $this->record($uuid, '12.760.364-5', new \DateTime(), GenderType::Male, ['001'], ['001']);
+    {
+        $birthday = new DateTime();
+        return $this->record($uuid, '12.760.364-5', $birthday, GenderType::Male, ['001'], ['001']);
     }
 
-    public function record(string $uuid, string $rg, $birthday, GenderType $gender, array $packages, array $integrations): Account
+    public function record(string $uuid, string $rg, DateTime $birthday, GenderType $gender, array $packages, array $integrations): Account
     {
-
         $account = new Account();
         $account->uuid = $uuid;
         $account->rg = $rg;

@@ -12,19 +12,17 @@ class BankNetworkController extends BaseController
 {
     public function seed(){
 
-        $this->record("XXX000", '010', OperatorType::Checking, 1, "001", ["001"], '43294616000125', 10000, 10000);
+        $this->record("XXX000", '010', OperatorType::Checking, 18236120, "001", ["001"], '24410913000144', 10000, 10000);
     }
 
-    public function record(string $number, string $branch, OperatorType $operator, int $bank_ispb, string $code, array $tax_codes, string $document, int $prev_balance, int $balance){
-
-        $branch = new BranchController();
+    public function record(string $number, string $branch, OperatorType $operator, int $ispb, string $code, array $tax_codes, string $document, int $prev_balance, int $balance){
 
         $bankNetwork = new BanksNetwork();
         $bankNetwork->uid = Uuid::uuid4();
         $bankNetwork->number = $number;
         $bankNetwork->branch = $branch;
         $bankNetwork->operator = $operator;
-        $bankNetwork->bank_ispb = $bank_ispb;
+        $bankNetwork->ispb = $ispb;
         $bankNetwork->code = $code;
         $bankNetwork->tax_codes = $tax_codes;
         $bankNetwork->document = $document;
@@ -49,7 +47,6 @@ class BankNetworkController extends BaseController
     }
 
     public function taxFilter($integration, array $packages): array {
-        
         $banksReceipients = [];
         foreach ($integration->bankNetwork as $bank) {// 2^2*2^3
             foreach ($bank->tax_codes as $code) {// 2^3*2^4
@@ -65,9 +62,15 @@ class BankNetworkController extends BaseController
                 
             }
         }
+        //dd($banksReceipients);
 
         return $banksReceipients;
         
+    }
+
+    public function showByCode($code): BanksNetwork
+    {
+        return BanksNetwork::where("code", "=", $code)->first();
     }
     
 }

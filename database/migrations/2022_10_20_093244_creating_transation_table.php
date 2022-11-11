@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('uid');
             $table->unsignedBigInteger('amount');
             $table->string('payer_document', 14);
+            $table->string('payer_uid', 36);
             $table->string('payer_uuid', 36);
             $table->string('payer_bank_company', 50);
             $table->string('payer_bank_code', 3);
@@ -26,6 +27,7 @@ return new class extends Migration
             $table->string('payer_bank_number', 6);
             $table->string('payer_bank_operator', 2);
             $table->string('receipient_document', 14);
+            $table->string('receipient_uid', 36);
             $table->string('receipient_uuid', 36);
             $table->string('receipient_bank_company', 50);
             $table->string('receipient_bank_code', 3);
@@ -33,7 +35,7 @@ return new class extends Migration
             $table->string('receipient_bank_branch', 4);
             $table->string('receipient_bank_number', 6);
             $table->string('receipient_bank_operator', 2);
-            $table->json('tax_package');
+            $table->json('packages');
             $table->unsignedBigInteger('tax_amount');
             $table->string('status', 50);
             $table->string('type', 50);

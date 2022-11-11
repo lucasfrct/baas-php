@@ -21,7 +21,7 @@ class BanksNetwork extends Model
         'number',
         'branch',
         'operator',
-        'bank_ispb',
+        'ispb',
         'code',
         'tax_codes',
         'document',
