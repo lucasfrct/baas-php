@@ -150,14 +150,17 @@ class UserController extends BaseController
         $transactionController = new TransactionController();
         $balanceController = new BalanceController();
         $accountController = new AccountController();
-        $parentController = new ParentController;
+        $parentController = new ParentController();
         $bankAccountController = new BankAccountController();
         $bankNetworkController = new BankNetworkController();
         $banksListController = new BanksListController();
         $integrationController = new IntegrationController();
+
+        //$this->seeder();
+        //dd('funfou!');
         
         $payerUuid = '888786e7-b112-4683-abdc-ab77465a8abe';
-        $amount = 5000;
+        $amount = 1000;
         $transactionType = TransactionType::CashIn->value;
         $payerBankIspb = 18236120;
         
@@ -218,6 +221,7 @@ class UserController extends BaseController
                 $packages[] = $payerPackageData;
                 $packagesAmount += $payerPackageData->amount;
             }
+            dd($packagesAmount);
         }
         
         $amountCharge = $amount + $packagesAmount;
@@ -301,7 +305,7 @@ class UserController extends BaseController
         
         $banksReceipients = [];
         foreach ($integrations as $integration) {// 2^2
-            $banksReceipients = array_merge($banksReceipients, $bankNetworkController->taxFilter($integration, $packages));            
+            $banksReceipients = array_merge($banksReceipients, $bankNetworkController->taxFilter($integration, $packages));
         };
         //dd("funfou!", $banksReceipients);
         
@@ -365,14 +369,14 @@ class UserController extends BaseController
         $bankNetworkController = new BankNetworkController();
         $integrationController = new IntegrationController();
 
-        $parentController->seed();
+        //$parentController->seed();
 
         $taxController->seed();
         $package->seed();
 
-        $bankNetworkController->seed();
-        $integrationController->seed();
-        $banksList->seed();
+        //$bankNetworkController->seed();
+        //$integrationController->seed();
+        //$banksList->seed();
     }
 
     public function showByUuid($uuid)

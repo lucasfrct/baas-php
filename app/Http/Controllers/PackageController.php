@@ -46,8 +46,8 @@ class PackageController extends BaseController
 
             $packageData->taxes[] = $taxData;
             $packageData->amount += $taxData->amount;
-
         }
+        dd($packageData);
         return $packageData;
     }
 
