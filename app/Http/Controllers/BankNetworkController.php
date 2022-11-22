@@ -55,14 +55,13 @@ class BankNetworkController extends BaseController
                         if ($code == $tax->code) {
                             $bank->tax_amount = $tax->amount;
                             $bank->packages_codes[] = $package->code;
-                            $banksReceipients[] = $bank;
+                            $banksReceipients[] = clone $bank;
                         };
                     }
-                }
-                
+                }                
             }
+            //dd($banksReceipients);
         }
-        //dd($banksReceipients);
 
         return $banksReceipients;
         

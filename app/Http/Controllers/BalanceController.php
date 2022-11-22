@@ -47,4 +47,30 @@ class BalanceController extends BaseController
 
         return $amount;
     }
+
+
+    // filtrar por data - do primeiro dia do mes atual ate o dia atual
+    public function processTransactionsBanksNetwork(string $uid): int{
+        // ToDo: refatorar a query de transacao
+        $transactionsPayer = Transaction::where("payer_uid", "=", $uid);// chamar pela controller
+        $transactionsRecipient = Transaction::where("receipient_uid", "=", $uid);// chamar pela controller
+        $transactions = array_merge($transactionsPayer, $transactionsRecipient);
+        
+        $amount = 0;
+        foreach ($transactions as $transaction) {
+            if ($transaction->type == TransactionType::CashIn) {
+                $amount += $transaction->amount;
+            }
+
+            if ($transaction->type == TransactionType::CashOut) {
+                $amount -= $transaction->amount;
+            }
+        }
+
+        $bankAccount = new BankAccount();// chamar a controller do bankAccount por uid 
+        $bankAccount->balance = $amount;
+        $bankAccount->save();
+
+        return $amount;
+    }
 }

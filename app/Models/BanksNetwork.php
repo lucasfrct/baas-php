@@ -47,4 +47,8 @@ class BanksNetwork extends Model
         'updated_at' => 'datetime',
         'tax_codes'  => 'array'
     ];
+
+    public function __clone() {
+        return $this;
+    }
 }

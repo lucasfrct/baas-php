@@ -221,7 +221,7 @@ class UserController extends BaseController
                 $packages[] = $payerPackageData;
                 $packagesAmount += $payerPackageData->amount;
             }
-            dd($packagesAmount);
+            //dd($payerPackageData->amount);
         }
         
         $amountCharge = $amount + $packagesAmount;
@@ -343,6 +343,23 @@ class UserController extends BaseController
         }
         dd("funfou", $transactionsPool);
         
+        // ? ####################################################################################################
+        // ? ATUALIZA O BALANCE DO PAGADOR
+        // ? ####################################################################################################
+        
+
+
+        // ? ####################################################################################################
+        // ? ATUALIZA O BALANCE DO PAGADOR
+        // ? ####################################################################################################
+
+
+
+        // ? ####################################################################################################
+        // ? ATUALIZA O BALANCE DO PAGADOR
+        // ? ####################################################################################################
+
+
         
         //# iniciando a transacao: 
         // 
