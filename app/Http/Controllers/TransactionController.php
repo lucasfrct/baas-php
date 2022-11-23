@@ -92,4 +92,47 @@ class TransactionController extends BaseController
 
         return $transaction;
     }
+
+    public function showByUid($uid): array
+    {
+        return array_merge($this->showByPayerUid($uid), $this->showByReceipientUid($uid));
+    }
+
+    public function showByPayerUid($uid)
+    {
+       return Transaction::where("payer_uid", "=", $uid)->first();
+    }
+
+    public function showByReceipientUid($uid)
+    {
+       return Transaction::where("receipient_uid", "=", $uid)->first();
+    }
+
+    public function showMonthBalanceByUid($uid, $month)
+    {
+        $balance = 0;
+        $year = strval(date('Y'));
+        
+        $monthLenthInDays = cal_days_in_month(CAL_GREGORIAN, $month, strval(date('Y')));
+        $from = date("{$year}-{$month}-01");
+        $until = date("{$year}-{$month}-{$monthLenthInDays}");
+        $untilNormalized = date('Y-m-d', strtotime($until. ' + 1 days'));
+
+       $transactions = Transaction::where(function($query) use($uid){
+        return $query->orWhere("payer_uid", "=", $uid)->orWhere("receipient_uid", "=", $uid);
+       })->whereBetween('created_at', [$from, $untilNormalized])->get();
+
+       $payeds = 0;
+       $receiveds = 0;
+       foreach ($transactions as $transaction) {
+        if (!empty($transaction->payer_uid)) {
+            $payeds -= $transaction->amount;
+            continue;
+        }
+        if (!empty($transaction->receipient_uid)) {
+            $receiveds += $transaction->amount;
+        }
+       }
+       return $payeds + $receiveds;
+    }
 }

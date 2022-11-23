@@ -8,6 +8,7 @@ use App\Models\BankAccount;
 use App\Models\Transaction;
 use App\Types\TransactionType;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\BankAccountController;
 
 class BalanceController extends BaseController
 {
@@ -51,10 +52,15 @@ class BalanceController extends BaseController
 
     // filtrar por data - do primeiro dia do mes atual ate o dia atual
     public function processTransactionsBanksNetwork(string $uid): int{
+
+        $transactionController = new TransactionController();
+        $bankAccountController = new BankAccountController();
+
+        dd($transactionController->showMonthBalanceByUid($uid, '11'));
+
         // ToDo: refatorar a query de transacao
-        $transactionsPayer = Transaction::where("payer_uid", "=", $uid);// chamar pela controller
-        $transactionsRecipient = Transaction::where("receipient_uid", "=", $uid);// chamar pela controller
-        $transactions = array_merge($transactionsPayer, $transactionsRecipient);
+        
+        $transactions = $transactionController->showByUid($uid);
         
         $amount = 0;
         foreach ($transactions as $transaction) {
@@ -67,9 +73,7 @@ class BalanceController extends BaseController
             }
         }
 
-        $bankAccount = new BankAccount();// chamar a controller do bankAccount por uid 
-        $bankAccount->balance = $amount;
-        $bankAccount->save();
+        $bankAccountController->setAmount($amount);// chamar a controller do bankAccount por uid
 
         return $amount;
     }

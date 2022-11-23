@@ -341,13 +341,21 @@ class UserController extends BaseController
             $transactionController->updateStatus($transaction->uid, TransactionStatusType::Processing->value);
             sleep(1);
         }
-        dd("funfou", $transactionsPool);
         
         // ? ####################################################################################################
         // ? ATUALIZA O BALANCE DO PAGADOR
         // ? ####################################################################################################
         
-
+        foreach ($banksReceipients as $bank) {
+            
+            $bankData = $banksListController->showByIspb($bank->ispb);
+            if (!$bankData) {
+                continue;
+            }
+            $balanceController->processTransactionsBanksNetwork($bank->uid);
+            dd("funfou!", $bank);
+            sleep(1);
+        }
 
         // ? ####################################################################################################
         // ? ATUALIZA O BALANCE DO PAGADOR
