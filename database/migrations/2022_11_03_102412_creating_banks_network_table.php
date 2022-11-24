@@ -24,8 +24,8 @@ return new class extends Migration
             $table->json('tax_codes');
             $table->string('document');
             $table->integer('enabled')->defaultValue(1);
-            $table->unsignedBigInteger('prev_balance')->nullable();
-            $table->unsignedBigInteger('balance')->nullable();
+            $table->bigInteger('prev_balance')->nullable();
+            $table->bigInteger('balance')->nullable();
             $table->timestamps();
         });
     }

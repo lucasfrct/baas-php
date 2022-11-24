@@ -46,7 +46,19 @@ class TransactionController extends BaseController
 
     }
 
-    public function insert($amount, $payerData, $payerBank, $payerBankAccount, $receipientData, $receipientBank, $receipientBankAccount, $packages, $tax_amount): Transaction
+    public function cashIn($amount, $payerData, $payerBank, $payerBankAccount, $receipientData, $receipientBank, $receipientBankAccount, $packages, $tax_amount): Transaction
+    {
+        $type = TransactionType::CashIn->value;
+        return $this->insert($amount, $payerData, $payerBank, $payerBankAccount, $receipientData, $receipientBank, $receipientBankAccount, $packages, $tax_amount, $type);
+    }
+
+    public function cashOut($amount, $payerData, $payerBank, $payerBankAccount, $receipientData, $receipientBank, $receipientBankAccount, $packages, $tax_amount): Transaction
+    {
+        $type = TransactionType::CashOut->value;
+        return $this->insert($amount, $payerData, $payerBank, $payerBankAccount, $receipientData, $receipientBank, $receipientBankAccount, $packages, $tax_amount, $type);
+    }
+
+    private function insert($amount, $payerData, $payerBank, $payerBankAccount, $receipientData, $receipientBank, $receipientBankAccount, $packages, $tax_amount, $type): Transaction
     {
         
         $transaction = new Transaction();
@@ -73,7 +85,7 @@ class TransactionController extends BaseController
         $transaction->receipient_bank_operator = $receipientBankAccount->operator;
         $transaction->packages = $packages;
         $transaction->tax_amount = $tax_amount;
-        $transaction->type = TransactionType::CashOut->value;
+        $transaction->type = $type;
         $transaction->status = TransactionStatusType::Transient->value;
         
         $transaction->save();
@@ -110,7 +122,16 @@ class TransactionController extends BaseController
 
     public function showMonthBalanceByUid($uid, $month)
     {
-        $balance = 0;
+        return $this->showMonthBalanceByKey("uid", $uid, $month);
+    }
+
+    public function showMonthBalanceByUuid($uuid, $month)
+    {
+        return $this->showMonthBalanceByKey("uuid", $uuid, $month);
+    }
+
+    private function showMonthBalanceByKey($key, $value, $month)
+    {
         $year = strval(date('Y'));
         
         $monthLenthInDays = cal_days_in_month(CAL_GREGORIAN, $month, strval(date('Y')));
@@ -118,21 +139,32 @@ class TransactionController extends BaseController
         $until = date("{$year}-{$month}-{$monthLenthInDays}");
         $untilNormalized = date('Y-m-d', strtotime($until. ' + 1 days'));
 
-       $transactions = Transaction::where(function($query) use($uid){
-        return $query->orWhere("payer_uid", "=", $uid)->orWhere("receipient_uid", "=", $uid);
-       })->whereBetween('created_at', [$from, $untilNormalized])->get();
+        $transactions = Transaction::where(function($query) use($key, $value){
+        return $query->orWhere("payer_{$key}", "=", $value)->orWhere("receipient_{$key}", "=", $value);
+        })->whereBetween('created_at', [$from, $untilNormalized])->get();
 
-       $payeds = 0;
-       $receiveds = 0;
-       foreach ($transactions as $transaction) {
-        if (!empty($transaction->payer_uid)) {
-            $payeds -= $transaction->amount;
-            continue;
+        $payeds = 0;
+        $receiveds = 0;
+        foreach ($transactions as $transaction) {
+            if ($key == 'uid' && !empty($transaction->payer_uid) && $transaction->payer_uid == $value) {
+                $payeds -= $transaction->amount;
+                continue;
+            }
+
+            if ($key == 'uid' && !empty($transaction->receipient_uid) && $transaction->receipient_uid == $value) {
+                $receiveds += $transaction->amount;
+                continue;
+            }
+
+            if ($key == 'uuid' && !empty($transaction->payer_uuid) && $transaction->payer_uuid == $value) {
+                $payeds -= $transaction->amount;
+                continue;
+            }
+            
+            if ($key == 'uuid' && !empty($transaction->receipient_uuid) && $transaction->receipient_uuid == $value) {
+                $receiveds += $transaction->amount;
+            }
         }
-        if (!empty($transaction->receipient_uid)) {
-            $receiveds += $transaction->amount;
-        }
-       }
-       return $payeds + $receiveds;
+        return $payeds + $receiveds;
     }
 }

@@ -15,7 +15,7 @@ class IntegrationController extends BaseController
 {
     public function seed(){
 
-        $this->record("001", 'description', ['001'], TransactionType::CashIn);
+        $this->record("001", 'description', ['001'], TransactionType::CashOut);
     }
 
     public function record(string $code, string $description, array $network_codes, TransactionType $type){

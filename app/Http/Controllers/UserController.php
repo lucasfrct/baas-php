@@ -144,31 +144,26 @@ class UserController extends BaseController
     
     public function sumulationTransaction() {
         
-        $bankAccount = new BankAccount();
-        $taxController = new TaxController();
-        $package = new PackageController();
+        $packageController = new PackageController();
         $transactionController = new TransactionController();
         $balanceController = new BalanceController();
         $accountController = new AccountController();
-        $parentController = new ParentController();
         $bankAccountController = new BankAccountController();
         $bankNetworkController = new BankNetworkController();
         $banksListController = new BanksListController();
         $integrationController = new IntegrationController();
 
         //$this->seeder();
-        //dd('funfou!');
         
-        $payerUuid = '888786e7-b112-4683-abdc-ab77465a8abe';
+        $payerUuid = '1d89d46c-7630-4c7e-ba3f-5c2ab305d344';
         $amount = 1000;
-        $transactionType = TransactionType::CashIn->value;
+        $transactionType = TransactionType::CashOut->value;
         $payerBankIspb = 18236120;
         
         $receipientBankIspb = 18236120;
         $receipientBankBranch = '001';
         $receipientBankNumber = '000002';
-        $receipientBankOperator = OperatorType::Checking->value;
-        
+        $receipientBankOperator = OperatorType::Checking->value;        
         
         // ? ####################################################################################################
         // ? CONSULTA SE O USUARIO PAGADOR EXISTE
@@ -195,7 +190,7 @@ class UserController extends BaseController
         // Banco emissor da conta do usuario pagador
         $payerBank = $banksListController->showByIspb($payerBankIspb);
         
-        $payerBankAccount = $bankAccountController->showByUuid($payerUuid);
+        $payerBankAccount = $bankAccountController->showByUuid($payerAccountData->uuid);
         if (!$payerBankAccount) {
             throw new Error('A conta bancaria do usuario emissor nao existe!');
         }
@@ -213,15 +208,14 @@ class UserController extends BaseController
         
         if (count($payerAccountData->packages) > 0) {
             
-            foreach ($payerAccountData->packages as $value) {
-                $payerPackageData = $package->showByCode($value);
+            foreach ($payerAccountData->packages as $code) {
+                $payerPackageData = $packageController->showByCode($code);
                 if (!$payerPackageData) {
                     continue;
                 }
                 $packages[] = $payerPackageData;
                 $packagesAmount += $payerPackageData->amount;
             }
-            //dd($payerPackageData->amount);
         }
         
         $amountCharge = $amount + $packagesAmount;
@@ -252,7 +246,6 @@ class UserController extends BaseController
         if (!$receipientBankAccount->enabled) {
             throw new Error('A conta bancaria do usuario recebedor esta desativada por tempo indeterminado!');
         }
-        //dd($receipientBank);
         
         // ? ####################################################################################################
         // ? CONSULTA SE O USUARIO RECEBEDOR EXISTE
@@ -307,7 +300,6 @@ class UserController extends BaseController
         foreach ($integrations as $integration) {// 2^2
             $banksReceipients = array_merge($banksReceipients, $bankNetworkController->taxFilter($integration, $packages));
         };
-        //dd("funfou!", $banksReceipients);
         
         // ? ####################################################################################################
         // ? REGISTRA A TRANSACAO
@@ -315,11 +307,11 @@ class UserController extends BaseController
         
         $transactionsPool = [];
         
-        $transactionData = $transactionController->insert($amount, $payerData, $payerBank , $payerBankAccount, $receipientData, $receipientBank, $receipientBankAccount, $packages, $packagesAmount);
+        $transactionData = $transactionController->cashOut($amount, $payerData, $payerBank , $payerBankAccount, $receipientData, $receipientBank, $receipientBankAccount, $packages, $packagesAmount);
         $transactionsPool[] = $transactionData;
         
         // ? ####################################################################################################
-        // ? REGISTRA AS TRANSACOES DO EMISSOR PARA AS INTEGRACOES
+        // ? REGISTRA AS TRANSACOES DA REDE BANCARIA (INTEGRACOES)
         // ? ####################################################################################################
         
         foreach ($banksReceipients as $bank) {
@@ -328,7 +320,7 @@ class UserController extends BaseController
             if (!$bankData) {
                 continue;
             }
-            $transactionsPool[] = $transactionController->insert($bank->tax_amount, $payerData, $payerBank, $payerBankAccount, $bank, $bankData, $bank, $packages, 0);
+            $transactionsPool[] = $transactionController->cashOut($bank->tax_amount, $payerData, $payerBank, $payerBankAccount, $bank, $bankData, $bank, $packages, 0);
             sleep(1);
         }
         
@@ -346,28 +338,34 @@ class UserController extends BaseController
         // ? ATUALIZA O BALANCE DO PAGADOR
         // ? ####################################################################################################
         
-        foreach ($banksReceipients as $bank) {
-            
-            $bankData = $banksListController->showByIspb($bank->ispb);
-            if (!$bankData) {
-                continue;
-            }
-            $balanceController->processTransactionsBanksNetwork($bank->uid);
-            dd("funfou!", $bank);
+        $balanceController->updateBankAccountByUuid($payerData->uuid);
+
+        // ? ####################################################################################################
+        // ? ATUALIZA O BALANCE DO RECEBEDOR
+        // ? ####################################################################################################
+        
+        $balanceController->updateBankAccountByUuid($receipientData->uuid);
+        
+        // ? ####################################################################################################
+        // ? ATUALIZA O BALANCE DOS RECEBEDORES DAS TAXAS
+        // ? ####################################################################################################
+        
+        foreach ($banksReceipients as $bank) 
+        {            
+            $balanceController->updateBankNetworkByUid($bank->uid);
             sleep(1);
         }
-
+        
         // ? ####################################################################################################
-        // ? ATUALIZA O BALANCE DO PAGADOR
+        // ? ATUALIZA STATUS DA TRANSACAO
         // ? ####################################################################################################
-
-
-
-        // ? ####################################################################################################
-        // ? ATUALIZA O BALANCE DO PAGADOR
-        // ? ####################################################################################################
-
-
+        
+        foreach ($transactionsPool as $transaction) {
+            
+            $transactionController->updateStatus($transaction->uid, TransactionStatusType::Paided->value);
+            sleep(1);
+        }
+        dd("funfou!");
         
         //# iniciando a transacao: 
         // 
@@ -389,19 +387,19 @@ class UserController extends BaseController
     {
         $parentController = new ParentController();
         $taxController = new TaxController();
-        $package = new PackageController();
+        $packageController = new PackageController();
         $banksList = new BanksListController;
         $bankNetworkController = new BankNetworkController();
         $integrationController = new IntegrationController();
 
-        //$parentController->seed();
+        $parentController->seed();
 
         $taxController->seed();
-        $package->seed();
+        $packageController->seed();
 
-        //$bankNetworkController->seed();
-        //$integrationController->seed();
-        //$banksList->seed();
+        $bankNetworkController->seed();
+        $integrationController->seed();
+        $banksList->seed();
     }
 
     public function showByUuid($uuid)

@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->string('uid');
-            $table->unsignedBigInteger('amount');
+            $table->bigInteger('amount');
             $table->string('payer_document', 14);
             $table->string('payer_uid', 36);
             $table->string('payer_uuid', 36);
@@ -36,7 +36,7 @@ return new class extends Migration
             $table->string('receipient_bank_number', 6);
             $table->string('receipient_bank_operator', 2);
             $table->json('packages');
-            $table->unsignedBigInteger('tax_amount');
+            $table->bigInteger('tax_amount');
             $table->string('status', 50);
             $table->string('type', 50);
             $table->timestamps();

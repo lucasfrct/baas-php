@@ -9,14 +9,16 @@ use App\Models\Transaction;
 use App\Types\TransactionType;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\BankAccountController;
+use App\Http\Controllers\BankNetworkController;
+use DateTime;
 
 class BalanceController extends BaseController
 {
-    public function currentMonth(string $uuid) {
-        // $this->processTransactions($uuid);
+    public function currentMonth(string $uuid): int
+    {
         $bankAccount = BankAccount::where("uuid", "=", $uuid)->first();
 
-        return $bankAccount->balance;
+        return $bankAccount->balance + $bankAccount->prev_balance;
     }
 
     public function lastMonth(string $uuid){
@@ -49,32 +51,30 @@ class BalanceController extends BaseController
         return $amount;
     }
 
-
     // filtrar por data - do primeiro dia do mes atual ate o dia atual
-    public function processTransactionsBanksNetwork(string $uid): int{
+    public function updateBankAccountByUuid(string $uuid): int{
 
         $transactionController = new TransactionController();
         $bankAccountController = new BankAccountController();
 
-        dd($transactionController->showMonthBalanceByUid($uid, '11'));
+        $bankAccountData = $bankAccountController->showByUuid($uuid);
+        $bankAccountData->balance = $bankAccountData->prev_balance + $transactionController->showMonthBalanceByUuid($uuid, date('m'));
+        $bankAccountData->updated_at = new Datetime();
+        $bankAccountData->save();
 
-        // ToDo: refatorar a query de transacao
-        
-        $transactions = $transactionController->showByUid($uid);
-        
-        $amount = 0;
-        foreach ($transactions as $transaction) {
-            if ($transaction->type == TransactionType::CashIn) {
-                $amount += $transaction->amount;
-            }
+        return $bankAccountData->balance;
+    }
 
-            if ($transaction->type == TransactionType::CashOut) {
-                $amount -= $transaction->amount;
-            }
-        }
+    public function updateBankNetworkByUid(string $uid): int{
 
-        $bankAccountController->setAmount($amount);// chamar a controller do bankAccount por uid
+        $transactionController = new TransactionController();
+        $bankNetworkController = new BankNetworkController();
 
-        return $amount;
+        $bankNetworkData = $bankNetworkController->showByUid($uid);
+        $bankNetworkData->balance = $bankNetworkData->prev_balance + $transactionController->showMonthBalanceByUid($uid, date('m'));
+        $bankNetworkData->updated_at = new Datetime();
+        $bankNetworkData->save();
+
+        return $bankNetworkData->balance;
     }
 }

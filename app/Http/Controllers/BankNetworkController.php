@@ -72,4 +72,8 @@ class BankNetworkController extends BaseController
         return BanksNetwork::where("code", "=", $code)->first();
     }
     
+    public function showByUid($uid): BanksNetwork
+    {
+        return BanksNetwork::where("uid", "=", $uid)->first();
+    }
 }

@@ -186,10 +186,10 @@ class BankAccountController extends Controller
         return $expirationTimestamp = $timestamp + $vigor;
     }
 
-    public function setAmount($amount) {
+    public function updateBalance($uuid, $balance) {
 
         $bankAccount = new BankAccount();
-        $bankAccount->balance = $amount;
+        $bankAccount->balance = $balance;
         $bankAccount->save();
     }
 
