@@ -9,9 +9,22 @@ use Illuminate\Routing\Controller as BaseController;
 
 use Ramsey\Uuid\Uuid;
 
+use App\Models\User;
+use App\Models\Account;
+use App\Models\BankAccount;
+use App\Models\BanksList;
+use App\Http\Controllers\BankAccountController;
+use App\Http\Controllers\BankNetworkController;
+use App\Http\Controllers\IntegrationController;
+use App\Http\Controllers\BanksListController;
+use App\Http\Controllers\BalanceController;
+use App\Http\Controllers\AccountController;
+use App\Http\Controllers\PackageController;
+use App\Exceptions\Error;
 use App\Models\Transaction;
 use App\Types\TransactionStatusType;
 use App\Types\TransactionType;
+use App\Types\OperatorType;
 
 class TransactionController extends BaseController
 {
@@ -167,4 +180,225 @@ class TransactionController extends BaseController
         }
         return $payeds + $receiveds;
     }
+
+    public function operate(
+        string $payerUuid, 
+        int $amount, 
+        TransactionType $type, 
+        int $payerBankIspb, 
+        int $receipientBankIspb, 
+        string $receipientBankBranch, 
+        string $receipientBankNumber, 
+        OperatorType $receipientBankOperator
+    ) {
+        
+        $packageController = new PackageController();
+        $balanceController = new BalanceController();
+        $accountController = new AccountController();
+        $bankAccountController = new BankAccountController();
+        $bankNetworkController = new BankNetworkController();
+        $banksListController = new BanksListController();
+        $integrationController = new IntegrationController();
+
+    }
+
+    public function prepare(
+        string $payerUuid, 
+        int $amount, 
+        TransactionType $type, 
+        int $payerBankIspb, 
+        int $receipientBankIspb, 
+        string $receipientBankBranch, 
+        string $receipientBankNumber, 
+        OperatorType $receipientBankOperator
+    ) {
+
+        $packageController = new PackageController();
+        $balanceController = new BalanceController();
+        $accountController = new AccountController();
+        $bankAccountController = new BankAccountController();
+        $bankNetworkController = new BankNetworkController();
+        $banksListController = new BanksListController();
+        $integrationController = new IntegrationController();
+
+        // ? ####################################################################################################
+        // ? CONSULTA SE O USUARIO PAGADOR EXISTE
+        // ? ####################################################################################################
+        
+        $payerData = $this->showByUuid($payerUuid);
+        if (!$payerData) {
+            throw new Error('O usuario emitente nao foi encontrado!');
+        }
+        
+        $payerAccountData = $accountController->showByUuid($payerUuid);
+        if (!$payerAccountData) {
+            throw new Error('A conta emitente nao foi encontrada!');
+        }
+        
+        if (!$payerAccountData->enabled) {
+            throw new Error('A conta do usuario esta desativada por tempo indeterminado!');
+        }
+        
+        // ? ####################################################################################################
+        // ? CONSULTA A CONTA BANCARIA DO USUARIO PAGADOR
+        // ? ####################################################################################################
+        
+        // Banco emissor da conta do usuario pagador
+        $payerBank = $banksListController->showByIspb($payerBankIspb);
+        
+        $payerBankAccount = $bankAccountController->showByUuid($payerAccountData->uuid);
+        if (!$payerBankAccount) {
+            throw new Error('A conta bancaria do usuario emissor nao existe!');
+        }
+        
+        if (!$payerBankAccount->enabled) {
+            throw new Error('A conta bancaria do usuario emissor esta desativada por tempo indeterminado!');
+        }
+        
+        // ? ####################################################################################################
+        // ? BUSCA OS PACOTES DO USUARIO PAGADOR
+        // ? ####################################################################################################
+        
+        $packages = [];
+        $packagesAmount = 0;
+        
+        if (count($payerAccountData->packages) > 0) {
+            
+            foreach ($payerAccountData->packages as $code) {
+                $payerPackageData = $packageController->showByCode($code);
+                if (!$payerPackageData) {
+                    continue;
+                }
+                $packages[] = $payerPackageData;
+                $packagesAmount += $payerPackageData->amount;
+            }
+        }
+        
+        $amountCharge = $amount + $packagesAmount;
+        
+        // ? ####################################################################################################
+        // ? CONSULTA AO SALDO DO USUARIO PAGADOR
+        // ? ####################################################################################################
+        
+        $savings = $balanceController->currentMonth($payerUuid);
+        if ($savings <= $amountCharge) {
+            throw new Error('Saldo insuficiente!');
+        }
+        
+        // ? ####################################################################################################
+        // ? CONSULTA A CONTA BANCARIA DO USUARIO RECEBEDOR / CARREGA O BANCO DO RECEBEDOR
+        // ? ####################################################################################################
+        
+        $receipientBank = $banksListController->showByIspb($receipientBankIspb);
+        if (!$receipientBank) {
+            throw new Error('Banco recebedor nao encontrado!');
+        }
+        
+        $receipientBankAccount = $bankAccountController->showByNumber($receipientBank->code, $receipientBankBranch, $receipientBankNumber, $receipientBankOperator);
+        if (!$receipientBankAccount) {
+            throw new Error('A conta bancaria do usuario recebedor nao existe!');
+        }
+        
+        if (!$receipientBankAccount->enabled) {
+            throw new Error('A conta bancaria do usuario recebedor esta desativada por tempo indeterminado!');
+        }
+        
+        // ? ####################################################################################################
+        // ? CONSULTA SE O USUARIO RECEBEDOR EXISTE
+        // ? ####################################################################################################
+        
+        $receipientData = $this->showByUuid($receipientBankAccount->uuid);
+        if (!$receipientData) {
+            throw new Error('O usuario emitente nao foi encontrado!');
+        }
+        
+        $receipientAccountData = $accountController->showByUuid($receipientData->uuid);
+        if (!$receipientAccountData) {
+            throw new Error('A conta emitente nao foi encontrada!');
+        }
+        
+        if (!$receipientAccountData->enabled) {
+            throw new Error('A conta do usuario esta desativada por tempo indeterminado!');
+        }
+        
+        // ? ####################################################################################################
+        // ? CARREGANDO A INTEGRACAO DA REDE BANCARIA DO PAGADOR
+        // ? ####################################################################################################
+        
+        if (count($payerAccountData->integrations) == 0) {
+            throw new Error('Usuario nao possui integracao com a rede bancaria!');
+        };
+        
+        $integrations = [];
+        
+        foreach ($payerAccountData->integrations as $code) {
+            
+            $integrationData = $integrationController->showByCode($code);
+            if (!$integrationData || $integrationData->type != $type) {
+                continue;
+            };
+            
+            $integrations[] = $integrationData;
+        };
+        
+        if (count($integrations) == 0) {
+            throw new Error('Usuario nao possui integracao para essa transacao!');
+        };
+        
+        // ? ####################################################################################################
+        // ? SELECIONANDO AS CONTAS BOLSAO E DISTRIBUINDO O MARKUP
+        // ? ####################################################################################################
+        
+        // Normalmente havera uma integracao para cada transacao
+        // Ainda esta em analise para multiplas integracoes
+        
+        $banksReceipients = [];
+        foreach ($integrations as $integration) {// 2^2
+            $banksReceipients = array_merge($banksReceipients, $bankNetworkController->taxFilter($integration, $packages));
+        };
+
+    }
+
+    public function apply(
+        int $amount, 
+        User $payerData, 
+        BanksList $payerBank , 
+        BankAccount $payerBankAccount, 
+        array $receipientData, 
+        array $receipientBank, 
+        array $receipientBankAccount, $packages, $packagesAmount, $banksReceipients) {
+
+        $banksListController = new BanksListController();
+
+        // ? ####################################################################################################
+        // ? REGISTRA A TRANSACAO
+        // ? ####################################################################################################
+        
+        $transactionsPool = [];
+        
+        $transactionData = $this->cashOut($amount, $payerData, $payerBank , $payerBankAccount, $receipientData, $receipientBank, $receipientBankAccount, $packages, $packagesAmount);
+        $transactionsPool[] = $transactionData;
+        
+        // ? ####################################################################################################
+        // ? REGISTRA AS TRANSACOES DA REDE BANCARIA (INTEGRACOES)
+        // ? ####################################################################################################
+        
+        foreach ($banksReceipients as $bank) {
+            
+            $bankData = $banksListController->showByIspb($bank->ispb);
+            if (!$bankData) {
+                continue;
+            }
+            $transactionsPool[] = $this->cashOut($bank->tax_amount, $payerData, $payerBank, $payerBankAccount, $bank, $bankData, $bank, $packages, 0);
+            sleep(1);
+        }
+
+    }
 }
+
+// $this->execute();
+// $this->register();
+// $this->send();
+// $this->do();
+// $this->make();
+// $this->apply();

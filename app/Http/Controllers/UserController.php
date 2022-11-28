@@ -402,7 +402,7 @@ class UserController extends BaseController
         $banksList->seed();
     }
 
-    public function showByUuid($uuid)
+    public function showByUuid($uuid): User
     {
        return User::where("uuid", "=", $uuid)->first();
     }
@@ -477,4 +477,3 @@ class UserController extends BaseController
     }
 
 }
-

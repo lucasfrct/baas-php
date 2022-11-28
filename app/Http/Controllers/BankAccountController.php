@@ -118,7 +118,7 @@ class BankAccountController extends Controller
         return view("home", ["bankAccount" => $bankAccount]);
     }
 
-    public function showByUuid($uuid)
+    public function showByUuid($uuid): BankAccount
     {
        return BankAccount::where("uuid", "=", $uuid)->first();
     }
