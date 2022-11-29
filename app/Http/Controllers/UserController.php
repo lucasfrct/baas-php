@@ -143,9 +143,22 @@ class UserController extends BaseController
     }
     
     public function sumulationTransaction() {
+
+        $payerUuid = '1d89d46c-7630-4c7e-ba3f-5c2ab305d344';
+        $amount = 1000;
+        $transactionType = TransactionType::CashOut;
+        $payerBankIspb = 18236120;
         
-        $packageController = new PackageController();
+        $receipientBankIspb = 18236120;
+        $receipientBankBranch = '001';
+        $receipientBankNumber = '000002';
+        $receipientBankOperator = OperatorType::Checking;        
+        
         $transactionController = new TransactionController();
+        $transactionController->operate($payerUuid, $amount, $transactionType, $payerBankIspb, $receipientBankIspb, $receipientBankBranch, $receipientBankNumber, $receipientBankOperator);
+        return;
+
+        $packageController = new PackageController();
         $balanceController = new BalanceController();
         $accountController = new AccountController();
         $bankAccountController = new BankAccountController();
@@ -155,15 +168,6 @@ class UserController extends BaseController
 
         //$this->seeder();
         
-        $payerUuid = '1d89d46c-7630-4c7e-ba3f-5c2ab305d344';
-        $amount = 1000;
-        $transactionType = TransactionType::CashOut->value;
-        $payerBankIspb = 18236120;
-        
-        $receipientBankIspb = 18236120;
-        $receipientBankBranch = '001';
-        $receipientBankNumber = '000002';
-        $receipientBankOperator = OperatorType::Checking->value;        
         
         // ? ####################################################################################################
         // ? CONSULTA SE O USUARIO PAGADOR EXISTE

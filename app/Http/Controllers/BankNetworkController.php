@@ -60,11 +60,9 @@ class BankNetworkController extends BaseController
                     }
                 }                
             }
-            //dd($banksReceipients);
         }
 
-        return $banksReceipients;
-        
+        return $banksReceipients;        
     }
 
     public function showByCode($code): BanksNetwork
