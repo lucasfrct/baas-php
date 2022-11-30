@@ -31,23 +31,37 @@ class TransactionController extends BaseController
     private PackageController $packageController;
     private BalanceController $balanceController;
     private AccountController $accountController;
+    private UserController $userController;
     private BankAccountController $bankAccountController;
     private BankNetworkController $bankNetworkController;
     private BanksListController $banksListController;
     private IntegrationController $integrationController;
 
     private array $packages = [];
+    private array $integrations = [];
+    private array $banksReceipients = [];
+    private User $payerData;
+    private User $receipientData;
+    private Account $payerAccountData;
+    private Account $receipientAccountData;
+    private BanksList $payerBank;
+    private BanksList $receipientBank;
+    private BankAccount $payerBankAccount;
+    private BankAccount $receipientBankAccount;
+    private int $packagesAmount;
+    private int $amountCharge;
+
 
     public function __construct() {
         $this->packageController = new PackageController();
         $this->balanceController = new BalanceController();
         $this->accountController = new AccountController();
+        $this->userController = new UserController();
         $this->bankAccountController = new BankAccountController();
         $this->bankNetworkController = new BankNetworkController();
         $this->banksListController = new BanksListController();
         $this->integrationController = new IntegrationController();
 
-        dd('funfou');
     }
 
     public function store(){
@@ -81,19 +95,19 @@ class TransactionController extends BaseController
 
     }
 
-    public function cashIn($amount, $payerData, $payerBank, $payerBankAccount, $receipientData, $receipientBank, $receipientBankAccount, $packages, $tax_amount): Transaction
+    public function cashIn($amount, $payerData, $payerBank, $payerBankAccount, $receipientData, $receipientBank, $receipientBankAccount, $tax_amount): Transaction
     {
         $type = TransactionType::CashIn->value;
-        return $this->insert($amount, $payerData, $payerBank, $payerBankAccount, $receipientData, $receipientBank, $receipientBankAccount, $packages, $tax_amount, $type);
+        return $this->insert($amount, $payerData, $payerBank, $payerBankAccount, $receipientData, $receipientBank, $receipientBankAccount, $tax_amount, $type);
     }
 
-    public function cashOut($amount, $payerData, $payerBank, $payerBankAccount, $receipientData, $receipientBank, $receipientBankAccount, $packages, $tax_amount): Transaction
+    public function cashOut($amount, $payerData, $payerBank, $payerBankAccount, $receipientData, $receipientBank, $receipientBankAccount, $tax_amount): Transaction
     {
         $type = TransactionType::CashOut->value;
-        return $this->insert($amount, $payerData, $payerBank, $payerBankAccount, $receipientData, $receipientBank, $receipientBankAccount, $packages, $tax_amount, $type);
+        return $this->insert($amount, $payerData, $payerBank, $payerBankAccount, $receipientData, $receipientBank, $receipientBankAccount, $tax_amount, $type);
     }
 
-    private function insert($amount, $payerData, $payerBank, $payerBankAccount, $receipientData, $receipientBank, $receipientBankAccount, $packages, $tax_amount, $type): Transaction
+    private function insert($amount, $payerData, $payerBank, $payerBankAccount, $receipientData, $receipientBank, $receipientBankAccount, $tax_amount, $type): Transaction
     {
         
         $transaction = new Transaction();
@@ -118,7 +132,7 @@ class TransactionController extends BaseController
         $transaction->receipient_bank_branch = $receipientBankAccount->branch;
         $transaction->receipient_bank_number = $receipientBankAccount->number;
         $transaction->receipient_bank_operator = $receipientBankAccount->operator;
-        $transaction->packages = $packages;
+        $transaction->packages = $this->packages;
         $transaction->tax_amount = $tax_amount;
         $transaction->type = $type;
         $transaction->status = TransactionStatusType::Transient->value;
@@ -225,22 +239,21 @@ class TransactionController extends BaseController
         string $receipientBankNumber, 
         OperatorType $receipientBankOperator
     ) {
-
         // ? ####################################################################################################
         // ? CONSULTA SE O USUARIO PAGADOR EXISTE
         // ? ####################################################################################################
         
-        $payerData = $this->showByUuid($payerUuid);
-        if (!$payerData) {
+        $this->payerData = $this->userController->showByUuid($payerUuid);
+        if (!$this->payerData) {
             throw new Error('O usuario emitente nao foi encontrado!');
         }
         
-        $payerAccountData = $this->accountController->showByUuid($payerUuid);
-        if (!$payerAccountData) {
+        $this->payerAccountData = $this->accountController->showByUuid($payerUuid);
+        if (!$this->payerAccountData) {
             throw new Error('A conta emitente nao foi encontrada!');
         }
         
-        if (!$payerAccountData->enabled) {
+        if (!$this->payerAccountData->enabled) {
             throw new Error('A conta do usuario esta desativada por tempo indeterminado!');
         }
         
@@ -249,14 +262,14 @@ class TransactionController extends BaseController
         // ? ####################################################################################################
         
         // Banco emissor da conta do usuario pagador
-        $payerBank = $this->banksListController->showByIspb($payerBankIspb);
+        $this->payerBank = $this->banksListController->showByIspb($payerBankIspb);
         
-        $payerBankAccount = $this->bankAccountController->showByUuid($payerAccountData->uuid);
-        if (!$payerBankAccount) {
+        $this->payerBankAccount = $this->bankAccountController->showByUuid($this->payerAccountData->uuid);
+        if (!$this->payerBankAccount) {
             throw new Error('A conta bancaria do usuario emissor nao existe!');
         }
         
-        if (!$payerBankAccount->enabled) {
+        if (!$this->payerBankAccount->enabled) {
             throw new Error('A conta bancaria do usuario emissor esta desativada por tempo indeterminado!');
         }
         
@@ -265,28 +278,28 @@ class TransactionController extends BaseController
         // ? ####################################################################################################
         
         $this->packages = [];
-        $packagesAmount = 0;
+        $this->packagesAmount = 0;
         
-        if (count($payerAccountData->packages) > 0) {
+        if (count($this->payerAccountData->packages) > 0) {
             
-            foreach ($payerAccountData->packages as $code) {
+            foreach ($this->payerAccountData->packages as $code) {
                 $payerPackageData = $this->packageController->showByCode($code);
                 if (!$payerPackageData) {
                     continue;
                 }
                 $this->packages[] = $payerPackageData;
-                $packagesAmount += $payerPackageData->amount;
+                $this->packagesAmount += $payerPackageData->amount;
             }
         }
         
-        $amountCharge = $amount + $packagesAmount;
+        $this->amountCharge = $amount + $this->packagesAmount;
         
         // ? ####################################################################################################
         // ? CONSULTA AO SALDO DO USUARIO PAGADOR
         // ? ####################################################################################################
         
         $savings = $this->balanceController->currentMonth($payerUuid);
-        if ($savings <= $amountCharge) {
+        if ($savings <= $this->amountCharge) {
             throw new Error('Saldo insuficiente!');
         }
         
@@ -294,17 +307,17 @@ class TransactionController extends BaseController
         // ? CONSULTA A CONTA BANCARIA DO USUARIO RECEBEDOR / CARREGA O BANCO DO RECEBEDOR
         // ? ####################################################################################################
         
-        $receipientBank = $this->banksListController->showByIspb($receipientBankIspb);
-        if (!$receipientBank) {
+        $this->receipientBank = $this->banksListController->showByIspb($receipientBankIspb);
+        if (!$this->receipientBank) {
             throw new Error('Banco recebedor nao encontrado!');
         }
         
-        $receipientBankAccount = $this->bankAccountController->showByNumber($receipientBank->code, $receipientBankBranch, $receipientBankNumber, $receipientBankOperator);
-        if (!$receipientBankAccount) {
+        $this->receipientBankAccount = $this->bankAccountController->showByNumber($this->receipientBank->code, $receipientBankBranch, $receipientBankNumber, $receipientBankOperator);
+        if (!$this->receipientBankAccount) {
             throw new Error('A conta bancaria do usuario recebedor nao existe!');
         }
         
-        if (!$receipientBankAccount->enabled) {
+        if (!$this->receipientBankAccount->enabled) {
             throw new Error('A conta bancaria do usuario recebedor esta desativada por tempo indeterminado!');
         }
         
@@ -312,17 +325,17 @@ class TransactionController extends BaseController
         // ? CONSULTA SE O USUARIO RECEBEDOR EXISTE
         // ? ####################################################################################################
         
-        $receipientData = $this->showByUuid($receipientBankAccount->uuid);
-        if (!$receipientData) {
+        $this->receipientData = $this->userController->showByUuid($this->receipientBankAccount->uuid);
+        if (!$this->receipientData) {
             throw new Error('O usuario emitente nao foi encontrado!');
         }
         
-        $receipientAccountData = $this->accountController->showByUuid($receipientData->uuid);
-        if (!$receipientAccountData) {
+        $this->receipientAccountData = $this->accountController->showByUuid($this->receipientData->uuid);
+        if (!$this->receipientAccountData) {
             throw new Error('A conta emitente nao foi encontrada!');
         }
         
-        if (!$receipientAccountData->enabled) {
+        if (!$this->receipientAccountData->enabled) {
             throw new Error('A conta do usuario esta desativada por tempo indeterminado!');
         }
         
@@ -330,23 +343,23 @@ class TransactionController extends BaseController
         // ? CARREGANDO A INTEGRACAO DA REDE BANCARIA DO PAGADOR
         // ? ####################################################################################################
         
-        if (count($payerAccountData->integrations) == 0) {
+        if (count($this->payerAccountData->integrations) == 0) {
             throw new Error('Usuario nao possui integracao com a rede bancaria!');
         };
         
-        $integrations = [];
+        $this->integrations = [];
         
-        foreach ($payerAccountData->integrations as $code) {
+        foreach ($this->payerAccountData->integrations as $code) {
             
             $integrationData = $this->integrationController->showByCode($code);
-            if (!$integrationData || $integrationData->type != $type) {
+            if (!$integrationData || $integrationData->type != $type->value) {
                 continue;
             };
             
-            $integrations[] = $integrationData;
+            $this->integrations[] = $integrationData;
         };
         
-        if (count($integrations) == 0) {
+        if (count($this->integrations) == 0) {
             throw new Error('Usuario nao possui integracao para essa transacao!');
         };
         
@@ -357,11 +370,11 @@ class TransactionController extends BaseController
         // Normalmente havera uma integracao para cada transacao
         // Ainda esta em analise para multiplas integracoes
         
-        $banksReceipients = [];
-        foreach ($integrations as $integration) {// 2^2
-            $banksReceipients = array_merge($banksReceipients, $this->bankNetworkController->taxFilter($integration, $this->packages));
+        $this->banksReceipients = [];
+        foreach ($this->integrations as $integration) {// 2^2
+            $this->banksReceipients = array_merge($this->banksReceipients, $this->bankNetworkController->taxFilter($integration, $this->packages));
         };
-
+        dd('funfou teste', $this->banksReceipients);
     }
 
     public function apply(
@@ -372,7 +385,6 @@ class TransactionController extends BaseController
         User $receipientData, 
         BanksList $receipientBank, 
         BankAccount $receipientBankAccount, 
-        array $packages, 
         int $packagesAmount, 
         array $banksReceipients) {
 
@@ -382,27 +394,27 @@ class TransactionController extends BaseController
         
         $transactionsPool = [];
         
-        $transactionData = $this->cashOut($amount, $payerData, $payerBank , $payerBankAccount, $receipientData, $receipientBank, $receipientBankAccount, $this->packages, $packagesAmount);
+        $transactionData = $this->cashOut($amount, $payerData, $payerBank , $this->payerBankAccount, $receipientData, $receipientBank, $this->receipientBankAccount, $this->packages, $this->packagesAmount);
         $transactionsPool[] = $transactionData;
         
         // ? ####################################################################################################
         // ? REGISTRA AS TRANSACOES DA REDE BANCARIA (INTEGRACOES)
         // ? ####################################################################################################
         
-        foreach ($banksReceipients as $bank) {
+        foreach ($this->banksReceipients as $bank) {
             
             $bankData = $this->banksListController->showByIspb($bank->ispb);
             if (!$bankData) {
                 continue;
             }
-            $transactionsPool[] = $this->cashOut($bank->tax_amount, $payerData, $payerBank, $payerBankAccount, $bank, $bankData, $bank, $this->packages, 0);
+            $transactionsPool[] = $this->cashOut($bank->tax_amount, $payerData, $payerBank, $this->payerBankAccount, $bank, $bankData, $bank, $this->packages, 0);
             sleep(1);
         }
 
     }
 
-    public function liquidate(array $transactionsPool, User $payerData, User $receipientData, array $banksReceipients) {
-        
+    public function liquidate(array $transactionsPool, User $payerData, User $receipientData, array $banksReceipients) 
+    {        
         // ? ####################################################################################################
         // ? ATUALIZA STATUS DA TRANSACAO
         // ? ####################################################################################################
@@ -417,19 +429,19 @@ class TransactionController extends BaseController
         // ? ATUALIZA O BALANCE DO PAGADOR
         // ? ####################################################################################################
         
-        $this->balanceController->updateBankAccountByUuid($payerData->uuid);
+        $this->balanceController->updateBankAccountByUuid($this->payerData->uuid);
 
         // ? ####################################################################################################
         // ? ATUALIZA O BALANCE DO RECEBEDOR
         // ? ####################################################################################################
         
-        $this->balanceController->updateBankAccountByUuid($receipientData->uuid);
+        $this->balanceController->updateBankAccountByUuid($this->receipientData->uuid);
         
         // ? ####################################################################################################
         // ? ATUALIZA O BALANCE DOS RECEBEDORES DAS TAXAS
         // ? ####################################################################################################
         
-        foreach ($banksReceipients as $bank) 
+        foreach ($this->banksReceipients as $bank) 
         {            
             $this->balanceController->updateBankNetworkByUid($bank->uid);
             sleep(1);
