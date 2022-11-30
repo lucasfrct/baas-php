@@ -40,6 +40,7 @@ class TransactionController extends BaseController
     private array $packages = [];
     private array $integrations = [];
     private array $banksReceipients = [];
+    private array $transactionsPool = [];
     private User $payerData;
     private User $receipientData;
     private Account $payerAccountData;
@@ -142,11 +143,11 @@ class TransactionController extends BaseController
         return $transaction;
     }
 
-    public function updateStatus(string $uid, string $status): Transaction
+    public function updateStatus(string $uid, TransactionStatusType $status): Transaction
     {
         $transaction = Transaction::where("uid", "=", $uid)->first();
 
-        $transaction->status = $status;
+        $transaction->status = $status->value;
 
         $transaction->save();
 
@@ -227,6 +228,10 @@ class TransactionController extends BaseController
         OperatorType $receipientBankOperator
     ) {        
         $this->prepare($payerUuid, $amount, $type, $payerBankIspb, $receipientBankIspb, $receipientBankBranch, $receipientBankNumber, $receipientBankOperator);
+
+        $this->apply($amount);
+
+        $this->liquidate();
     }
 
     public function prepare(
@@ -374,28 +379,26 @@ class TransactionController extends BaseController
         foreach ($this->integrations as $integration) {// 2^2
             $this->banksReceipients = array_merge($this->banksReceipients, $this->bankNetworkController->taxFilter($integration, $this->packages));
         };
-        dd('funfou teste', $this->banksReceipients);
     }
-
-    public function apply(
-        int $amount, 
-        User $payerData, 
-        BanksList $payerBank , 
-        BankAccount $payerBankAccount, 
-        User $receipientData, 
-        BanksList $receipientBank, 
-        BankAccount $receipientBankAccount, 
-        int $packagesAmount, 
-        array $banksReceipients) {
-
+    
+    public function apply(int $amount) 
+    {            
         // ? ####################################################################################################
         // ? REGISTRA A TRANSACAO
         // ? ####################################################################################################
         
-        $transactionsPool = [];
+        $this->transactionsPool = [];
         
-        $transactionData = $this->cashOut($amount, $payerData, $payerBank , $this->payerBankAccount, $receipientData, $receipientBank, $this->receipientBankAccount, $this->packages, $this->packagesAmount);
-        $transactionsPool[] = $transactionData;
+        $this->transactionsPool[] = $this->cashOut(
+            $amount, 
+            $this->payerData, 
+            $this->payerBank , 
+            $this->payerBankAccount, 
+            $this->receipientData, 
+            $this->receipientBank, 
+            $this->receipientBankAccount,
+            $this->packagesAmount
+        );
         
         // ? ####################################################################################################
         // ? REGISTRA AS TRANSACOES DA REDE BANCARIA (INTEGRACOES)
@@ -407,21 +410,20 @@ class TransactionController extends BaseController
             if (!$bankData) {
                 continue;
             }
-            $transactionsPool[] = $this->cashOut($bank->tax_amount, $payerData, $payerBank, $this->payerBankAccount, $bank, $bankData, $bank, $this->packages, 0);
+            $this->transactionsPool[] = $this->cashOut($bank->tax_amount, $this->payerData, $this->payerBank, $this->payerBankAccount, $bank, $bankData, $bank, 0);
             sleep(1);
         }
-
     }
 
-    public function liquidate(array $transactionsPool, User $payerData, User $receipientData, array $banksReceipients) 
+    public function liquidate() 
     {        
         // ? ####################################################################################################
         // ? ATUALIZA STATUS DA TRANSACAO
         // ? ####################################################################################################
         
-        foreach ($transactionsPool as $transaction) {
+        foreach ($this->transactionsPool as $transaction) {
             
-            $this->updateStatus($transaction->uid, TransactionStatusType::Processing->value);
+            $this->updateStatus($transaction->uid, TransactionStatusType::Processing);
             sleep(1);
         }
         
@@ -430,7 +432,7 @@ class TransactionController extends BaseController
         // ? ####################################################################################################
         
         $this->balanceController->updateBankAccountByUuid($this->payerData->uuid);
-
+        
         // ? ####################################################################################################
         // ? ATUALIZA O BALANCE DO RECEBEDOR
         // ? ####################################################################################################
@@ -451,12 +453,12 @@ class TransactionController extends BaseController
         // ? ATUALIZA STATUS DA TRANSACAO
         // ? ####################################################################################################
         
-        foreach ($transactionsPool as $transaction) {
+        foreach ($this->transactionsPool as $transaction) {
             
-            $this->updateStatus($transaction->uid, TransactionStatusType::Paided->value);
+            $this->updateStatus($transaction->uid, TransactionStatusType::Paided);
             sleep(1);
         }
-
+        dd('funfou teste');
     }
 }
 
