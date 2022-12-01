@@ -157,7 +157,7 @@ class UserController extends BaseController
         $transactionController = new TransactionController();
         $transactionController->operate($payerUuid, $amount, $transactionType, $payerBankIspb, $receipientBankIspb, $receipientBankBranch, $receipientBankNumber, $receipientBankOperator);
         return;
-        
+
         //# iniciando a transacao: 
         // 
         // consulta se o usuario emitente existe

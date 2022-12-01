@@ -458,12 +458,5 @@ class TransactionController extends BaseController
             $this->updateStatus($transaction->uid, TransactionStatusType::Paided);
             sleep(1);
         }
-        dd('funfou teste');
     }
 }
-
-// $this->confirm();
-// $this->finalize();
-// $this->register();
-// $this->liquidate();
-// $this->bill();

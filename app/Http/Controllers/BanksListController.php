@@ -129,4 +129,9 @@ class BanksListController extends Controller
     {
         return BanksList::where("ispb", "=", $ispb)->first();
     }
+
+    public function showByCode(string $code): BanksList
+    {
+        return BanksList::where("code", "=", $code)->first();
+    }
 }
