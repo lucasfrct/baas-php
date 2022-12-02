@@ -35,8 +35,9 @@ class DashboardController extends Controller
         $user = Auth::user();
         $bankAccount = $bankAccountController->showByUuid($user->uuid);
         $bank = $banksListController->showByCode($bankAccount->code);
+        $banksList = $banksListController->list();
 
-        return view('dashboard', ["user" => $user, "bankAccount" => $bankAccount, "bank" => $bank]);
+        return view('dashboard', ["user" => $user, "bankAccount" => $bankAccount, "bank" => $bank, "banksList" => $banksList]);
     }
 
     /**

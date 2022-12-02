@@ -12,6 +12,8 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 use Ramsey\Uuid\Uuid;
 
+use Illuminate\Database\Eloquent\Collection;
+
 use App\Shared\Str;
 use App\Models\User;
 use App\Models\Parents;
@@ -133,5 +135,10 @@ class BanksListController extends Controller
     public function showByCode(string $code): BanksList
     {
         return BanksList::where("code", "=", $code)->first();
+    }
+
+    public function list(): Collection
+    {
+        return BanksList::where("id", ">", 0)->get();
     }
 }

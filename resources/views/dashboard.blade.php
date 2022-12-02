@@ -22,159 +22,219 @@
     @include('header')
 
     <main class="container-fluid my-2" style="min-height: 100vh">
-
-    <h1> Marcus Feio</h1>
-
-    <div class="card">
-        <h5 class="card-header">{{$user->firstName}} {{$user->lastName}}</h5>
-        <div class="card-body">
-          <h5 class="card-title">Conta Bancaria</h5>
-          <div class="row">
-            <div class="col-6">
-                <span>Banco: {{$bank->company}}</span>
-            </div>
-            <div class="col-6">
-                <span>Agencia: {{$bankAccount->branch}}</span>
-            </div>
-            <div class="col-6">
-                <span>Conta Corrente (cc): {{$bankAccount->number}}</span>
-            </div>
-            <div class="col-6">
-                <span>Operador: {{$bankAccount->operator}}</span>
-            </div>
-          </div>
-          <a href="#" class="btn btn-primary">Go somewhere</a>
+        <div class="row">
+            <h1>{{$user->firstName}} {{$user->lastName}}</h1>
         </div>
-    </div>
 
-    <div class="d-flex align-itens-center justify-content-center">
+        <div class="row">
 
-        <form action="{{route('signin')}}" method="POST" class="border border-grey-200 py-4 px-5 rounded-3 shadow m-4"
-            style="width: 680px;">
-
-            <div class="row">
-
-                <legend class="text-center h1 mb-4">Beneficiário</legend>
-
-                <input type="hidden" name="_token" value="{{ csrf_token() }}">
-
-                <div class="mb-4 col-6">
-                    <div class="form-group">
-                        <label class="mb-2 ms-1" class="mb-2 ms-1" for="bank">Banco:</label>
-                        <input type="text" id="bank" name="bank" placeholder="Banco" value="Jumeci Bank"
-                            @class([
-                                'is-valid' => !$errors->has('bank'),
-                                'is-invalid' => $errors->has('bank'),
-                                'form-control',
-                            ])>
-                    </div>
-                    @error('bank')
-                        <div class="feedback text-danger">
-                            <span class="ms-2 me-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                                    fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
-                                    <path
-                                        d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
-                                    <path
-                                        d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
-                                </svg>
-                            </span>
-                            <span style="font-size: 11px;">{{ $message }}</span>
+            <div class="col-4">
+                <div class="card">
+                    <h5 class="card-header">Saldo</h5>
+                    <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            @isset($bankAccount)
+                                <h2>R$ @money($bankAccount->balance)</h2>
+                            @endisset
                         </div>
-                    @enderror
-                </div>
-                
-                <div class="mb-4 col-6">
-                    <div class="form-group">
-                        <label class="mb-2 ms-1" class="mb-2 ms-1" for="branch">Agencia:</label>
-                        <input type="text" id="branch" name="branch" placeholder="Agencia" value="001"
-                            @class([
-                                'is-valid' => !$errors->has('branch'),
-                                'is-invalid' => $errors->has('branch'),
-                                'form-control',
-                            ])>
                     </div>
-                    @error('branch')
-                        <div class="feedback text-danger">
-                            <span class="ms-2 me-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                                    fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
-                                    <path
-                                        d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
-                                    <path
-                                        d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
-                                </svg>
-                            </span>
-                            <span style="font-size: 11px;">{{ $message }}</span>
-                        </div>
-                    @enderror
-                </div>
-
-                <div class="mb-4 col-6">
-                    <div class="form-group">
-                        <label class="mb-2 ms-1" for="number">Conta Corrente (cc):</label>
-                        <input type="text" id="number" name="number" placeholder="Conta Corrente (cc)" value="000001"
-                            @class([
-                                'is-valid' => !$errors->has('number'),
-                                'is-invalid' => $errors->has('number'),
-                                'form-control',
-                            ])>
                     </div>
-                    @error('number')
-                        <div class="feedback text-danger">
-                            <span class="ms-2 me-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                                    fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
-                                    <path
-                                        d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
-                                    <path
-                                        d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
-                                </svg>
-                            </span>
-                            <span style="font-size: 11px;">{{ $message }}</span>
-                        </div>
-                    @enderror
                 </div>
-
-                <div class="mb-4 col-6">
-                    <div class="form-group">
-                        <label class="mb-2 ms-1" for="operator">Operador:</label>
-                        <input type="text" id="operator" name="operator" placeholder="Operador" value="1"
-                            @class([
-                                'is-valid' => !$errors->has('operator'),
-                                'is-invalid' => $errors->has('operator'),
-                                'form-control',
-                            ])>
-                    </div>
-                    @error('operator')
-                        <div class="feedback text-danger">
-                            <span class="ms-2 me-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                                    fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
-                                    <path
-                                        d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
-                                    <path
-                                        d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
-                                </svg>
-                            </span>
-                            <span style="font-size: 11px;">{{ $message }}</span>
-                        </div>
-                    @enderror
-                </div>
-
-                <div class="d-flex flex-row-reverse mt-4">
-                    <button type="submit" class="btn btn-primary btn-lg px-5">Enviar</button>
-                </div>
-
-                @isset($success)
-                    <div class="alert alert-success my-4" role="alert">Beneficiário enviado com sucesso!</div>
-                @endisset
             </div>
 
-        </form>
+            <div class="col-4">
+                <div class="card">
+                    <h5 class="card-header">Conta Bancaria</h5>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <span>Banco: {{$bank->company}}</span>
+                            </div>
+                            <div class="col-6">
+                                <span>Agencia: {{$bankAccount->branch}}</span>
+                            </div>
+                            <div class="col-6">
+                                <span>Conta Corrente (cc): {{$bankAccount->number}}</span>
+                            </div>
+                            <div class="col-6">
+                                <span>Operador: {{$bankAccount->operator}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    </div>
+        </div>
 
+        <div class="row">
+
+            <div class="d-flex align-itens-center justify-content-center">
+
+                <form action="{{route('signin')}}" method="POST" class="border border-grey-200 py-4 px-5 rounded-3 shadow m-4"
+                    style="width: 680px;">
+
+                    <div class="row">
+
+                        <legend class="text-center h4 mb-4">Transferencia</legend>
+
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+                        <div class="mb-4 col-4">
+                            <div class="form-group">
+                                <label class="mb-2 ms-1" for="amount">Valor da transferencia:</label>
+                                <input type="text" id="amount" name="amount" placeholder="Valor da transferencia:" value="0,00"
+                                    @class([
+                                        'is-valid' => !$errors->has('amount'),
+                                        'is-invalid' => $errors->has('amount'),
+                                        'form-control',
+                                    ])>
+                            </div>
+                            @error('amount')
+                                <div class="feedback text-danger">
+                                    <span class="ms-2 me-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                            fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
+                                            <path
+                                                d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
+                                            <path
+                                                d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+                                        </svg>
+                                    </span>
+                                    <span style="font-size: 11px;">{{ $message }}</span>
+                                </div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-4 col-8">
+                            <div class="form-group">
+                                <label class="mb-2 ms-1" class="mb-2 ms-1" for="bank">Banco:</label>
+                                <select class="form-select" id="bank" name="bank" value="Jumeci Bank"
+                                    @class([
+                                        'is-valid' => !$errors->has('bank'),
+                                        'is-invalid' => $errors->has('bank'),
+                                        'form-control',
+                                    ])
+                                >
+                                    <option selected disabled>Selecione o banco para transferir:</option>
+                                    @isset($banksList)
+                                        @foreach ($banksList as $bank)
+                                            <option value="{{$bank->ispb}}">{{ $bank->company }}</option>
+                                        @endforeach
+                                    @endisset
+                                    
+                                </select>
+
+
+                            </div>
+                            @error('bank')
+                                <div class="feedback text-danger">
+                                    <span class="ms-2 me-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                            fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
+                                            <path
+                                                d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
+                                            <path
+                                                d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+                                        </svg>
+                                    </span>
+                                    <span style="font-size: 11px;">{{ $message }}</span>
+                                </div>
+                            @enderror
+                        </div>
+                        
+                        <div class="mb-4 col-4">
+                            <div class="form-group">
+                                <label class="mb-2 ms-1" class="mb-2 ms-1" for="branch">Agencia:</label>
+                                <input type="text" id="branch" name="branch" placeholder="Agencia" value="001"
+                                    @class([
+                                        'is-valid' => !$errors->has('branch'),
+                                        'is-invalid' => $errors->has('branch'),
+                                        'form-control',
+                                    ])>
+                            </div>
+                            @error('branch')
+                                <div class="feedback text-danger">
+                                    <span class="ms-2 me-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                            fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
+                                            <path
+                                                d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
+                                            <path
+                                                d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+                                        </svg>
+                                    </span>
+                                    <span style="font-size: 11px;">{{ $message }}</span>
+                                </div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-4 col-4">
+                            <div class="form-group">
+                                <label class="mb-2 ms-1" for="number">Conta Corrente (cc):</label>
+                                <input type="text" id="number" name="number" placeholder="Conta Corrente (cc)" value="000001"
+                                    @class([
+                                        'is-valid' => !$errors->has('number'),
+                                        'is-invalid' => $errors->has('number'),
+                                        'form-control',
+                                    ])>
+                            </div>
+                            @error('number')
+                                <div class="feedback text-danger">
+                                    <span class="ms-2 me-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                            fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
+                                            <path
+                                                d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
+                                            <path
+                                                d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+                                        </svg>
+                                    </span>
+                                    <span style="font-size: 11px;">{{ $message }}</span>
+                                </div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-4 col-4">
+                            <div class="form-group">
+                                <label class="mb-2 ms-1" for="operator">Operador:</label>
+                                <input type="text" id="operator" name="operator" placeholder="Operador" value="1"
+                                    @class([
+                                        'is-valid' => !$errors->has('operator'),
+                                        'is-invalid' => $errors->has('operator'),
+                                        'form-control',
+                                    ])>
+                            </div>
+                            @error('operator')
+                                <div class="feedback text-danger">
+                                    <span class="ms-2 me-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                                            fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
+                                            <path
+                                                d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z" />
+                                            <path
+                                                d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z" />
+                                        </svg>
+                                    </span>
+                                    <span style="font-size: 11px;">{{ $message }}</span>
+                                </div>
+                            @enderror
+                        </div>
+
+                        <div class="d-flex flex-row-reverse mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg px-5">Transferir</button>
+                        </div>
+
+                        @isset($success)
+                            <div class="alert alert-success my-4" role="alert">Beneficiário enviado com sucesso!</div>
+                        @endisset
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
     </main>
 
     @include('footer')
