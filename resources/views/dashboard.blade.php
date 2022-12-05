@@ -35,7 +35,7 @@
                     <div class="row">
                         <div class="col-12">
                             @isset($bankAccount)
-                                <h2>R$ @money($bankAccount->balance)</h2>
+                                <h2>R$ @currence_cents($bankAccount->balance)</h2>
                             @endisset
                         </div>
                     </div>
@@ -71,7 +71,7 @@
 
             <div class="d-flex align-itens-center justify-content-center">
 
-                <form action="{{route('signin')}}" method="POST" class="border border-grey-200 py-4 px-5 rounded-3 shadow m-4"
+                <form action="{{route('applyingTransaction')}}" method="POST" class="border border-grey-200 py-4 px-5 rounded-3 shadow m-4"
                     style="width: 680px;">
 
                     <div class="row">
@@ -79,6 +79,10 @@
                         <legend class="text-center h4 mb-4">Transferencia</legend>
 
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+                        <input type="hidden" name="payer_uuid" value="{{ $user->uuid }}">
+                        <input type="hidden" name="transaction_type" value="cashout">
+                        <input type="hidden" name="payer_bank_ispb" value="{{ $bank->ispb }}">
 
                         <div class="mb-4 col-4">
                             <div class="form-group">
@@ -109,7 +113,7 @@
                         <div class="mb-4 col-8">
                             <div class="form-group">
                                 <label class="mb-2 ms-1" class="mb-2 ms-1" for="bank">Banco:</label>
-                                <select class="form-select" id="bank" name="bank" value="Jumeci Bank"
+                                <select class="form-select" id="bank" name="receipient_bank" value="Jumeci Bank"
                                     @class([
                                         'is-valid' => !$errors->has('bank'),
                                         'is-invalid' => $errors->has('bank'),
@@ -146,7 +150,7 @@
                         <div class="mb-4 col-4">
                             <div class="form-group">
                                 <label class="mb-2 ms-1" class="mb-2 ms-1" for="branch">Agencia:</label>
-                                <input type="text" id="branch" name="branch" placeholder="Agencia" value="001"
+                                <input type="text" id="branch" name="receipient_bank_branch" placeholder="Agencia" value="001"
                                     @class([
                                         'is-valid' => !$errors->has('branch'),
                                         'is-invalid' => $errors->has('branch'),
@@ -172,7 +176,7 @@
                         <div class="mb-4 col-4">
                             <div class="form-group">
                                 <label class="mb-2 ms-1" for="number">Conta Corrente (cc):</label>
-                                <input type="text" id="number" name="number" placeholder="Conta Corrente (cc)" value="000001"
+                                <input type="text" id="number" name="receipient_bank_number" placeholder="Conta Corrente (cc)" value="000001"
                                     @class([
                                         'is-valid' => !$errors->has('number'),
                                         'is-invalid' => $errors->has('number'),
@@ -198,7 +202,7 @@
                         <div class="mb-4 col-4">
                             <div class="form-group">
                                 <label class="mb-2 ms-1" for="operator">Operador:</label>
-                                <input type="text" id="operator" name="operator" placeholder="Operador" value="1"
+                                <input type="text" id="operator" name="receipient_bank_operator" placeholder="Operador" value="1"
                                     @class([
                                         'is-valid' => !$errors->has('operator'),
                                         'is-invalid' => $errors->has('operator'),

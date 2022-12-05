@@ -28,5 +28,6 @@ Route::get('/signin', [UserController::class, 'signinCreate'])->name('signin');
 Route::post('/signin', [UserController::class, 'signinStore'])->name('signin');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
+Route::post('/dashboard/transaction', [DashboardController::class, 'applyingTransaction'])->name('applyingTransaction')->middleware('auth');
 
 Route::resource('/bank-account', BankAccountController::class);

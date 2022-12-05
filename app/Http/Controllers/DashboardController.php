@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\BanksListController;
 use App\Models\BankAccount;
@@ -121,5 +122,25 @@ class DashboardController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function applyingTransaction(Request $request) 
+    {
+        $transactionController = new TransactionController;
+
+        $form = $request->all();
+
+        $transactionController->operate(
+            $form["payer_uuid"],
+            $form["amount"],
+            $form["transaction_type"],
+            $form["payer_bank_ispb"],
+            $form["receipient_bank_ispb"],
+            $form["receipient_bank_branch"],
+            $form["receipient_bank_number"],
+            $form["receipient_bank_operator"]
+        );
+        //dd($request->all());
+        return $this->index();
     }
 }
