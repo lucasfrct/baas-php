@@ -76,7 +76,7 @@
 
                     <div class="row">
 
-                        <legend class="text-center h4 mb-4">Transferencia</legend>
+                        <legend class="text-center h4 mb-4">Dados do recebedor</legend>
 
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
@@ -84,7 +84,7 @@
                         <input type="hidden" name="transaction_type" value="cashout">
                         <input type="hidden" name="payer_bank_ispb" value="{{ $bank->ispb }}">
 
-                        <div class="mb-4 col-4">
+                        {{-- <div class="mb-4 col-4">
                             <div class="form-group">
                                 <label class="mb-2 ms-1" for="amount">Valor da transferencia:</label>
                                 <input type="text" id="amount" name="amount" placeholder="Valor da transferencia:" value="0,00"
@@ -108,12 +108,12 @@
                                     <span style="font-size: 11px;">{{ $message }}</span>
                                 </div>
                             @enderror
-                        </div>
+                        </div> --}}
 
-                        <div class="mb-4 col-8">
+                        <div class="mb-4 col-12">
                             <div class="form-group">
                                 <label class="mb-2 ms-1" class="mb-2 ms-1" for="bank">Banco:</label>
-                                <select class="form-select" id="bank" name="receipient_bank" value="Jumeci Bank"
+                                <select class="form-select" id="bank" name="receipient_bank_ispb" value="Jumeci Bank"
                                     @class([
                                         'is-valid' => !$errors->has('bank'),
                                         'is-invalid' => $errors->has('bank'),
@@ -202,7 +202,7 @@
                         <div class="mb-4 col-4">
                             <div class="form-group">
                                 <label class="mb-2 ms-1" for="operator">Operador:</label>
-                                <input type="text" id="operator" name="receipient_bank_operator" placeholder="Operador" value="1"
+                                <input type="number" id="operator" name="receipient_bank_operator" placeholder="Operador" value="1" min="0" max="2"
                                     @class([
                                         'is-valid' => !$errors->has('operator'),
                                         'is-invalid' => $errors->has('operator'),
@@ -226,7 +226,7 @@
                         </div>
 
                         <div class="d-flex flex-row-reverse mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg px-5">Transferir</button>
+                            <button type="submit" class="btn btn-primary btn-lg px-5">Continuar</button>
                         </div>
 
                         @isset($success)

@@ -20,6 +20,8 @@ use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\BanksListController;
 use App\Models\BankAccount;
 use App\Models\User;
+use App\Types\OperatorType;
+use App\Types\TransactionType;
 
 class DashboardController extends Controller
 {
@@ -129,18 +131,26 @@ class DashboardController extends Controller
         $transactionController = new TransactionController;
 
         $form = $request->all();
+        
+        if ($form["transaction_type"] == TransactionType::CashOut->value) {
+            $type = TransactionType::CashOut;
+        }
 
+        if (intval($form["receipient_bank_operator"]) == OperatorType::Checking->value) {
+            $operatorType = OperatorType::Checking;
+        }
+        
         $transactionController->operate(
             $form["payer_uuid"],
             $form["amount"],
-            $form["transaction_type"],
+            $type,
             $form["payer_bank_ispb"],
             $form["receipient_bank_ispb"],
             $form["receipient_bank_branch"],
             $form["receipient_bank_number"],
-            $form["receipient_bank_operator"]
+            $operatorType
         );
-        //dd($request->all());
-        return $this->index();
+
+        return redirect()->intended('dashboard');
     }
 }
