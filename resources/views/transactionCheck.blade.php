@@ -42,7 +42,7 @@
 
             <div class="d-flex align-itens-center justify-content-center">
 
-                @include('bankAccountData')
+                @include('bankAccountDataAmount')
 
             </div>
 

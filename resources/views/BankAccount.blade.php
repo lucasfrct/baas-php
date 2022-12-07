@@ -1,4 +1,4 @@
-<div class="row">
+{{-- <div class="row">
  
     <form action="/bank-account" method="POST" class="border border-grey-200 p-3 rounded-3 shadow m-2 row">
       
@@ -39,4 +39,24 @@
       </div>
     @endisset
  
+</div> --}}
+
+<div class="card">
+    <h5 class="card-header">Conta Bancaria</h5>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-6">
+                <span>Banco: {{$bank->company}}</span>
+            </div>
+            <div class="col-6">
+                <span>Agencia: {{$bankAccount->branch}}</span>
+            </div>
+            <div class="col-6">
+                <span>Conta Corrente (cc): {{$bankAccount->number}}</span>
+            </div>
+            <div class="col-6">
+                <span>Operador: {{$bankAccount->operator}}</span>
+            </div>
+        </div>
+    </div>
 </div>

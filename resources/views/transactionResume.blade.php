@@ -40,9 +40,9 @@
 
         <div class="row">
 
-            <div class="d-flex align-itens-center justify-content-center">
+            <div class="d-flex flex-column align-itens-center justify-content-center col-4 mt-4">
 
-                @include('bankAccountData')
+                @include('reportResume')
 
             </div>
 

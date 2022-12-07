@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TransactionCheckController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +29,7 @@ Route::get('/signin', [UserController::class, 'signinCreate'])->name('signin');
 Route::post('/signin', [UserController::class, 'signinStore'])->name('signin');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
-Route::post('/dashboard/transaction', [DashboardController::class, 'applyingTransaction'])->name('applyingTransaction')->middleware('auth');
+Route::post('/dashboard/transaction/check', [DashboardController::class, 'transactionCheck'])->name('transactionCheck')->middleware('auth');
+Route::post('/dashboard/transaction/resume', [DashboardController::class, 'transactionResume'])->name('transactionResume')->middleware('auth');
 
 Route::resource('/bank-account', BankAccountController::class);

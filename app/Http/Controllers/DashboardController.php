@@ -153,4 +153,30 @@ class DashboardController extends Controller
 
         return redirect()->intended('dashboard');
     }
+
+    public function transactionCheck() {
+
+        $bankAccountController = new BankAccountController();
+        $banksListController = new BanksListController();
+
+        $user = Auth::user();
+        $bankAccount = $bankAccountController->showByUuid($user->uuid);
+        $bank = $banksListController->showByCode($bankAccount->code);
+        $banksList = $banksListController->list();
+
+        return view('transactionCheck', ["user" => $user, "bankAccount" => $bankAccount, "bank" => $bank, "banksList" => $banksList]);
+    }
+
+    public function transactionResume() {
+
+        $bankAccountController = new BankAccountController();
+        $banksListController = new BanksListController();
+
+        $user = Auth::user();
+        $bankAccount = $bankAccountController->showByUuid($user->uuid);
+        $bank = $banksListController->showByCode($bankAccount->code);
+        $banksList = $banksListController->list();
+
+        return view('transactionResume', ["user" => $user, "bankAccount" => $bankAccount, "bank" => $bank, "banksList" => $banksList]);
+    }
 }
