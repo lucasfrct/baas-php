@@ -34,13 +34,14 @@ class DashboardController extends Controller
     {
         $bankAccountController = new BankAccountController();
         $banksListController = new BanksListController();
+        $cashOut = TransactionType::CashOut->value;
 
         $user = Auth::user();
         $bankAccount = $bankAccountController->showByUuid($user->uuid);
         $bank = $banksListController->showByCode($bankAccount->code);
         $banksList = $banksListController->list();
 
-        return view('dashboard', ["user" => $user, "bankAccount" => $bankAccount, "bank" => $bank, "banksList" => $banksList]);
+        return view('dashboard', ["user" => $user, "bankAccount" => $bankAccount, "userBank" => $bank, "banksList" => $banksList, "cashout" => $cashOut]);
     }
 
     /**
@@ -154,17 +155,64 @@ class DashboardController extends Controller
         return redirect()->intended('dashboard');
     }
 
-    public function transactionCheck() {
+    public function transactionCheck(Request $request) {
 
-        $bankAccountController = new BankAccountController();
-        $banksListController = new BanksListController();
+        try {
+            $request->validate(
+                [
+                    'payer_uuid' => ['required'],
+                    'transaction_type' => ['required'],
+                    'payer_bank_ispb' => ['required'],
+                    'receipient_bank_ispb' => ['required'],
+                    'receipient_bank_branch' => ['required'],
+                    'receipient_bank_number' => ['required'],
+                    'receipient_bank_operator' => ['required'],
+                ],
+                [
+                    'receipient_bank_ispb.required' => 'O banco do rebedor é obrigatório',
+                    'receipient_bank_branch.required' => 'A agencia bancaria do rebedor é obrigatória',
+                    'receipient_bank_number.required' => 'A numero da conta do rebedor é obrigatório',
+                    'receipient_bank_operator.required' => 'O operador da conta do rebedor é obrigatório',
+                    
+                ]
+            );
+    
+            $form = $request->all();
+    
+            $transactionController = new TransactionController();
+            $transactionType = ($form["transaction_type"] == "cashout") ? TransactionType::CashOut : TransactionType::CashIn;
+            $operatorType = ($form["receipient_bank_operator"] == 1) ? OperatorType::Checking : OperatorType::Savings;
 
-        $user = Auth::user();
-        $bankAccount = $bankAccountController->showByUuid($user->uuid);
-        $bank = $banksListController->showByCode($bankAccount->code);
-        $banksList = $banksListController->list();
+    
+            $transactionController->prepare(
+                $form["payer_uuid"],
+                0,
+                $transactionType,
+                $form["payer_bank_ispb"],
+                $form["receipient_bank_ispb"],
+                $form["receipient_bank_branch"],
+                $form["receipient_bank_number"],
+                $operatorType,
+            );
+    
+            // return redirect()->back()->withErrors(['email' => 'Verifique se o email foi digitado corretamente.', 'password' => 'Verifique se a senha foi digitada corretamnete.']);
+    
+            $bankAccountController = new BankAccountController();
+            $banksListController = new BanksListController();
+    
+            $user = Auth::user();
+            $bankAccount = $bankAccountController->showByUuid($user->uuid);
+            $bank = $banksListController->showByCode($bankAccount->code);
+            $banksList = $banksListController->list();
+    
+    
+            return view('transactionCheck', ["user" => $user, "bankAccount" => $bankAccount, "userBank" => $bank, "banksList" => $banksList]);
 
-        return view('transactionCheck', ["user" => $user, "bankAccount" => $bankAccount, "bank" => $bank, "banksList" => $banksList]);
+        } catch (\Throwable $th) {
+            return redirect()->back()->withErrors(['errorDefault' => $th->getMessage()]);
+        }
+
+        
     }
 
     public function transactionResume() {

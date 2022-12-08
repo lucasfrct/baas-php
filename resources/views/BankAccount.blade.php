@@ -46,7 +46,7 @@
     <div class="card-body">
         <div class="row">
             <div class="col-6">
-                <span>Banco: {{$bank->company}}</span>
+                <span>Banco: {{$userBank->company}}</span>
             </div>
             <div class="col-6">
                 <span>Agencia: {{$bankAccount->branch}}</span>

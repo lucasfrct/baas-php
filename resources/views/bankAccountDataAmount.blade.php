@@ -8,8 +8,8 @@ style="width: 680px;">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
         <input type="hidden" name="payer_uuid" value="{{ $user->uuid }}">
-        <input type="hidden" name="transaction_type" value="cashout">
-        <input type="hidden" name="payer_bank_ispb" value="{{ $bank->ispb }}">
+        <input type="hidden" name="transaction_type" value="{{ $cashout }}">
+        <input type="hidden" name="payer_bank_ispb" value="{{ $userBank->ispb }}">
 
         <div class="mb-4 col-12">
             <div class="form-group">
@@ -72,6 +72,12 @@ style="width: 680px;">
                     <span style="font-size: 11px;">{{ $message }}</span>
                 </div>
             @enderror
+        </div>
+
+        <div class="mb-4 col-12 p-4">
+            <div class="alert alert-primary border border-info border-dashed" role="alert">
+                <span>Transacao para: <b class="text-uppercase">{{$receipientData->firstName}}</b></span>
+            </div>
         </div>
 
         <div class="d-flex flex-row-reverse mt-4">
