@@ -184,7 +184,7 @@ class DashboardController extends Controller
             $operatorType = ($form["receipient_bank_operator"] == 1) ? OperatorType::Checking : OperatorType::Savings;
 
     
-            $transactionController->prepare(
+            $receipientData = $transactionController->prepare(
                 $form["payer_uuid"],
                 0,
                 $transactionType,
@@ -194,6 +194,29 @@ class DashboardController extends Controller
                 $form["receipient_bank_number"],
                 $operatorType,
             );
+            
+            $operatorTypes = array_map(function ($item){
+                switch ($item->name) {
+                    case 'Savings':
+                        $item->name = "Poupanca";
+                        break;
+                    
+                    case 'Checking':
+                        $item->name = "Corrente";
+                        break;
+                    
+                    case 'Vgbl':
+                        $item->name = "Plano de Previdencia";
+                        break;
+                            
+                    default:
+                        $item->name = "Corrente";
+                        break;
+                }
+            
+                return $item;
+            
+            }, OperatorType::cases());;
     
             // return redirect()->back()->withErrors(['email' => 'Verifique se o email foi digitado corretamente.', 'password' => 'Verifique se a senha foi digitada corretamnete.']);
     
@@ -206,7 +229,14 @@ class DashboardController extends Controller
             $banksList = $banksListController->list();
     
     
-            return view('transactionCheck', ["user" => $user, "bankAccount" => $bankAccount, "userBank" => $bank, "banksList" => $banksList]);
+            return view('transactionCheck', [
+                "user" => $user,
+                "bankAccount" => $bankAccount,
+                "userBank" => $bank,
+                "transaction" => $form,
+                "receipientData" => $receipientData,
+                "operatorTypes" => $operatorTypes
+            ]);
 
         } catch (\Throwable $th) {
             return redirect()->back()->withErrors(['errorDefault' => $th->getMessage()]);

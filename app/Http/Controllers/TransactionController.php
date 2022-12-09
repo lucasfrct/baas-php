@@ -243,7 +243,7 @@ class TransactionController extends BaseController
         string $receipientBankBranch, 
         string $receipientBankNumber, 
         OperatorType $receipientBankOperator
-    ) {
+    ): User {
         // ? ####################################################################################################
         // ? CONSULTA SE O USUARIO PAGADOR EXISTE
         // ? ####################################################################################################
@@ -379,6 +379,8 @@ class TransactionController extends BaseController
         foreach ($this->integrations as $integration) {// 2^2
             $this->banksReceipients = array_merge($this->banksReceipients, $this->bankNetworkController->taxFilter($integration, $this->packages));
         };
+
+        return $this->receipientData;
     }
     
     public function apply(int $amount) 
