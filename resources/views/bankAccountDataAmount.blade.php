@@ -17,18 +17,18 @@ style="width: 680px;">
 
         <div class="mb-4 col-12">
             <div class="form-group">
-                <label class="mb-2 ms-1" class="mb-2 ms-1" for="operator_type">Tipo de conta:</label>
-                <select class="form-select" id="operator_type" name="operator_type"
+                <label class="mb-2 ms-1" class="mb-2 ms-1" for="payer_operator_type">Tipo de conta:</label>
+                <select class="form-select" id="payer_operator_type" name="payer_operator_type"
                     @class([
-                        'is-valid' => !$errors->has('operator_type'),
-                        'is-invalid' => $errors->has('operator_type'),
+                        'is-valid' => !$errors->has('payer_operator_type'),
+                        'is-invalid' => $errors->has('payer_operator_type'),
                         'form-control',
                     ])
                 >
                     <option selected disabled>Selecione o banco para transferir:</option>
-                    @isset($operatorTypes)
-                        @foreach ($operatorTypes as $type)
-                            <option value="{{$type->value}}">{{ $type->name }}</option>
+                    @isset($operatorTypeLabel)
+                        @foreach ($operatorTypeLabel as $operator)
+                            <option value="{{$operator['value']}}">{{ $operator['label'] }}</option>
                         @endforeach
                     @endisset
                     
@@ -36,7 +36,7 @@ style="width: 680px;">
 
 
             </div>
-            @error('operator_type')
+            @error('payer_operator_type')
                 <div class="feedback text-danger">
                     <span class="ms-2 me-1">
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"

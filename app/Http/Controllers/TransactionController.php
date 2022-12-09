@@ -221,13 +221,14 @@ class TransactionController extends BaseController
         string $payerUuid, 
         int $amount, 
         TransactionType $type, 
-        int $payerBankIspb, 
+        int $payerBankIspb,
+        OperatorType $payerBankOperator,
         int $receipientBankIspb, 
         string $receipientBankBranch, 
         string $receipientBankNumber, 
         OperatorType $receipientBankOperator
     ) {        
-        $this->prepare($payerUuid, $amount, $type, $payerBankIspb, $receipientBankIspb, $receipientBankBranch, $receipientBankNumber, $receipientBankOperator);
+        $this->prepare($payerUuid, $amount, $type, $payerBankIspb, $payerBankOperator, $receipientBankIspb, $receipientBankBranch, $receipientBankNumber, $receipientBankOperator);
 
         $this->apply($amount);
 
@@ -239,6 +240,7 @@ class TransactionController extends BaseController
         int $amount, 
         TransactionType $type, 
         int $payerBankIspb, 
+        OperatorType $payerBankOperator,
         int $receipientBankIspb, 
         string $receipientBankBranch, 
         string $receipientBankNumber, 

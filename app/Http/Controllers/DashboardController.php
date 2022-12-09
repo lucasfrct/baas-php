@@ -146,6 +146,7 @@ class DashboardController extends Controller
             $form["amount"],
             $type,
             $form["payer_bank_ispb"],
+            OperatorType::Checking,
             $form["receipient_bank_ispb"],
             $form["receipient_bank_branch"],
             $form["receipient_bank_number"],
@@ -189,34 +190,36 @@ class DashboardController extends Controller
                 0,
                 $transactionType,
                 $form["payer_bank_ispb"],
+                OperatorType::Checking,
                 $form["receipient_bank_ispb"],
                 $form["receipient_bank_branch"],
                 $form["receipient_bank_number"],
                 $operatorType,
             );
             
-            $operatorTypes = array_map(function ($item){
+            $operatorTypeLabel = [];
+            $operatorTypeLabel = array_map(function ($item){
+                $name = "";
                 switch ($item->name) {
                     case 'Savings':
-                        $item->name = "Poupanca";
+                        $name = "Poupanca";
                         break;
                     
                     case 'Checking':
-                        $item->name = "Corrente";
+                        $name = "Corrente";
                         break;
                     
                     case 'Vgbl':
-                        $item->name = "Plano de Previdencia";
+                        $name = "Plano de Previdencia";
                         break;
                             
                     default:
-                        $item->name = "Corrente";
+                        $name = $item->name;
                         break;
                 }
-            
-                return $item;
-            
-            }, OperatorType::cases());;
+                return array("label" => $name, "value" => $item->value);
+                        
+            }, OperatorType::cases());
     
             // return redirect()->back()->withErrors(['email' => 'Verifique se o email foi digitado corretamente.', 'password' => 'Verifique se a senha foi digitada corretamnete.']);
     
@@ -235,26 +238,72 @@ class DashboardController extends Controller
                 "userBank" => $bank,
                 "transaction" => $form,
                 "receipientData" => $receipientData,
-                "operatorTypes" => $operatorTypes
+                "operatorTypeLabel" => $operatorTypeLabel
             ]);
 
         } catch (\Throwable $th) {
             return redirect()->back()->withErrors(['errorDefault' => $th->getMessage()]);
         }
-
-        
     }
 
-    public function transactionResume() {
+    public function transactionResume(Request $request) {
 
-        $bankAccountController = new BankAccountController();
-        $banksListController = new BanksListController();
+        try {
+            $request->validate(
+                [
+                    'payer_uuid' => ['required'],
+                    'transaction_type' => ['required'],
+                    'payer_bank_ispb' => ['required'],
+                    'receipient_bank_ispb' => ['required'],
+                    'receipient_bank_branch' => ['required'],
+                    'receipient_bank_number' => ['required'],
+                    'receipient_bank_operator' => ['required'],
+                    'payer_operator_type' => ['required'],
+                    'amount' => ['required'],
+                ],
+                [
+                    'receipient_bank_ispb.required' => 'O banco do rebedor é obrigatório',
+                    'receipient_bank_branch.required' => 'A agencia bancaria do rebedor é obrigatória',
+                    'receipient_bank_number.required' => 'A numero da conta do rebedor é obrigatório',
+                    'receipient_bank_operator.required' => 'O operador da conta do rebedor é obrigatório',
+                    'payer_operator_type.required' => 'O operador da conta do pagador é obrigatório',
+                    'amount.required' => 'O valor da transferencia é obrigatório',
+                ]
+            );
 
-        $user = Auth::user();
-        $bankAccount = $bankAccountController->showByUuid($user->uuid);
-        $bank = $banksListController->showByCode($bankAccount->code);
-        $banksList = $banksListController->list();
+            $form = $request->all();
 
-        return view('transactionResume', ["user" => $user, "bankAccount" => $bankAccount, "bank" => $bank, "banksList" => $banksList]);
+            $transactionController = new TransactionController();
+            $transactionType = ($form["transaction_type"] == "cashout") ? TransactionType::CashOut : TransactionType::CashIn;
+            $operatorType = ($form["receipient_bank_operator"] == 1) ? OperatorType::Checking : OperatorType::Savings;
+            $payerOperatorType = ($form["payer_operator_type"] == 1) ? OperatorType::Checking : OperatorType::Savings;
+
+    
+            $receipientData = $transactionController->prepare(
+                $form["payer_uuid"],
+                0,
+                $transactionType,
+                $form["payer_bank_ispb"],
+                $payerOperatorType,
+                $form["receipient_bank_ispb"],
+                $form["receipient_bank_branch"],
+                $form["receipient_bank_number"],
+                $form["receipient_bank_number"],
+                $operatorType,
+            );
+
+            $bankAccountController = new BankAccountController();
+            $banksListController = new BanksListController();
+    
+            $user = Auth::user();
+            $bankAccount = $bankAccountController->showByUuid($user->uuid);
+            $bank = $banksListController->showByCode($bankAccount->code);
+            $banksList = $banksListController->list();
+    
+            return view('transactionResume', ["user" => $user, "bankAccount" => $bankAccount, "bank" => $bank, "banksList" => $banksList]);
+
+        } catch (\Throwable $th) {
+            return redirect()->back()->withErrors(['errorDefault' => $th->getMessage()]);
+        }
     }
 }
