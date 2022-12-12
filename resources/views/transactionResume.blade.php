@@ -40,10 +40,10 @@
 
         <div class="row">
 
-            <div class="d-flex flex-column align-itens-center justify-content-center col-4 mt-4">
-
-                @include('reportResume')
-
+            <div class="d-flex flex-row align-itens-center justify-content-center mt-4">
+                <div class="col-4">
+                    @include('reportResume')
+                </div>
             </div>
 
         </div>

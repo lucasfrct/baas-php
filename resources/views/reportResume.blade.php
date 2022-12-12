@@ -4,8 +4,11 @@
 
         <div class="row p-4">
             <h4>Dados do Pagador</h4>
+            <div class="col-12">
+                <span>Nome: {{$user->firstName}} {{$user->lastName}}</span>
+            </div>
             <div class="col-6">
-                <span>Banco: {{$bank->company}}</span>
+                <span>Banco: {{$userBank->company}}</span>
             </div>
             <div class="col-6">
                 <span>Agencia: {{$bankAccount->branch}}</span>
@@ -17,49 +20,49 @@
                 <span>Operador: {{$bankAccount->operator}}</span>
             </div>
             <div class="col-12">
-                <span>Valor da Transferencia: {{$bankAccount->operator}}</span>
+                <span>Valor da Transferencia: {{$transaction["amount"]}}</span>
             </div>
             <div class="col-6">
-                <span>Tipo: {{$bankAccount->branch}}</span>
+                <span>Tipo da Transferencia: {{$transaction["transaction_type"]}}</span>
             </div>
         </div>
 
         <div class="row p-4">
             <h4>Dados do Recebedor</h4>
-            <div class="col-6">
-                <span>Banco: {{$bank->company}}</span>
+            <div class="col-12">
+                <span>Nome: {{$receipientData->firstName}} {{$receipientData->lastName}}</span>
             </div>
             <div class="col-6">
-                <span>Agencia: {{$bankAccount->branch}}</span>
+                <span>Banco: {{$receipientBank->company}}</span>
             </div>
             <div class="col-6">
-                <span>Conta Corrente (cc): {{$bankAccount->number}}</span>
+                <span>Agencia: {{$receipientBankAccount->branch}}</span>
             </div>
             <div class="col-6">
-                <span>Operador: {{$bankAccount->operator}}</span>
+                <span>Conta Corrente (cc): {{$receipientBankAccount->number}}</span>
+            </div>
+            <div class="col-6">
+                <span>Operador: {{$receipientBankAccount->operator}}</span>
             </div>
         </div>
 
         <div class="row p-4">
             <h4>Taxas Bancarias</h4>
             <div class="col-12">
-                <span>Valor: {{$bank->company}}</span>
+                <span>Valor: {{$packagesAmount}}</span>
             </div>
             <div class="col-6">
-                <span>Tipo: {{$bankAccount->branch}}</span>
-            </div>
-            <div class="col-6">
-                <span>Data: {{$bankAccount->number}}</span>
+                <span>Data: {{$dateTime}}</span>
             </div>
         </div>
 
         <div class="row p-4">
-            <h4></h4>
+            <h4>Transferencia</h4>
             <div class="col-12">
-                <span>Valor da transacao (Transferencia + taxas): {{$bank->company}}</span>
+                <span>Valor da transacao (Transferencia + taxas): {{$amountCharge}}</span>
             </div>
             <div class="col-6">
-                <span>Data: {{$bankAccount->number}}</span>
+                <span>Data: {{$dateTime}}</span>
             </div>
         </div>
 

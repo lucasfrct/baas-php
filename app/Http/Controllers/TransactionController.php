@@ -2,9 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 
 use Ramsey\Uuid\Uuid;
@@ -245,7 +242,7 @@ class TransactionController extends BaseController
         string $receipientBankBranch, 
         string $receipientBankNumber, 
         OperatorType $receipientBankOperator
-    ): User {
+    ): array {
         // ? ####################################################################################################
         // ? CONSULTA SE O USUARIO PAGADOR EXISTE
         // ? ####################################################################################################
@@ -382,7 +379,7 @@ class TransactionController extends BaseController
             $this->banksReceipients = array_merge($this->banksReceipients, $this->bankNetworkController->taxFilter($integration, $this->packages));
         };
 
-        return $this->receipientData;
+        return [$this->receipientData, $this->receipientBankAccount, $this->receipientBank, $this->packagesAmount, $this->amountCharge];
     }
     
     public function apply(int $amount) 

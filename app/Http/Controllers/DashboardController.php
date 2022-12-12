@@ -3,25 +3,18 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
 
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\BanksListController;
 use App\Models\BankAccount;
-use App\Models\User;
 use App\Types\OperatorType;
 use App\Types\TransactionType;
+use DateTime;
 
 class DashboardController extends Controller
 {
@@ -279,28 +272,46 @@ class DashboardController extends Controller
             $payerOperatorType = ($form["payer_operator_type"] == 1) ? OperatorType::Checking : OperatorType::Savings;
 
     
-            $receipientData = $transactionController->prepare(
+            list(
+                $receipientData,
+                $receipientBankAccount,
+                $receipientBank,
+                $packagesAmount,
+                $amountCharge
+            ) = $transactionController->prepare(
                 $form["payer_uuid"],
-                0,
+                $form["amount"],
                 $transactionType,
                 $form["payer_bank_ispb"],
                 $payerOperatorType,
                 $form["receipient_bank_ispb"],
                 $form["receipient_bank_branch"],
                 $form["receipient_bank_number"],
-                $form["receipient_bank_number"],
                 $operatorType,
             );
-
+            
             $bankAccountController = new BankAccountController();
             $banksListController = new BanksListController();
-    
+            
             $user = Auth::user();
             $bankAccount = $bankAccountController->showByUuid($user->uuid);
             $bank = $banksListController->showByCode($bankAccount->code);
-            $banksList = $banksListController->list();
-    
-            return view('transactionResume', ["user" => $user, "bankAccount" => $bankAccount, "bank" => $bank, "banksList" => $banksList]);
+
+            $dateTime = date_format(new DateTime(),"d/m/Y H:i");
+            
+            return view('transactionResume', 
+            [
+                "user" => $user,
+                "bankAccount" => $bankAccount,
+                "userBank" => $bank,
+                "transaction" => $form,
+                "dateTime" => $dateTime,
+                "receipientData" => $receipientData,
+                "receipientBankAccount" => $receipientBankAccount,
+                "receipientBank" => $receipientBank,
+                "packagesAmount" => $packagesAmount,
+                "amountCharge" => $amountCharge
+            ]);
 
         } catch (\Throwable $th) {
             return redirect()->back()->withErrors(['errorDefault' => $th->getMessage()]);
