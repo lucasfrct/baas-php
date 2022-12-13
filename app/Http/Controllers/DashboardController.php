@@ -178,7 +178,7 @@ class DashboardController extends Controller
             $operatorType = ($form["receipient_bank_operator"] == 1) ? OperatorType::Checking : OperatorType::Savings;
 
     
-            $receipientData = $transactionController->prepare(
+            list($receipientData) = $transactionController->prepare(
                 $form["payer_uuid"],
                 0,
                 $transactionType,
@@ -223,7 +223,6 @@ class DashboardController extends Controller
             $bankAccount = $bankAccountController->showByUuid($user->uuid);
             $bank = $banksListController->showByCode($bankAccount->code);
             $banksList = $banksListController->list();
-    
     
             return view('transactionCheck', [
                 "user" => $user,

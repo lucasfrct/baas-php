@@ -19,12 +19,6 @@
             <div class="col-6">
                 <span>Operador: {{$bankAccount->operator}}</span>
             </div>
-            <div class="col-12">
-                <span>Valor da Transferencia: {{$transaction["amount"]}}</span>
-            </div>
-            <div class="col-6">
-                <span>Tipo da Transferencia: {{$transaction["transaction_type"]}}</span>
-            </div>
         </div>
 
         <div class="row p-4">
@@ -48,7 +42,7 @@
 
         <div class="row p-4">
             <h4>Taxas Bancarias</h4>
-            <div class="col-12">
+            <div class="col-6">
                 <span>Valor: {{$packagesAmount}}</span>
             </div>
             <div class="col-6">
@@ -58,10 +52,13 @@
 
         <div class="row p-4">
             <h4>Transferencia</h4>
-            <div class="col-12">
-                <span>Valor da transacao (Transferencia + taxas): {{$amountCharge}}</span>
+            <div class="col-12 fs-6">
+                <span>Valor da Transferencia: <b>R$@currence_cents($transaction["amount"])</b></span>
             </div>
-            <div class="col-6">
+            <div class="col-12">
+                <span>Valor da transacao (Transferencia + taxas): <b>R$@currence_cents($amountCharge)</b></span>
+            </div>
+            <div class="col-12 mt-4">
                 <span>Data: {{$dateTime}}</span>
             </div>
         </div>

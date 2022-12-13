@@ -24,7 +24,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-
         Blade::directive('currence_cents', function ($cents) {
             return "<?php echo number_format(($cents/100),2,',','.'); ?>";
         });
