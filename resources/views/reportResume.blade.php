@@ -5,7 +5,7 @@
         <div class="row p-4">
             <h4>Dados do Pagador</h4>
             <div class="col-12">
-                <span>Nome: {{$user->firstName}} {{$user->lastName}}</span>
+                <span>Nome: <b>{{$user->firstName}} {{$user->lastName}}</b></span>
             </div>
             <div class="col-6">
                 <span>Banco: {{$userBank->company}}</span>
@@ -24,7 +24,7 @@
         <div class="row p-4">
             <h4>Dados do Recebedor</h4>
             <div class="col-12">
-                <span>Nome: {{$receipientData->firstName}} {{$receipientData->lastName}}</span>
+                <span>Nome: <b>{{$receipientData->firstName}} {{$receipientData->lastName}}</b></span>
             </div>
             <div class="col-6">
                 <span>Banco: {{$receipientBank->company}}</span>
@@ -41,12 +41,9 @@
         </div>
 
         <div class="row p-4">
-            <h4>Taxas Bancarias</h4>
-            <div class="col-6">
-                <span>Valor: {{$packagesAmount}}</span>
-            </div>
-            <div class="col-6">
-                <span>Data: {{$dateTime}}</span>
+            <h4>Total das Taxas Bancarias</h4>
+            <div class="col-12">
+                <span>Valor: <b>R$@currence_cents($packagesAmount)</b></span>
             </div>
         </div>
 
@@ -59,7 +56,7 @@
                 <span>Valor da transacao (Transferencia + taxas): <b>R$@currence_cents($amountCharge)</b></span>
             </div>
             <div class="col-12 mt-4">
-                <span>Data: {{$dateTime}}</span>
+                <span>Data: <b>{{$dateTime}}</b></span>
             </div>
         </div>
         

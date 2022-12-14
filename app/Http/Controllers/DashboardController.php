@@ -222,7 +222,6 @@ class DashboardController extends Controller
             $user = Auth::user();
             $bankAccount = $bankAccountController->showByUuid($user->uuid);
             $bank = $banksListController->showByCode($bankAccount->code);
-            $banksList = $banksListController->list();
     
             return view('transactionCheck', [
                 "user" => $user,
@@ -270,6 +269,7 @@ class DashboardController extends Controller
             $operatorType = ($form["receipient_bank_operator"] == 1) ? OperatorType::Checking : OperatorType::Savings;
             $payerOperatorType = ($form["payer_operator_type"] == 1) ? OperatorType::Checking : OperatorType::Savings;
 
+            $form["amount"] = preg_replace( '/[^0-9]/', '', $form["amount"] );
     
             list(
                 $receipientData,
@@ -349,6 +349,8 @@ class DashboardController extends Controller
             $transactionType = ($form["transaction_type"] == "cashout") ? TransactionType::CashOut : TransactionType::CashIn;
             $operatorType = ($form["receipient_bank_operator"] == 1) ? OperatorType::Checking : OperatorType::Savings;
             $payerOperatorType = ($form["payer_operator_type"] == 1) ? OperatorType::Checking : OperatorType::Savings;
+
+            $form["amount"] = preg_replace( '/[^0-9]/', '', $form["amount"] );
             
             $transactionController->operate(
                 $form["payer_uuid"],

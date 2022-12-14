@@ -1,16 +1,17 @@
 let input = document.querySelector("input[name='amount']")
 
-input.addEventListener("keyup", () => {
-    // formatCurrency(this);
-    console.log("input key")
+input.addEventListener("keypress", (e) => {
+    formatCurrency(e.target); 
+})
 
+input.addEventListener("keyup", (e) => {
+    formatCurrency(e.target); 
 })
 
 function formatCurrency(input) {
-
-    let value = input.value;
-    value = value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-    input.value(value)
-    console.log("input format", value)
+    
+    let cents = input.value.replace(/[\D]+/g,'');
+    let currency = parseFloat(cents/100);
+    input.value = currency.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'});
 
 }
