@@ -152,7 +152,7 @@ class UserController extends BaseController
         $receipientBankOperator = OperatorType::Checking;        
         
         $transactionController = new TransactionController();
-        $transactionController->operate($payerUuid, $amount, $transactionType, $payerBankIspb, $receipientBankIspb, $receipientBankBranch, $receipientBankNumber, $receipientBankOperator);
+        // $transactionController->operate($payerUuid, $amount, $transactionType, $payerBankIspb, $receipientBankIspb, $receipientBankBranch, $receipientBankNumber, $receipientBankOperator);
         return;
 
         //# iniciando a transacao: 

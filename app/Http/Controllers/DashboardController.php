@@ -311,6 +311,58 @@ class DashboardController extends Controller
                 "packagesAmount" => $packagesAmount,
                 "amountCharge" => $amountCharge
             ]);
+            
+        } catch (\Throwable $th) {
+            return redirect()->back()->withErrors(['errorDefault' => $th->getMessage()]);
+        }
+    }
+    
+    public function transactionApply(Request $request) {
+        
+        try {
+
+            $request->validate(
+                [
+                    'payer_uuid' => ['required'],
+                    'transaction_type' => ['required'],
+                    'payer_bank_ispb' => ['required'],
+                    'receipient_bank_ispb' => ['required'],
+                    'receipient_bank_branch' => ['required'],
+                    'receipient_bank_number' => ['required'],
+                    'receipient_bank_operator' => ['required'],
+                    'payer_operator_type' => ['required'],
+                    'amount' => ['required'],
+                ],
+                [
+                    'receipient_bank_ispb.required' => 'O banco do rebedor é obrigatório',
+                    'receipient_bank_branch.required' => 'A agencia bancaria do rebedor é obrigatória',
+                    'receipient_bank_number.required' => 'A numero da conta do rebedor é obrigatório',
+                    'receipient_bank_operator.required' => 'O operador da conta do rebedor é obrigatório',
+                    'payer_operator_type.required' => 'O operador da conta do pagador é obrigatório',
+                    'amount.required' => 'O valor da transferencia é obrigatório',
+                ]
+            );
+
+            $form = $request->all();
+
+            $transactionController = new TransactionController();
+            $transactionType = ($form["transaction_type"] == "cashout") ? TransactionType::CashOut : TransactionType::CashIn;
+            $operatorType = ($form["receipient_bank_operator"] == 1) ? OperatorType::Checking : OperatorType::Savings;
+            $payerOperatorType = ($form["payer_operator_type"] == 1) ? OperatorType::Checking : OperatorType::Savings;
+            
+            $transactionController->operate(
+                $form["payer_uuid"],
+                $form["amount"],
+                $transactionType,
+                $form["payer_bank_ispb"],
+                $payerOperatorType,
+                $form["receipient_bank_ispb"],
+                $form["receipient_bank_branch"],
+                $form["receipient_bank_number"],
+                $operatorType,
+            );
+
+            return redirect()->intended('dashboard'); // ToDo tirar depois de pronto
 
         } catch (\Throwable $th) {
             return redirect()->back()->withErrors(['errorDefault' => $th->getMessage()]);

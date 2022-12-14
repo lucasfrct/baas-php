@@ -45,7 +45,7 @@
                     @include('reportResume')
                 </div>
             </div>
-
+            
         </div>
     </main>
 

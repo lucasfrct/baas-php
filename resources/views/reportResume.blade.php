@@ -62,8 +62,11 @@
                 <span>Data: {{$dateTime}}</span>
             </div>
         </div>
+        
+        <form class="row p-4" action="{{route('transactionApply')}}" method="POST">
 
-        <form class="row p-4" action="{{route('transactionResume')}}" method="POST">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
             <input type="hidden" name="payer_uuid" value="{{ $transaction["payer_uuid"] }}">
             <input type="hidden" name="transaction_type" value="{{ $transaction["transaction_type"] }}">
             <input type="hidden" name="payer_bank_ispb" value="{{ $transaction["payer_bank_ispb"] }}">
@@ -73,7 +76,7 @@
             <input type="hidden" name="receipient_bank_operator" value="{{ $transaction["receipient_bank_operator"] }}">
             <input type="hidden" name="payer_operator_type" value="{{ $transaction["payer_operator_type"] }}">
             <input type="hidden" name="amount" value="{{ $transaction["amount"] }}">
-
+            
             <div class="d-flex flex-row-reverse mt-4">
                 <button type="submit" class="btn btn-primary btn-lg px-5">Continuar</button>
             </div>
