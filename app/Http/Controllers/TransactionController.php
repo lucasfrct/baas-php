@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Database\Eloquent\Collection;
 
 use Ramsey\Uuid\Uuid;
 
@@ -212,6 +213,27 @@ class TransactionController extends BaseController
             }
         }
         return $payeds + $receiveds;
+    }
+
+    public function showTransactionsBetweenDates($key, $value, $from, $until): Collection
+    {
+        try {
+
+            $untilNormalized = date('Y-m-d', strtotime($until. ' + 1 days'));
+    
+            $transactions = Transaction::where(function($query) use($key, $value){
+            return $query->orWhere("payer_{$key}", "=", $value)->orWhere("receipient_{$key}", "=", $value);
+            })->whereBetween('created_at', [$from, $untilNormalized])->get();
+    
+            if (!$transactions) {
+                throw new Error('Nao foram encontradas transacoes nesse periodo!');
+            }
+            // dd($transactions);
+            return $transactions;
+
+        } catch (\Throwable $th) {
+            return redirect()->back()->withErrors(['errorDefault' => $th->getMessage()]);
+        }
     }
 
     public function operate(

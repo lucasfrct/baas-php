@@ -33,4 +33,6 @@ Route::post('/dashboard/transaction/check', [DashboardController::class, 'transa
 Route::post('/dashboard/transaction/resume', [DashboardController::class, 'transactionResume'])->name('transactionResume')->middleware('auth');
 Route::post('/dashboard/transaction/apply', [DashboardController::class, 'transactionApply'])->name('transactionApply')->middleware('auth');
 
+Route::get('/dashboard/bankstatement', [DashboardController::class, 'bankStatement'])->name('bankStatement')->middleware('auth');
+
 Route::resource('/bank-account', BankAccountController::class);

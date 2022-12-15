@@ -370,4 +370,48 @@ class DashboardController extends Controller
             return redirect()->back()->withErrors(['errorDefault' => $th->getMessage()]);
         }
     }
+
+    public function bankStatement() {
+
+        $bankAccountController = new BankAccountController();
+        $transactionController = new TransactionController();
+        $banksListController = new BanksListController();
+        $cashOut = TransactionType::CashOut->value;
+
+        $user = Auth::user();
+        $bankAccount = $bankAccountController->showByUuid($user->uuid);
+        $bank = $banksListController->showByCode($bankAccount->code);
+        $banksList = $banksListController->list();
+
+        $transactionsList = $transactionController->showTransactionsBetweenDates("uuid", $user->uuid, "2022-12-01", "2022-12-14");
+
+        return view(
+            'bankStatement', 
+            [
+                "user" => $user, 
+                "bankAccount" => $bankAccount, 
+                "userBank" => $bank, 
+                "banksList" => $banksList, 
+                "cashout" => $cashOut, 
+                "transactionsList" => $transactionsList
+            ]
+        );
+    }
+
+    public function bankStatementReport() {
+
+        $bankAccountController = new BankAccountController();
+        $transactionController = new TransactionController();
+        $banksListController = new BanksListController();
+        $cashOut = TransactionType::CashOut->value;
+        
+        $user = Auth::user();
+        $bankAccount = $bankAccountController->showByUuid($user->uuid);
+        $bank = $banksListController->showByCode($bankAccount->code);
+        $banksList = $banksListController->list();
+        
+        // $transactionController->showBalanceBetweenDates($key, $value, $from, $until);
+
+        return view('bankStatement', ["user" => $user, "bankAccount" => $bankAccount, "userBank" => $bank, "banksList" => $banksList, "cashout" => $cashOut]);
+    }
 }
