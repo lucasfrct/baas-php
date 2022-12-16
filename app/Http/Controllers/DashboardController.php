@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\BanksListController;
+use App\Http\Controllers\UserController;
 use App\Models\BankAccount;
 use App\Types\OperatorType;
 use App\Types\TransactionType;
@@ -383,7 +384,7 @@ class DashboardController extends Controller
         $bank = $banksListController->showByCode($bankAccount->code);
         $banksList = $banksListController->list();
 
-        $transactionsList = $transactionController->showTransactionsBetweenDates("uuid", $user->uuid, "2022-12-01", "2022-12-14");
+        $transactionsList = $transactionController->showBetweenDates("uuid", $user->uuid, "2022-12-01", "2022-12-14");
 
         return view(
             'bankStatement', 

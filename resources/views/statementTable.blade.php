@@ -1,7 +1,6 @@
 <table class="table">
     <thead>
       <tr>
-        <th scope="col">#</th>
         <th scope="col">Pagador</th>
         <th scope="col">Recebedor</th>
         <th scope="col">Banco do recebedor</th>
@@ -14,13 +13,22 @@
         @isset($transactionsList)
             @foreach ($transactionsList as $transaction)
                 <tr>
-                    <th scope="row">1</th>
-                    <td>{{$transaction->payer_document}}</td>
-                    <td>{{$transaction->receipient_document}}</td>
+                    @isset($transaction->payerUser->firstName)
+                        <td>{{$transaction->payerUser->firstName}} {{$transaction->payerUser->lastName}} {{$transaction->payer_document}}</td>
+                    @endisset
+                    @isset($transaction->payerUser->company)
+                        <td>{{$transaction->payerUser->company}} {{$transaction->payer_document}}</td>
+                    @endisset
+                    @isset($transaction->receipientUser->firstName)
+                        <td>{{$transaction->receipientUser->firstName}} {{$transaction->receipientUser->lastName}} {{$transaction->receipient_document}}</td>
+                    @endisset
+                    @isset($transaction->receipientUser->company)
+                        <td>{{$transaction->receipientUser->company}} {{$transaction->receipient_document}}</td>
+                    @endisset
                     <td>{{$transaction->receipient_bank_company}}</td>
-                    <td>{{$transaction->amount}}</td>
-                    <td>{{$transaction->tax_amount}}</td>
-                    <td>{{$transaction->created_at}}</td>
+                    <td><b>R$@currence_cents($transaction->amount)</b></td>
+                    <td><b>R$@currence_cents($transaction->tax_amount)</b></td>
+                    <td>{{date('d/m/Y h:i', strtotime($transaction->created_at))}}</td>
                 </tr>
             @endforeach
         @endisset

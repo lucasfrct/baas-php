@@ -14,6 +14,7 @@ use App\Models\BanksList;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\BankNetworkController;
 use App\Http\Controllers\IntegrationController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\BanksListController;
 use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\AccountController;
@@ -49,6 +50,9 @@ class TransactionController extends BaseController
     private BankAccount $receipientBankAccount;
     private int $packagesAmount;
     private int $amountCharge;
+
+    public User $payerUser;
+    public User $receipientUser;
 
 
     public function __construct() {
@@ -215,9 +219,12 @@ class TransactionController extends BaseController
         return $payeds + $receiveds;
     }
 
-    public function showTransactionsBetweenDates($key, $value, $from, $until): Collection
+    public function showBetweenDates($key, $value, $from, $until)
     {
         try {
+            $userController = new UserController();
+            $banksNetworkController = new BankNetworkController();
+            $bankListController = new BanksListController();
 
             $untilNormalized = date('Y-m-d', strtotime($until. ' + 1 days'));
     
@@ -225,11 +232,31 @@ class TransactionController extends BaseController
             return $query->orWhere("payer_{$key}", "=", $value)->orWhere("receipient_{$key}", "=", $value);
             })->whereBetween('created_at', [$from, $untilNormalized])->get();
     
-            if (!$transactions) {
-                throw new Error('Nao foram encontradas transacoes nesse periodo!');
+            $transactionsData = [];
+            foreach ($transactions as $transaction) {
+
+                if (!empty($transaction->payer_uuid)) {
+                    $transaction->payerUser = $userController->showByUuid($transaction->payer_uuid);
+                }
+
+                if (!empty($transaction->payer_uid)) {
+                    $bankNetwork = $banksNetworkController->showByUid($transaction->payer_uid);
+                    $transaction->payerUser = $bankListController->showByIspb($bankNetwork->ispb);
+                }
+
+                if (!empty($transaction->receipient_uuid)) {
+                    $transaction->receipientUser = $userController->showByUuid($transaction->receipient_uuid);
+                }
+
+                if (!empty($transaction->receipient_uid)) {
+                    $bankNetwork = $banksNetworkController->showByUid($transaction->receipient_uid);
+                    $transaction->receipientUser = $bankListController->showByIspb($bankNetwork->ispb);
+                }
+                
+                $transactionsData[] = $transaction;
             }
-            // dd($transactions);
-            return $transactions;
+
+            return $transactionsData;
 
         } catch (\Throwable $th) {
             return redirect()->back()->withErrors(['errorDefault' => $th->getMessage()]);

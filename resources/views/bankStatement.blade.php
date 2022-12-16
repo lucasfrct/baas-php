@@ -42,7 +42,7 @@
 
                 <div class="d-flex align-itens-center justify-content-center pt-5">
 
-                    <div class="col-6">
+                    <div class="col-8">
                         @include('statementTable')
                     </div>
 
