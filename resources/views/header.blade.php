@@ -5,6 +5,7 @@
       </a>
       <a class="py-2 d-none d-md-inline-block" href="/home">Home</a>
       <a class="py-2 d-none d-md-inline-block" href="/dashboard">Dashboard</a>
+      <a class="py-2 d-none d-md-inline-block" href="/dashboard/bankstatement">Extrato</a>
       <a class="py-2 d-none d-md-inline-block" href="/contact">Contato</a>
       <a class="py-2 d-none d-md-inline-block" href="/aboutus">Sobre nós</a>
       <a class="py-2 d-none d-md-inline-block" href="/support">Suporte</a>

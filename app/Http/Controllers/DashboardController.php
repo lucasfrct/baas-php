@@ -372,7 +372,10 @@ class DashboardController extends Controller
         }
     }
 
-    public function bankStatement() {
+    public function bankStatement(Request $request) {
+
+        $form = $request->all();
+        // dd($form);
 
         $bankAccountController = new BankAccountController();
         $transactionController = new TransactionController();
@@ -384,7 +387,9 @@ class DashboardController extends Controller
         $bank = $banksListController->showByCode($bankAccount->code);
         $banksList = $banksListController->list();
 
-        $transactionsList = $transactionController->showBetweenDates("uuid", $user->uuid, "2022-12-01", "2022-12-14");
+        
+        
+        $transactionsList = $transactionController->showBetweenDates("uuid", $user->uuid, $form["start_date"], $form["end_date"]);
 
         return view(
             'bankStatement', 
