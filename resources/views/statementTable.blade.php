@@ -3,9 +3,9 @@
         <div class="d-flex flex-row-reverse col">
             <div class="input-group">
                 <span class="input-group-text">De:</span>
-                <input type="date" class="form-control" placeholder="Username" aria-label="Username" name="start_date">
+                <input type="date" class="form-control" placeholder="Username" aria-label="Username" name="start_date" value={{$form['start_date']}}>
                 <span class="input-group-text">Até:</span>
-                <input type="date" class="form-control" placeholder="Server" aria-label="Server" name="end_date">
+                <input type="date" class="form-control" placeholder="Server" aria-label="Server" name="end_date" value={{$form['end_date']}}>
             </div>
         </div>
 
@@ -23,6 +23,7 @@
         <th scope="col">Valor da tranferencia</th>
         <th scope="col">Valor das taxas</th>
         <th scope="col">Data</th>
+        <th scope="col">Status</th>
       </tr>
     </thead>
     <tbody>
@@ -45,6 +46,7 @@
                     <td><b>R$@currence_cents($transaction->amount)</b></td>
                     <td><b>R$@currence_cents($transaction->tax_amount)</b></td>
                     <td>{{date('d/m/Y h:i', strtotime($transaction->created_at))}}</td>
+                    <td>{{$transactionTypeLabel[$transaction->status]}}</td>
                 </tr>
             @endforeach
         @endisset

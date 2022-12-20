@@ -11,9 +11,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\BanksListController;
-use App\Http\Controllers\UserController;
 use App\Models\BankAccount;
 use App\Types\OperatorType;
+use App\Types\TransactionStatusType;
 use App\Types\TransactionType;
 use DateTime;
 
@@ -387,9 +387,57 @@ class DashboardController extends Controller
         $bank = $banksListController->showByCode($bankAccount->code);
         $banksList = $banksListController->list();
 
+        $isEmpty = (count($form) == 0) ? true : false;
         
-        
+        if ($isEmpty) {
+            $endDate = date("Y-m-d");
+            $startDate = date_create($endDate);
+            date_sub($startDate, date_interval_create_from_date_string("30 days"));
+            $startDate = date_format($startDate,"Y-m-d");
+            $form["start_date"] = $startDate;
+            $form["end_date"] = $endDate;
+        };
+
         $transactionsList = $transactionController->showBetweenDates("uuid", $user->uuid, $form["start_date"], $form["end_date"]);
+
+        $transactionTypeLabel = [];
+        foreach (TransactionStatusType::cases() as $item) {
+            $name = "";
+            switch ($item->value) {
+                case 'transient':
+                    $name = "Em Transicao";
+                    break;
+                
+                case 'error':
+                    $name = "Erro";
+                    break;
+                
+                case 'denied':
+                    $name = "Negado";
+                    break;
+
+                case 'incomplete':
+                    $name = "Incompleto";
+                    break;
+
+                case 'processing':
+                    $name = "Processando";
+                    break;
+
+                case 'paided':
+                    $name = "Pago";
+                    break;
+
+                case 'canceled':
+                    $name = "Cancelado";
+                    break;
+                                    
+                default:
+                    $name = $item->value;
+                    break;
+            }
+            $transactionTypeLabel[$item->value] = $name;
+        };
 
         return view(
             'bankStatement', 
@@ -399,7 +447,9 @@ class DashboardController extends Controller
                 "userBank" => $bank, 
                 "banksList" => $banksList, 
                 "cashout" => $cashOut, 
-                "transactionsList" => $transactionsList
+                "transactionsList" => $transactionsList,
+                "form" => $form,
+                "transactionTypeLabel" => $transactionTypeLabel
             ]
         );
     }
