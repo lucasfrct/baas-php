@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\TransactionCheckController;
+use App\Http\Controllers\AdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +27,8 @@ Route::get('/logout', [UserController::class, 'logout'])->name('logout');
 
 Route::get('/signin', [UserController::class, 'signinCreate'])->name('signin');
 Route::post('/signin', [UserController::class, 'signinStore'])->name('signin');
+
+Route::get('/admin', [AdminController::class, 'index'])->name('index')->middleware('auth');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
 Route::post('/dashboard/transaction/check', [DashboardController::class, 'transactionCheck'])->name('transactionCheck')->middleware('auth');

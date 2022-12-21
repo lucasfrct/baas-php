@@ -28,7 +28,7 @@ class BanksListController extends Controller
 {
     public function seed(): BanksList
     {
-        return $this->record('NU PAGAMENTOS - IP', 'NUBANK', '24410913000144', "260", 18236120);
+        return $this->record('CAIXA ECONOMICA FEDERAL', 'CAIXA ECONOMICA FEDERAL', '00360305000104', "104", 00360305);
     }
 
     /**
