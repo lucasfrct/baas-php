@@ -32,7 +32,9 @@
                 <ul class="list-group">
                     @isset($banksList)
                         @foreach ($banksList as $bank)
-                            <li class="list-group-item" aria-current="true">{{$bank->company}}</li>
+                            <li class="list-group-item" aria-current="true">{{$bank->company}}
+                                <a href="http://localhost:8000/admin" target="_self">{{$bank->ispb}}</a>
+                            </li>
                         @endforeach
                     @endisset
                 </ul>
