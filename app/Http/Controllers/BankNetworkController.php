@@ -74,4 +74,9 @@ class BankNetworkController extends BaseController
     {
         return BanksNetwork::where("uid", "=", $uid)->first();
     }
+
+    public function showByIspb($ispb): BanksNetwork
+    {
+        return BanksNetwork::where("ispb", "=", $ispb)->first();
+    }
 }

@@ -219,7 +219,16 @@ class TransactionController extends BaseController
         return $payeds + $receiveds;
     }
 
-    public function showBetweenDates($key, $value, $from, $until)
+    /**
+     * * Retorna todas as transacoes dentro de um dado periodo de tempo
+     *
+     * @param [string] $key: assume dois valores - "uid" e "uuid" - uid para empresas e uuid para o usuario
+     * @param [string] $id: uuid ou uid identificador de um usuario ou uma empresa
+     * @param [string] $from: data de inicio da pesquisa
+     * @param [string] $until: data de fim da pesquisa
+     * @return [array] Transaction: Lista de transacoes entre datas
+     */
+    public function showBetweenDates($key, $id, $from, $until)
     {
         try {
             $userController = new UserController();
@@ -228,8 +237,8 @@ class TransactionController extends BaseController
 
             $untilNormalized = date('Y-m-d', strtotime($until. ' + 1 days'));
     
-            $transactions = Transaction::where(function($query) use($key, $value){
-            return $query->orWhere("payer_{$key}", "=", $value)->orWhere("receipient_{$key}", "=", $value);
+            $transactions = Transaction::where(function($query) use($key, $id){
+            return $query->orWhere("payer_{$key}", "=", $id)->orWhere("receipient_{$key}", "=", $id);
             })->whereBetween('created_at', [$from, $untilNormalized])->get();
     
             $transactionsData = [];
@@ -508,5 +517,14 @@ class TransactionController extends BaseController
             $this->updateStatus($transaction->uid, TransactionStatusType::Paided);
             sleep(1);
         }
+    }
+
+    public function showPaginationByIspb($ispb, $page, $perpage) 
+    {
+        $transactions = Transaction::where(function($query) use($ispb){
+            return $query->orWhere("payer_bank_ispb", "=", $ispb)->orWhere("receipient_bank_ispb", "=", $ispb);
+        })->paginate($perpage, ["*"], "transactions", $page);
+
+        return $transactions;
     }
 }

@@ -37,4 +37,8 @@ class BanksList extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    public function getIspbAttribute($ispb) {
+        return str_pad($ispb, 8, '0', STR_PAD_LEFT);
+    }
 }
