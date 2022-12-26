@@ -79,4 +79,5 @@ class BankNetworkController extends BaseController
     {
         return BanksNetwork::where("ispb", "=", $ispb)->first();
     }
+
 }

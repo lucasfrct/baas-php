@@ -42,9 +42,27 @@
         </div>
 
         <div class="col-8 border border-danger">
-
+            <div class="row">
+                <div class="col-4">
+                    @isset($balance)
+                        <h2>Saldo: R$ @currence_cents($balance)</h2>
+                    @endisset
+                </div>
+                <div class="col-4">
+                    @isset($prevBalance)
+                        <h2>Saldo anterior: R$ @currence_cents($prevBalance)</h2>
+                    @endisset
+                </div>
+                <div class="col-4">
+                    @isset($total)
+                        <h2>Transacoes: {{$total}}</h2>
+                    @endisset
+                </div>
+                <div class="col-12">
+                    @include('statementTable')
+                </div>
+            </div>            
         </div>
-
     </main>
 
     @include('footer')

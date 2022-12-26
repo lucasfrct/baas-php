@@ -521,10 +521,83 @@ class TransactionController extends BaseController
 
     public function showPaginationByIspb($ispb, $page, $perpage) 
     {
-        $transactions = Transaction::where(function($query) use($ispb){
-            return $query->orWhere("payer_bank_ispb", "=", $ispb)->orWhere("receipient_bank_ispb", "=", $ispb);
+        $userController = new UserController();
+        $banksNetworkController = new BankNetworkController();
+        $bankListController = new BanksListController();
+
+        $bankNetwork = $banksNetworkController->showByIspb($ispb);
+        $transactions = Transaction::where(function($query) use($bankNetwork){
+            return $query->orWhere("payer_uid", "=", $bankNetwork->uid)->orWhere("receipient_uid", "=", $bankNetwork->uid);
         })->paginate($perpage, ["*"], "transactions", $page);
 
-        return $transactions;
+        $transactionsData = [];
+            foreach ($transactions as $transaction) {
+
+                if (!empty($transaction->payer_uuid)) {
+                    $transaction->payerUser = $userController->showByUuid($transaction->payer_uuid);
+                }
+
+                if (!empty($transaction->payer_uid)) {
+                    $bankNetwork = $banksNetworkController->showByUid($transaction->payer_uid);
+                    $transaction->payerUser = $bankListController->showByIspb($bankNetwork->ispb);
+                }
+
+                if (!empty($transaction->receipient_uuid)) {
+                    $transaction->receipientUser = $userController->showByUuid($transaction->receipient_uuid);
+                }
+
+                if (!empty($transaction->receipient_uid)) {
+                    $bankNetwork = $banksNetworkController->showByUid($transaction->receipient_uid);
+                    $transaction->receipientUser = $bankListController->showByIspb($bankNetwork->ispb);
+                }
+                
+                $transactionsData[] = $transaction;
+            }
+
+        return [$transactionsData, $transactions->total, $transactions->currentPage, $transactions->perPage, $transactions->lastPage];
+    }
+
+    public function typeLabel() 
+    {
+        $transactionTypeLabel = [];
+        foreach (TransactionStatusType::cases() as $item) {
+            $name = "";
+            switch ($item->value) {
+                case 'transient':
+                    $name = "Em Transicao";
+                    break;
+                
+                case 'error':
+                    $name = "Erro";
+                    break;
+                
+                case 'denied':
+                    $name = "Negado";
+                    break;
+
+                case 'incomplete':
+                    $name = "Incompleto";
+                    break;
+
+                case 'processing':
+                    $name = "Processando";
+                    break;
+
+                case 'paided':
+                    $name = "Pago";
+                    break;
+
+                case 'canceled':
+                    $name = "Cancelado";
+                    break;
+                                    
+                default:
+                    $name = $item->value;
+                    break;
+            }
+            $transactionTypeLabel[$item->value] = $name;
+        };
+
+        return $transactionTypeLabel;
     }
 }

@@ -375,7 +375,6 @@ class DashboardController extends Controller
     public function bankStatement(Request $request) {
 
         $form = $request->all();
-        // dd($form);
 
         $bankAccountController = new BankAccountController();
         $transactionController = new TransactionController();
@@ -400,44 +399,7 @@ class DashboardController extends Controller
 
         $transactionsList = $transactionController->showBetweenDates("uuid", $user->uuid, $form["start_date"], $form["end_date"]);
 
-        $transactionTypeLabel = [];
-        foreach (TransactionStatusType::cases() as $item) {
-            $name = "";
-            switch ($item->value) {
-                case 'transient':
-                    $name = "Em Transicao";
-                    break;
-                
-                case 'error':
-                    $name = "Erro";
-                    break;
-                
-                case 'denied':
-                    $name = "Negado";
-                    break;
-
-                case 'incomplete':
-                    $name = "Incompleto";
-                    break;
-
-                case 'processing':
-                    $name = "Processando";
-                    break;
-
-                case 'paided':
-                    $name = "Pago";
-                    break;
-
-                case 'canceled':
-                    $name = "Cancelado";
-                    break;
-                                    
-                default:
-                    $name = $item->value;
-                    break;
-            }
-            $transactionTypeLabel[$item->value] = $name;
-        };
+        $transactionTypeLabel = $transactionController->typeLabel();
 
         return view(
             'bankStatement', 

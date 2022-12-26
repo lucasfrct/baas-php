@@ -21,10 +21,27 @@ class BalanceController extends BaseController
         return $bankAccount->balance + $bankAccount->prev_balance;
     }
 
+    public function currentMonthByIspb(string $ispb): int
+    {
+        $bankNetworkController = new BankNetworkController;
+
+        $bankNetwork = $bankNetworkController->showByIspb($ispb);
+
+        return $bankNetwork->balance + $bankNetwork->prev_balance;
+    }
+
     public function lastMonth(string $uuid){
         $bankAccount = BankAccount::where("uuid", "=", $uuid)->first();
 
         return $bankAccount->prev_balance;
+    }
+
+    public function lastMonthByIspb(string $ispb){
+        $bankNetworkController = new BankNetworkController;
+
+        $bankNetwork = $bankNetworkController->showByIspb($ispb);
+
+        return $bankNetwork->prev_balance;
     }
 
     public function processTransactions(string $uuid): int{

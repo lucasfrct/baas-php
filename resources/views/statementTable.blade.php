@@ -1,19 +1,22 @@
-<div class="row d-flex flex-row-reverse">
-    <form action="{{route('bankStatement')}}" method="GET" class="border border-grey-200 rounded-3 row px-1 py-3 col-6 me-3 mb-3">
-        <div class="d-flex flex-row-reverse col">
-            <div class="input-group">
-                <span class="input-group-text">De:</span>
-                <input type="date" class="form-control" placeholder="Username" aria-label="Username" name="start_date" value={{$form['start_date']}}>
-                <span class="input-group-text">Até:</span>
-                <input type="date" class="form-control" placeholder="Server" aria-label="Server" name="end_date" value={{$form['end_date']}}>
+@isset($form['start_date'])
+    <div class="row d-flex flex-row-reverse">
+        <form action="{{route('bankStatement')}}" method="GET" class="border border-grey-200 rounded-3 row px-1 py-3 col-6 me-3 mb-3">
+            <div class="d-flex flex-row-reverse col">
+                <div class="input-group">
+                    <span class="input-group-text">De:</span>
+                    <input type="date" class="form-control" placeholder="Username" aria-label="Username" name="start_date" value={{$form['start_date']}}>
+                    <span class="input-group-text">Até:</span>
+                    <input type="date" class="form-control" placeholder="Server" aria-label="Server" name="end_date" value={{$form['end_date']}}>
+                </div>
             </div>
-        </div>
 
-        <div class="d-flex flex-row-reverse col-3">
-            <button type="submit" class="btn btn-primary btn-sm px-5 py-0" style="height: 38px">Buscar</button>
-        </div>
-    </form>
-</div>
+            <div class="d-flex flex-row-reverse col-3">
+                <button type="submit" class="btn btn-primary btn-sm px-5 py-0" style="height: 38px">Buscar</button>
+            </div>
+        </form>
+    </div>
+@endisset
+
 <table class="table">
     <thead>
       <tr>
