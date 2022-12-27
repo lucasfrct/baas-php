@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 use Ramsey\Uuid\Uuid;
 
@@ -554,7 +555,8 @@ class TransactionController extends BaseController
                 $transactionsData[] = $transaction;
             }
 
-        return [$transactionsData, $transactions->total, $transactions->currentPage, $transactions->perPage, $transactions->lastPage];
+
+        return [$transactionsData, $transactions->total(), $transactions->currentPage(), $transactions->perPage(), $transactions->lastPage()];
     }
 
     public function typeLabel() 

@@ -24,16 +24,16 @@
 
     @include('header')
 
-    <main class="row container-fluid p-0 m-0">
+    <main class="row container-fluid p-5 m-0">
 
-        <div class="col-4 border border-danger">
-            <aside class="border border-info mt-5 mb-4">
+        <div class="col-4 border-right-1">
+            <aside class="mt-5 mb-4">
                 <h4 class="p-3">Lista de Bancos</h4>
                 <ul class="list-group">
                     @isset($banksList)
                         @foreach ($banksList as $bank)
-                            <li class="list-group-item" aria-current="true">
-                                <a href="/admin?ispb={{$bank->ispb}}" target="_self">{{$bank->company}} {{$bank->ispb}}</a>
+                            <li class="list-group-item p-3" aria-current="true">
+                                {{$bank->company}}<a class="cp-link" href="/admin?ispb={{$bank->ispb}}" target="_self"> {{$bank->ispb}}</a>
                             </li>
                         @endforeach
                     @endisset
@@ -41,24 +41,25 @@
             </aside>
         </div>
 
-        <div class="col-8 border border-danger">
+        <div class="col-8">
             <div class="row">
-                <div class="col-4">
+                <div class="col-4 p-2">
                     @isset($balance)
-                        <h2>Saldo: R$ @currence_cents($balance)</h2>
+                        <h4 class="text-center text-success border border-success p-3 rounded">Saldo: R$ @currence_cents($balance)</h4>
                     @endisset
                 </div>
-                <div class="col-4">
+                <div class="col-4 p-2">
                     @isset($prevBalance)
-                        <h2>Saldo anterior: R$ @currence_cents($prevBalance)</h2>
+                        <h4 class="text-center text-info border border-info p-3 rounded">Saldo anterior: R$ @currence_cents($prevBalance)</h4>
                     @endisset
                 </div>
-                <div class="col-4">
+                <div class="col-4 p-2">
                     @isset($total)
-                        <h2>Transacoes: {{$total}}</h2>
+                        <h4 class="text-center text-primary border border-primary p-3 rounded">Transações: {{$total}}</h4>
                     @endisset
                 </div>
-                <div class="col-12">
+                <div class="col-12 p-2 text-center">
+                    <hr class="my-4">
                     @include('statementTable')
                 </div>
             </div>            
