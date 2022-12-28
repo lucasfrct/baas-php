@@ -240,7 +240,7 @@ class TransactionController extends BaseController
     
             $transactions = Transaction::where(function($query) use($key, $id){
             return $query->orWhere("payer_{$key}", "=", $id)->orWhere("receipient_{$key}", "=", $id);
-            })->whereBetween('created_at', [$from, $untilNormalized])->get();
+            })->whereBetween('created_at', [$from, $untilNormalized])->orderBy('updated_at', 'desc')->get();
     
             $transactionsData = [];
             foreach ($transactions as $transaction) {
@@ -261,6 +261,14 @@ class TransactionController extends BaseController
                 if (!empty($transaction->receipient_uid)) {
                     $bankNetwork = $banksNetworkController->showByUid($transaction->receipient_uid);
                     $transaction->receipientUser = $bankListController->showByIspb($bankNetwork->ispb);
+                }
+
+                if ($transaction->payer_uuid == $id || $transaction->payer_uid == $id) {
+                    $transaction->type = TransactionType::CashOut->value;
+                }
+
+                if ($transaction->receipient_uuid == $id || $transaction->receipient_uid == $id) {
+                    $transaction->type = TransactionType::CashIn->value;
                 }
                 
                 $transactionsData[] = $transaction;
@@ -401,6 +409,10 @@ class TransactionController extends BaseController
         if (!$this->receipientAccountData->enabled) {
             throw new Error('A conta do usuario esta desativada por tempo indeterminado!');
         }
+
+        if ($payerUuid == $this->receipientData->uuid) {
+            throw new Error('A conta do recebedor não pode ser igual a do pagador!');
+        }
         
         // ? ####################################################################################################
         // ? CARREGANDO A INTEGRACAO DA REDE BANCARIA DO PAGADOR
@@ -435,7 +447,7 @@ class TransactionController extends BaseController
         
         $this->banksReceipients = [];
         foreach ($this->integrations as $integration) {// 2^2
-            $this->banksReceipients = array_merge($this->banksReceipients, $this->bankNetworkController->taxFilter($integration, $this->packages));
+            $this->banksReceipients = array_merge($this->banksReceipients, $this->bankNetworkController->taxFilter($integration, $this->packages, $this->receipientBank->code));
         };
 
         return [$this->receipientData, $this->receipientBankAccount, $this->receipientBank, $this->packagesAmount, $this->amountCharge];
@@ -529,7 +541,7 @@ class TransactionController extends BaseController
         $bankNetwork = $banksNetworkController->showByIspb($ispb);
         $transactions = Transaction::where(function($query) use($bankNetwork){
             return $query->orWhere("payer_uid", "=", $bankNetwork->uid)->orWhere("receipient_uid", "=", $bankNetwork->uid);
-        })->paginate($perpage, ["*"], "transactions", $page);
+        })->orderBy('updated_at', 'desc')->paginate($perpage, ["*"], "transactions", $page);
 
         $transactionsData = [];
             foreach ($transactions as $transaction) {
@@ -551,6 +563,14 @@ class TransactionController extends BaseController
                     $bankNetwork = $banksNetworkController->showByUid($transaction->receipient_uid);
                     $transaction->receipientUser = $bankListController->showByIspb($bankNetwork->ispb);
                 }
+
+                if ($transaction->payer_uid == $bankNetwork->uid) {
+                    $transaction->type = TransactionType::CashOut->value;
+                }
+
+                if ($transaction->receipient_uid == $bankNetwork->uid) {
+                    $transaction->type = TransactionType::CashIn->value;
+                }
                 
                 $transactionsData[] = $transaction;
             }
@@ -559,7 +579,7 @@ class TransactionController extends BaseController
         return [$transactionsData, $transactions->total(), $transactions->currentPage(), $transactions->perPage(), $transactions->lastPage()];
     }
 
-    public function typeLabel() 
+    public function statusLabel() 
     {
         $transactionTypeLabel = [];
         foreach (TransactionStatusType::cases() as $item) {
@@ -591,6 +611,34 @@ class TransactionController extends BaseController
 
                 case 'canceled':
                     $name = "Cancelado";
+                    break;
+                                    
+                default:
+                    $name = $item->value;
+                    break;
+            }
+            $transactionTypeLabel[$item->value] = $name;
+        };
+
+        return $transactionTypeLabel;
+    }
+
+    public function typeLabel() 
+    {
+        $transactionTypeLabel = [];
+        foreach (TransactionType::cases() as $item) {
+            $name = "";
+            switch ($item->value) {
+                case 'cashin':
+                    $name = $item->value;
+                    break;
+                
+                case 'cashout':
+                    $name = $item->value;
+                    break;
+                
+                case 'bankslip':
+                    $name = $item->value;
                     break;
                                     
                 default:

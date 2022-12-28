@@ -31,14 +31,13 @@ class AdminController extends BaseController
             list($transactionsList, $total, $currentPage, $perPage, $lastPage) = $transactionController->showPaginationByIspb($bankNetwork->ispb, $page, $perpage);
             $balance = $balanceController->currentMonthByIspb($params['ispb']);
             $prevBalance = $balanceController->lastMonthByIspb($params['ispb']);
-            // dd($transactionsList);
         }
         
+        $transactionStatusLabel = $transactionController->statusLabel();
         $transactionTypeLabel = $transactionController->typeLabel();
 
         // $banksListController->seed();
         $banksList = $banksListController->list();
-
 
         return view(
             'admin', 
@@ -46,6 +45,7 @@ class AdminController extends BaseController
             'balance' => $balance, 
             'prevBalance' => $prevBalance, 
             'transactionsList' => $transactionsList, 
+            'transactionStatusLabel' => $transactionStatusLabel,
             'transactionTypeLabel' => $transactionTypeLabel,
             'total' => $total
         ]);

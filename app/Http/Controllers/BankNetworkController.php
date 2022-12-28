@@ -12,7 +12,7 @@ class BankNetworkController extends BaseController
 {
     public function seed(){
 
-        $this->record("XXX000", '010', OperatorType::Checking, 18236120, "001", ["001"], '24410913000144', 10000, 10000);
+        $this->record("XXX002", '010', OperatorType::Checking, 00360305, "001", ["001"], '00360305000104', 10000, 10000);
     }
 
     public function record(string $number, string $branch, OperatorType $operator, int $ispb, string $code, array $tax_codes, string $document, int $prev_balance, int $balance){
@@ -46,19 +46,21 @@ class BankNetworkController extends BaseController
         $bankNetworkData->save();
     }
 
-    public function taxFilter($integration, array $packages): array {
+    public function taxFilter($integration, array $packages, string $bankCode): array {
         $banksReceipients = [];
         foreach ($integration->bankNetwork as $bank) {// 2^2*2^3
-            foreach ($bank->tax_codes as $code) {// 2^3*2^4
-                foreach ($packages as $package) {// 2^4*2^5
-                    foreach ($package->taxes as $tax) {// 2^5*2^6
-                        if ($code == $tax->code) {
-                            $bank->tax_amount = $tax->amount;
-                            $bank->packages_codes[] = $package->code;
-                            $banksReceipients[] = clone $bank;
-                        };
-                    }
-                }                
+            if ($bankCode == $bank->code) {
+                foreach ($bank->tax_codes as $taxCode) {// 2^3*2^4
+                    foreach ($packages as $package) {// 2^4*2^5
+                        foreach ($package->taxes as $tax) {// 2^5*2^6
+                            if ($taxCode == $tax->code) {
+                                $bank->tax_amount = $tax->amount;
+                                $bank->packages_codes[] = $package->code;
+                                $banksReceipients[] = clone $bank;
+                            };
+                        }
+                    }                
+                }
             }
         }
 

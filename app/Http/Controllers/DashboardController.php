@@ -399,6 +399,7 @@ class DashboardController extends Controller
 
         $transactionsList = $transactionController->showBetweenDates("uuid", $user->uuid, $form["start_date"], $form["end_date"]);
 
+        $transactionStatusLabel = $transactionController->statusLabel();
         $transactionTypeLabel = $transactionController->typeLabel();
 
         return view(
@@ -411,6 +412,7 @@ class DashboardController extends Controller
                 "cashout" => $cashOut, 
                 "transactionsList" => $transactionsList,
                 "form" => $form,
+                "transactionStatusLabel" => $transactionStatusLabel,
                 "transactionTypeLabel" => $transactionTypeLabel
             ]
         );
